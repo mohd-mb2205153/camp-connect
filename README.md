@@ -36,23 +36,13 @@ CampConnect is a Flutter-based mobile application designed to bridge the gap bet
 
 ---
 
-## Running/Testing the Project
+## Running the Project
 
-1. **Run on Emulator or Device:**
+- **Run on Emulator or Device:**
    - Connect a physical device via USB or launch an emulator.
    - Execute:
      ```bash
      flutter run
-     ```
-
-2. **Testing:**
-   - Run automated tests:
-     ```bash
-     flutter test
-     ```
-   - For widget tests:
-     ```bash
-     flutter test test/widget_test.dart
      ```
 
 ---
