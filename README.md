@@ -14,11 +14,7 @@ CampConnect is a Flutter-based mobile application designed to bridge the gap bet
 - Ensure you have a connected device or emulator to run the app
 
 ### Steps
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/connected.git
-   cd connected
-   ```
+1. Clone the repository
 2. Install dependencies:
    ```bash
    flutter pub get
