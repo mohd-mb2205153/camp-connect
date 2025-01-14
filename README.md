@@ -45,10 +45,10 @@ CampConnect is a Flutter-based mobile application designed to bridge the gap bet
 
 ## Credits
 - **Development Team:**
-  - Marcus Monteiro 
-  - Fahrel Hidayat
-  - Mohd Muhtasim Bashar
-  - Mohd Shahriar Alam
+  - Marcus Monteiro - marcuswein0210@gmail.com
+  - Fahrel Hidayat - fahrelazki@gmail.com
+  - Mohd Muhtasim Bashar - muhtasim2k2@gmail.com
+  - Mohammad Mansib - mohdmansib@gmail.com
 
 ---
 
