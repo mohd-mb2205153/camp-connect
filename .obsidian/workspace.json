@@ -164,6 +164,9 @@
   },
   "active": "23ad8c3a8eb74b03",
   "lastOpenFiles": [
+    "campconnect/lib/screens/logged_in_user_provider.dart",
+    "campconnect/assets/countries.json",
+    "campconnect/assets",
     "Planning Documentation for CampConnect (Coding ).md"
   ]
 }
