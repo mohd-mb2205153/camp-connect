@@ -1,3 +1,4 @@
+import 'package:campconnect/google_map.dart';
 import 'package:campconnect/screens/home_screen.dart';
 import 'package:campconnect/screens/onboarding_screens/login_screen.dart';
 import 'package:campconnect/screens/maps_screen.dart';
@@ -43,7 +44,7 @@ class AppRouter {
           GoRoute(
               name: map.name,
               path: map.path,
-              builder: (context, state) => const MapsScreen()),
+              builder: (context, state) => const MapSample()),
           GoRoute(
               name: profile.name,
               path: profile.path,
