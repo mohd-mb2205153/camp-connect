@@ -1,3 +1,5 @@
+import 'package:campconnect/models/camp.dart';
+
 import 'user.dart';
 
 class Student extends User {
@@ -8,6 +10,7 @@ class Student extends User {
   String specialNeeds; // Accessibility requirements (optional)
   String currentLocation; // Automatically detected via GPS
   String preferredDistanceForCamps; // e.g., "Within 5 km"
+  List<String> enrolledCamps;
 
   Student({
     required super.firstName,
@@ -25,6 +28,7 @@ class Student extends User {
     this.specialNeeds = '',
     required this.currentLocation,
     required this.preferredDistanceForCamps,
+    required this.enrolledCamps
   }) : super(
           role: 'student',
         );
@@ -46,6 +50,7 @@ class Student extends User {
       specialNeeds: json['specialNeeds'] ?? '',
       currentLocation: json['currentLocation'],
       preferredDistanceForCamps: json['preferredDistanceForCamps'],
+      enrolledCamps: List<String>.from(json['enrolledCamps'])
     );
   }
 
@@ -60,6 +65,7 @@ class Student extends User {
         'specialNeeds': specialNeeds,
         'currentLocation': currentLocation,
         'preferredDistanceForCamps': preferredDistanceForCamps,
+        'enrolledCamps': enrolledCamps
       });
   }
 }

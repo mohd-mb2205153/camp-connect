@@ -1,3 +1,5 @@
+import 'package:campconnect/models/camp.dart';
+
 import 'user.dart';
 
 class Teacher extends User {
@@ -9,6 +11,7 @@ class Teacher extends User {
   String willingnessToTravel; // e.g., "Within 10 km"
   String availabilitySchedule; // Days and times available
   String preferredCampDuration; // e.g., "Short-term"
+  List<String> enrolledCamps;
 
   Teacher({
     required super.firstName,
@@ -27,6 +30,7 @@ class Teacher extends User {
     required this.willingnessToTravel,
     required this.availabilitySchedule,
     required this.preferredCampDuration,
+    required this.enrolledCamps
   }) : super(
           role: 'teacher',
         );
@@ -49,6 +53,7 @@ class Teacher extends User {
       willingnessToTravel: json['willingnessToTravel'],
       availabilitySchedule: json['availabilitySchedule'],
       preferredCampDuration: json['preferredCampDuration'],
+      enrolledCamps: List<String>.from(json['enrolledCamps'])
     );
   }
 
@@ -64,6 +69,7 @@ class Teacher extends User {
         'willingnessToTravel': willingnessToTravel,
         'availabilitySchedule': availabilitySchedule,
         'preferredCampDuration': preferredCampDuration,
+        'enrolledCamps': enrolledCamps
       });
   }
 }
