@@ -4,7 +4,8 @@ import 'package:campconnect/screens/onboarding_screens/login_screen.dart';
 import 'package:campconnect/screens/maps_screen.dart';
 import 'package:campconnect/screens/notifications_screen.dart';
 import 'package:campconnect/screens/onboarding_screens/onboarding_screen.dart';
-import 'package:campconnect/screens/profile_screen.dart';
+import 'package:campconnect/screens/profile_settings_screens/personal_info_screen.dart';
+import 'package:campconnect/screens/profile_settings_screens/profile_screen.dart';
 import 'package:campconnect/screens/onboarding_screens/register_screen.dart';
 import 'package:campconnect/screens/shell_screen.dart';
 import 'package:go_router/go_router.dart';
@@ -17,6 +18,9 @@ class AppRouter {
   static const map = (name: 'maps', path: '/maps');
   static const profile = (name: 'profile', path: '/profile');
   static const notifications = (name: 'notifications', path: '/notifications');
+
+  //Profile Settings routes
+  static const personal = (name: 'personal', path: '/profile/personal');
 
   static final router = GoRouter(
     initialLocation: onboarding.path,
@@ -46,9 +50,17 @@ class AppRouter {
               path: map.path,
               builder: (context, state) => const MapSample()),
           GoRoute(
-              name: profile.name,
-              path: profile.path,
-              builder: (context, state) => const ProfileScreen()),
+            name: profile.name,
+            path: profile.path,
+            builder: (context, state) => const ProfileScreen(),
+            routes: [
+              GoRoute(
+                path: personal.path,
+                name: personal.name,
+                builder: (context, state) => const PersonalInfoScreen(),
+              ),
+            ],
+          ),
           GoRoute(
               name: notifications.name,
               path: notifications.path,

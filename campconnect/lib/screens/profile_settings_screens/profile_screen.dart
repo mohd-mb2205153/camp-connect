@@ -1,5 +1,7 @@
+import 'package:campconnect/routes/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -58,6 +60,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     Text('First Name'),
                     Text('Last Name'),
                     Text('email@gmail.com'),
+                    Text('Role'),
                   ],
                 ),
               ],
@@ -72,7 +75,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             const SizedBox(
               height: 10,
             ),
-            buildMenuItem(const Icon(Icons.person), 'Personal Information'),
+            buildMenuItem(
+              const Icon(Icons.person),
+              'Personal Information',
+              () => context.push(AppRouter.personal.path),
+            ),
             buildMenuItem(
                 const Icon(Icons.menu_book_rounded), 'Educational Information'),
             buildMenuItem(const Icon(Icons.tune), 'Preferences'),
@@ -84,7 +91,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-  Widget buildMenuItem(Icon icon, String title) {
+  //For now onPressed is optional.
+  Widget buildMenuItem(Icon icon, String title, [Function()? onPressed]) {
     return Column(
       children: [
         ListTile(
@@ -95,7 +103,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
           trailing: IconButton(
             icon: const Icon(Icons.chevron_right),
-            onPressed: () {},
+            onPressed: onPressed,
           ),
         ),
         Divider(
