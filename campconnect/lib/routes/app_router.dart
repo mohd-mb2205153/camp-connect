@@ -23,7 +23,7 @@ class AppRouter {
   static const personal = (name: 'personal', path: '/profile/personal');
 
   static final router = GoRouter(
-    initialLocation: onboarding.path,
+    initialLocation: home.path,
     routes: [
       GoRoute(
           path: onboarding.path,
