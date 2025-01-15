@@ -1,6 +1,9 @@
+import 'package:campconnect/routes/app_router.dart';
+import 'package:campconnect/theme/styling_constants.dart';
 import 'package:campconnect/utils/helper_widgets.dart'; // For Assets and screenWidth helper
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
@@ -13,120 +16,82 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Column(
+      resizeToAvoidBottomInset: false,
+      body: Stack(
         children: [
-          // Top Section
-          Expanded(
-            flex: 1,
-            child: Container(
-              width: double.infinity,
-              color: const Color.fromARGB(255, 247, 247, 247),
-              child: Stack(
-                children: [
-                  // Top-left logo
-                  Positioned(
-                    top: 40,
-                    left: 16,
-                    child: SizedBox(
-                      width: 120,
-                      child: Image.asset(
-                        Assets.image('campconnect_textlogo_1500px.png'),
-                      ),
-                    ),
-                  ),
-                  // Centered bottom logo
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 20),
-                      child: SizedBox(
-                        width: screenWidth(context) * 0.6,
-                        child: Image.asset(
-                          Assets.image('campconnect_logo_1152px.png'),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+          // Background Image
+          Positioned.fill(
+            child: Image.asset(
+              Assets.image('bg1.png'),
+              fit: BoxFit.cover,
+            ),
+          ),
+          // Top-Left Logo
+          Positioned(
+            top: 40,
+            left: 24,
+            child: SizedBox(
+              width: 108,
+              child: Image.asset(
+                Assets.image('campconnect_whitetextlogo_1500px.png'),
               ),
             ),
           ),
-
-          // Bottom Section
-          Expanded(
-            flex: 1,
-            child: Container(
-              color: Colors.white,
+          // Lower Half Container
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: SizedBox(
+              width: double.infinity,
+              height: screenHeight(context) * 0.38, // occupies lower half
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 20),
-                        child: ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.transparent,
-                            side: BorderSide(
-                                color: Theme.of(context).primaryColor),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                          ),
-                          child: const Text(
-                            'Sign In',
-                            style: TextStyle(color: Colors.red),
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 40, vertical: 10),
-                        child: ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.transparent,
-                            side: const BorderSide(color: Colors.red),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                          ),
-                          child: const Text(
-                            'Create Account',
-                            style: TextStyle(color: Colors.red),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  // Circle Buttons Section
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    padding: const EdgeInsets.only(top: 12, left: 24),
+                    child: Column(
                       children: [
-                        // Donate Button
-                        IconButton(
-                          onPressed: () {
-                            // Navigate to Support Us page
-                          },
-                          icon: const Icon(Icons.volunteer_activism,
-                              color: Colors.grey),
-                          iconSize: 40,
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                "Education everywhere.",
+                                style: getTextStyle('largeBold',
+                                    color: Colors.white),
+                                softWrap: true,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 20),
-                        // Info Button
-                        IconButton(
-                          onPressed: () {
-                            // Navigate to About Us page
-                          },
-                          icon: const Icon(Icons.info_outline,
-                              color: Colors.grey),
-                          iconSize: 40,
+                        addVerticalSpace(8),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                wrapText(
+                                    "We empower safe spaces for learning, growth, and brighter futures, even in challenging times.",
+                                    37),
+                                style:
+                                    getTextStyle('small', color: Colors.white),
+                                overflow: TextOverflow.visible,
+                                softWrap: true,
+                              ),
+                            ),
+                          ],
                         ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 0, 24, 60),
+                    child: Column(
+                      children: [
+                        LoginButton(
+                            onLoginPressed: () => context
+                                .pushReplacementNamed(AppRouter.login.name)),
+                        addVerticalSpace(20),
+                        RegisterButton(
+                            onRegisterPressed: () => context
+                                .pushReplacementNamed(AppRouter.register.name)),
                       ],
                     ),
                   ),
@@ -135,6 +100,63 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class LoginButton extends StatelessWidget {
+  final VoidCallback onLoginPressed;
+
+  const LoginButton({super.key, required this.onLoginPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: 44,
+      child: ElevatedButton(
+        onPressed: onLoginPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          elevation: 0,
+        ),
+        child: Text(
+          "Sign in",
+          style: getTextStyle('smallBold', color: AppColors.lightTeal),
+        ),
+      ),
+    );
+  }
+}
+
+class RegisterButton extends StatelessWidget {
+  final VoidCallback onRegisterPressed;
+
+  const RegisterButton({super.key, required this.onRegisterPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: 44,
+      child: ElevatedButton(
+        onPressed: onRegisterPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.lightTeal,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+            side: const BorderSide(color: Colors.white, width: 1),
+          ),
+          elevation: 0,
+        ),
+        child: Text(
+          "Sign up",
+          style: getTextStyle('smallBold', color: Colors.white),
+        ),
       ),
     );
   }

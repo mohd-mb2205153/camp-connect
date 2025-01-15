@@ -12,6 +12,23 @@ Widget addHorizontalSpace(double width) {
   );
 }
 
+String wrapText(String text, int maxCharsPerLine) {
+  final words = text.split(' ');
+  StringBuffer buffer = StringBuffer();
+  int currentLineLength = 0;
+
+  for (var word in words) {
+    if (currentLineLength + word.length + 1 > maxCharsPerLine) {
+      buffer.write('\n');
+      currentLineLength = 0;
+    }
+    buffer.write(word + ' ');
+    currentLineLength += word.length + 1;
+  }
+
+  return buffer.toString().trim();
+}
+
 class Assets {
   static const _imagesBasePath = "assets/images/";
   static String image(String fileName) => '$_imagesBasePath$fileName';

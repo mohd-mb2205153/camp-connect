@@ -7,7 +7,7 @@ class AppTheme {
     scaffoldBackgroundColor: AppColors.white,
     primaryColor: AppColors.teal,
     primaryColorDark: AppColors.darkTeal,
-    primaryColorLight: AppColors.beige,
+    primaryColorLight: AppColors.lightTeal,
     dialogBackgroundColor: AppColors.darkBlue,
     colorScheme: ColorScheme.light(
       primary: AppColors.teal,
