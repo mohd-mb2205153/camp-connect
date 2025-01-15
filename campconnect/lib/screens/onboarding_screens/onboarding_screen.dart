@@ -1,3 +1,4 @@
+import 'package:campconnect/utils/helper_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -19,13 +20,10 @@ class _MyWidgetState extends ConsumerState<OnboardingScreen> {
           children: [
             Column(
               children: [
-                const SizedBox(height: 100),
-                const Text(
-                  'CCN',
-                  style: TextStyle(
-                    fontSize: 48,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue,
+                SizedBox(
+                  width: screenWidth(context) * 0.40,
+                  child: Image.asset(
+                    Assets.image('campconnect_logo_1152px.png'),
                   ),
                 ),
               ],
