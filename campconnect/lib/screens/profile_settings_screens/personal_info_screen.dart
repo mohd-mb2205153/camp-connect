@@ -1,6 +1,7 @@
-import 'dart:ui';
-
 import 'package:campconnect/providers/show_bot_nav_provider.dart';
+import 'package:campconnect/theme/frosted_glass.dart';
+import 'package:campconnect/widgets/details_row.dart';
+import 'package:campconnect/widgets/section_title_with_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -13,6 +14,18 @@ class PersonalInfoScreen extends ConsumerStatefulWidget {
 
 class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
   bool isEditing = false;
+
+  final TextEditingController firstNameController = TextEditingController();
+  final TextEditingController lastNameController = TextEditingController();
+  final TextEditingController nationalityController = TextEditingController();
+  final TextEditingController dobController = TextEditingController();
+  final TextEditingController primaryLangController = TextEditingController();
+  final TextEditingController specialNeedsController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController mobileController = TextEditingController();
+  final TextEditingController guardianMobileController =
+      TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -27,22 +40,13 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          flexibleSpace: ClipRect(
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-              child: Container(
-                color: Colors.black.withOpacity(0.2),
-              ),
-            ),
-          ),
+          elevation: 5,
           title: isEditing
               ? Text(
-                  "Editing Customer",
+                  "Editing Personal Details",
                 )
               : Text(
-                  "Customer Details",
+                  "Personal Details",
                 ),
           centerTitle: true,
           leading: IconButton(
@@ -68,7 +72,162 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
             ),
           ],
         ),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(15),
+            child: Column(
+              children: [
+                FrostedGlassBox(
+                  boxWidth: double.infinity,
+                  isCurved: true,
+                  boxChild: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: NameSection(
+                      isEditing: isEditing,
+                      controllers: [
+                        firstNameController,
+                        lastNameController,
+                        nationalityController,
+                        dobController,
+                        primaryLangController,
+                        specialNeedsController,
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                FrostedGlassBox(
+                  boxWidth: double.infinity,
+                  isCurved: true,
+                  boxChild: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: ContactSection(
+                      isEditing: isEditing,
+                      controllers: [
+                        emailController,
+                        mobileController,
+                        guardianMobileController,
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
+    );
+  }
+}
+
+class NameSection extends StatelessWidget {
+  final bool isEditing;
+  final List<TextEditingController> controllers;
+  // final User user;
+
+  const NameSection({
+    super.key,
+    required this.isEditing,
+    required this.controllers,
+    // required this.user,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SectionTitleWithIcon(
+          icon: Icons.person,
+          title: 'Personal Information',
+          child: Column(
+            children: [
+              DetailsRow(
+                label: "First Name",
+                value: 'Amr',
+                controller: isEditing ? controllers[0] : null,
+              ),
+              DetailsRow(
+                label: "Last Name",
+                value: 'Ahad',
+                controller: isEditing ? controllers[1] : null,
+              ),
+              DetailsRow(
+                label: "Nationality",
+                value: 'Iraq',
+                controller: isEditing ? controllers[2] : null,
+              ),
+              DetailsRow(
+                label: "Date of Birth",
+                value: '11-09-2004',
+                controller: isEditing ? controllers[3] : null,
+              ),
+              DetailsRow(
+                label: "Language",
+                value: 'Arabic',
+                controller: isEditing ? controllers[4] : null,
+                divider: /*(user.role == 'Student' || user.specialNeeds != '')*/
+                    false,
+              ),
+              // if (user.role == 'Student' || user.specialNeeds != '')
+              // DetailsRow(
+              //   label: "Special Needs",
+              //   value: '...',
+              //   controller: isEditing ? controllers[5] : null,
+              //   divider: false,
+              // )
+            ],
+          ),
+        )
+      ],
+    );
+  }
+}
+
+class ContactSection extends StatelessWidget {
+  final bool isEditing;
+  final List<TextEditingController> controllers;
+  // final User user;
+
+  const ContactSection({
+    super.key,
+    required this.isEditing,
+    required this.controllers,
+    // required this.user,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SectionTitleWithIcon(
+          icon: Icons.person,
+          title: 'Contact Information',
+          child: Column(
+            children: [
+              DetailsRow(
+                label: "Email",
+                value: 'enter@gmail.com',
+                controller: isEditing ? controllers[0] : null,
+              ),
+              DetailsRow(
+                label: "Mobile No.",
+                value: '30334066',
+                controller: isEditing ? controllers[1] : null,
+                divider: /*(user.role == 'Student')*/ false,
+              ),
+              // if (user.role == 'Student')
+              // DetailsRow(
+              //   label: "Guardian No.",
+              //   value: '30224077',
+              //   controller: isEditing ? controllers[2] : null,
+              //   divider: false,
+              // )
+            ],
+          ),
+        )
+      ],
     );
   }
 }
