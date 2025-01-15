@@ -44,6 +44,8 @@ dependencies:
   firebase_auth: ^5.4.0
   google_maps_flutter: ^2.10.0
   google_maps_flutter_android: ^2.14.12
+  geolocator: ^13.0.2
+  geocoding: ^3.0.0
 
 dev_dependencies:
   flutter_test:
