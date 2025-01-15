@@ -13,10 +13,10 @@ Widget addHorizontalSpace(double width) {
 }
 
 class Assets {
-  static const _imagesBasePath = "campconnect/assets/images/";
+  static const _imagesBasePath = "assets/images/";
   static String image(String fileName) => '$_imagesBasePath$fileName';
 
-  static const _dataBasePath = "campconnect/assets/";
+  static const _dataBasePath = "assets/data/";
   static String data(String fileName) => '$_dataBasePath$fileName';
 }
 
