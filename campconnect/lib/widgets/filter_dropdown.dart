@@ -16,16 +16,18 @@ class FilterDropdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: 40,
+      width: 200,
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       decoration: BoxDecoration(
-        color: AppColors.darkBlue,
+        color: Colors.transparent,
         border: Border.all(color: AppColors.darkBlue, width: 1),
         borderRadius: BorderRadius.circular(10),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           isExpanded: true,
-          dropdownColor: AppColors.darkBlue,
+          dropdownColor: Colors.white,
           value: selectedFilter,
           items: options
               .map((filter) => DropdownMenuItem(
@@ -40,10 +42,10 @@ class FilterDropdown extends StatelessWidget {
                   ))
               .toList(),
           onChanged: onSelected,
-          icon: const Icon(
-            Icons.arrow_drop_down,
-            color: AppColors.darkBlue,
-          ),
+          // icon: const Icon(
+          //   Icons.arrow_drop_down,
+          //   color: AppColors.darkBlue,
+          // ),
         ),
       ),
     );

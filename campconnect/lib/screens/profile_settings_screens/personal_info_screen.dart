@@ -1,3 +1,4 @@
+import 'package:campconnect/providers/language_provider.dart';
 import 'package:campconnect/providers/show_bot_nav_provider.dart';
 import 'package:campconnect/theme/frosted_glass.dart';
 import 'package:campconnect/theme/styling_constants.dart';
@@ -80,6 +81,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final languages = ref.watch(languagesProvider);
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
@@ -127,52 +129,61 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(15),
-            child: Column(
-              children: [
-                FrostedGlassBox(
-                  boxWidth: double.infinity,
-                  isCurved: true,
-                  boxChild: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: NameSection(
-                      isEditing: isEditing,
-                      controllers: [
-                        firstNameController,
-                        lastNameController,
-                        primaryLangController,
-                        specialNeedsController,
-                      ],
-                      dateOfBirth: dateOfBirth,
-                      countryName: countryName,
-                      selectDate: selectDate,
-                      selectNationality: selectNationality,
-                      selectedLanguage: selectedLanguage ?? 'Arabic', // Dummy
-                      languages: [],
-                      onLanguageSelected: (newLanguage) {
-                        setState(() {
-                          selectedLanguage = newLanguage;
-                        });
-                      },
+            child: Expanded(
+              child: Column(
+                children: [
+                  FrostedGlassBox(
+                    boxWidth: double.infinity,
+                    isCurved: true,
+                    boxChild: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: languages.when(
+                        data: (list) {
+                          return NameSection(
+                            isEditing: isEditing,
+                            controllers: [
+                              firstNameController,
+                              lastNameController,
+                              primaryLangController,
+                              specialNeedsController,
+                            ],
+                            dateOfBirth: dateOfBirth,
+                            countryName: countryName,
+                            selectDate: selectDate,
+                            selectNationality: selectNationality,
+                            selectedLanguage:
+                                selectedLanguage ?? 'Arabic', // Dummy
+                            languages: list,
+                            onLanguageSelected: (newLanguage) {
+                              setState(() {
+                                selectedLanguage = newLanguage;
+                              });
+                            },
+                          );
+                        },
+                        error: (err, stack) => Text('Error: $err'),
+                        loading: () => const CircularProgressIndicator(),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                FrostedGlassBox(
-                  boxWidth: double.infinity,
-                  isCurved: true,
-                  boxChild: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: ContactSection(
-                      isEditing: isEditing,
-                      controllers: [
-                        emailController,
-                        mobileController,
-                        guardianMobileController,
-                      ],
+                  const SizedBox(height: 20),
+                  FrostedGlassBox(
+                    boxWidth: double.infinity,
+                    isCurved: true,
+                    boxChild: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: ContactSection(
+                        isEditing: isEditing,
+                        controllers: [
+                          emailController,
+                          mobileController,
+                          guardianMobileController,
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -240,28 +251,32 @@ class NameSection extends StatelessWidget {
                       value: dateOfBirth ?? '11-09-2004',
                     ),
               isEditing
-                  ? Row(
-                      children: [
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 12.0),
-                            child: FilterDropdown(
-                              selectedFilter: selectedLanguage,
-                              options: languages,
-                              onSelected: (String? newLanguage) {
-                                if (newLanguage != null) {
-                                  onLanguageSelected(newLanguage);
-                                }
-                              },
-                            ),
+                  ? SizedBox(
+                      height: 48,
+                      width: MediaQuery.of(context).size.width * .8,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "First Language",
+                            style: getTextStyle('smallBold',
+                                color: AppColors.darkBlue),
                           ),
-                        ),
-                      ],
+                          FilterDropdown(
+                            selectedFilter: selectedLanguage,
+                            options: languages,
+                            onSelected: (String? newLanguage) {
+                              if (newLanguage != null) {
+                                onLanguageSelected(newLanguage);
+                              }
+                            },
+                          ),
+                        ],
+                      ),
                     )
                   : DetailsRow(
                       label: "First Language",
-                      value: 'Arabic',
-                      controller: isEditing ? controllers[2] : null,
+                      value: selectedLanguage,
                       divider: /*(user.role == 'Student')*/
                           false,
                     ),
