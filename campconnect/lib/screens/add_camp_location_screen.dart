@@ -4,8 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:lottie/lottie.dart';
+
+import '../routes/app_router.dart';
 
 class AddCampLocationScreen extends ConsumerStatefulWidget {
   const AddCampLocationScreen({super.key});
@@ -18,6 +21,7 @@ class _AddCamp extends ConsumerState<AddCampLocationScreen> {
   Completer<GoogleMapController> _googleMapController = Completer();
   late LatLng _default;
   late LatLng _scrolledLocation;
+  late String _transferString;
   CameraPosition? _initial;
   String addressStr = '';
 
@@ -57,9 +61,14 @@ class _AddCamp extends ConsumerState<AddCampLocationScreen> {
             right: MediaQuery.of(context).size.width * 0.4,
             child: SizedBox(
               width: 80,
-              child: ElevatedButton(onPressed: () {
-                
-              }, child: Text("Set")),
+              child: ElevatedButton(
+                  onPressed: () {
+                    _transferString =
+                        '${_scrolledLocation.latitude},${_scrolledLocation.longitude}';
+                    context.pushNamed(AppRouter.addCamp.name,
+                        pathParameters: {'location': _transferString});
+                  },
+                  child: Text("Set")),
             ))
       ],
     );

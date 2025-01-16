@@ -3,9 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class AddCampScreen extends ConsumerStatefulWidget {
-  //final String latitude;
-  //final String longitude;
-  const AddCampScreen({super.key, /*required this.latitude, required this.longitude*/});
+  final String location;
+  const AddCampScreen({super.key, required this.location});
 
   @override
   ConsumerState<AddCampScreen> createState() => _AddCampScreenState();
@@ -14,6 +13,8 @@ class AddCampScreen extends ConsumerStatefulWidget {
 class _AddCampScreenState extends ConsumerState<AddCampScreen> {
   @override
   Widget build(BuildContext context) {
+    String location = widget.location;
+    
     return const Placeholder();
   }
 }

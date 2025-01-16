@@ -13,24 +13,23 @@ import 'package:campconnect/screens/shell_screen.dart';
 import 'package:go_router/go_router.dart';
 
 class AppRouter {
-  static const onboarding = (name: 'onboarding', path: '/');
+  static const onboarding = (name: 'onboarding', path: '/onboarding');
   static const login = (name: 'login', path: '/login');
   static const register = (name: 'register', path: '/register');
-  static const home = (name: 'home', path: '/login/home');
-  static const map = (name: 'maps', path: '/login/maps');
-  static const profile = (name: 'profile', path: '/login/profile');
-  static const notifications =
-      (name: 'notifications', path: '/login/notifications');
+  static const home = (name: 'home', path: '/');
+  static const map = (name: 'maps', path: '/maps');
+  static const profile = (name: 'profile', path: 'profile');
+  static const notifications = (name: 'notifications', path: 'notifications');
 
   static const addCampLocation =
-      (name: "addCampLocation", path: '/login/home/addCampLocation');
+      (name: "addCampLocation", path: '/addCampLocation');
   static const addCamp =
-      (name: "addCamp", path: '/login/home/addCampLocation/addCamp:location');
+      (name: "addCamp", path: '/addCampLocation/addCamp:location');
 
   //Profile Settings routes
-  static const personal = (name: 'personal', path: '/login/profile/personal');
+  static const personal = (name: 'personal', path: '/profile/personal');
   static const educational =
-      (name: 'educational', path: '/login/profile/educational');
+      (name: 'educational', path: '/profile/educational');
 
   static final router = GoRouter(
     initialLocation: onboarding.path,
@@ -69,8 +68,7 @@ class AppRouter {
                           path: addCamp.path,
                           builder: (context, state) {
                             final location = state.pathParameters['location'];
-
-                            return AddCampScreen(/*location: location!*/);
+                            return AddCampScreen(location: location!);
                           })
                     ])
               ]),
