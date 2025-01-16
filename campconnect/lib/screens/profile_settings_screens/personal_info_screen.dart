@@ -45,6 +45,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
 
   void selectNationality(BuildContext context) {
     showCountryPicker(
+      exclude: <String>['IL'],
       useSafeArea: true,
       context: context,
       showPhoneCode: false,
@@ -224,7 +225,7 @@ class NameSection extends StatelessWidget {
                       value: dateOfBirth ?? '11-09-2004',
                     ),
               DetailsRow(
-                label: "Language",
+                label: "First Language",
                 value: 'Arabic',
                 controller: isEditing ? controllers[2] : null,
                 divider: /*(user.role == 'Student')*/
