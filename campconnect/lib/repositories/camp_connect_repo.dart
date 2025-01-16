@@ -14,11 +14,26 @@ class CampConnectRepo {
       required this.teachersRef,
       required this.campsRef});
 
+  Stream<List<Camp>> observecCamps() =>
+  campsRef.snapshots().map((snapshot) => snapshot.docs
+          .map((doc) => Camp.fromJson(doc.data() as Map<String, dynamic>))
+          .toList());
+
+  Future<Camp?> getCampById(String campId) {
+    // TODO: implement getCampById
+    throw UnimplementedError();
+  }
+
   Future<void> addCamp(Camp camp) async {
     final docId = campsRef.doc().id;
     camp.id = docId;
     await campsRef.doc(camp.id).set(camp.toJson());
   }
+
+  Future<void> updateCamp(Camp camp) =>
+      campsRef.doc(camp.id).update(camp.toJson());
+
+  Future<void> deleteCamp(Camp camp) => campsRef.doc(camp.id).delete();
 
   Future<void> addStudent(Student student) async {
     final docId = studentsRef.doc().id;
