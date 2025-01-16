@@ -47,6 +47,7 @@ dependencies:
   geolocator: ^13.0.2
   geocoding: ^3.0.0
   country_picker: ^2.0.27
+  lottie: ^3.2.0
 
 dev_dependencies:
   flutter_test:
@@ -81,6 +82,7 @@ flutter:
   assets:
     - assets/data/
     - assets/images/
+    - assets/icons/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

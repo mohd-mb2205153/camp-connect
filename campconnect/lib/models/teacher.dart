@@ -13,48 +13,49 @@ class Teacher extends User {
   String preferredCampDuration; // e.g., "Short-term"
   List<String> enrolledCamps;
 
-  Teacher({
-    required super.firstName,
-    required super.lastName,
-    required super.dateOfBirth,
-    super.gender,
-    required super.nationality,
-    required super.primaryLanguages,
-    required super.mobileNumber,
-    super.email = '',
-    required this.highestEducationLevel,
-    required this.certifications,
-    required this.teachingExperience,
-    required this.areasOfExpertise,
-    required this.preferredLocation,
-    required this.willingnessToTravel,
-    required this.availabilitySchedule,
-    required this.preferredCampDuration,
-    required this.enrolledCamps
-  }) : super(
+  Teacher(
+      {super.id,
+      required super.firstName,
+      required super.lastName,
+      required super.dateOfBirth,
+      super.gender,
+      required super.nationality,
+      required super.primaryLanguages,
+      required super.mobileNumber,
+      super.email = '',
+      required this.highestEducationLevel,
+      required this.certifications,
+      required this.teachingExperience,
+      required this.areasOfExpertise,
+      required this.preferredLocation,
+      required this.willingnessToTravel,
+      required this.availabilitySchedule,
+      required this.preferredCampDuration,
+      required this.enrolledCamps})
+      : super(
           role: 'teacher',
         );
 
   factory Teacher.fromJson(Map<String, dynamic> json) {
     return Teacher(
-      firstName: json['firstName'],
-      lastName: json['lastName'],
-      dateOfBirth: DateTime.parse(json['dateOfBirth']),
-      gender: json['gender'] ?? '',
-      nationality: json['nationality'],
-      primaryLanguages: List<String>.from(json['primaryLanguages']),
-      mobileNumber: json['mobileNumber'],
-      email: json['email'] ?? '',
-      highestEducationLevel: json['highestEducationLevel'],
-      certifications: List<String>.from(json['certifications']),
-      teachingExperience: json['teachingExperience'],
-      areasOfExpertise: List<String>.from(json['areasOfExpertise']),
-      preferredLocation: json['preferredLocation'],
-      willingnessToTravel: json['willingnessToTravel'],
-      availabilitySchedule: json['availabilitySchedule'],
-      preferredCampDuration: json['preferredCampDuration'],
-      enrolledCamps: List<String>.from(json['enrolledCamps'])
-    );
+        id: json['id'],
+        firstName: json['firstName'],
+        lastName: json['lastName'],
+        dateOfBirth: DateTime.parse(json['dateOfBirth']),
+        gender: json['gender'] ?? '',
+        nationality: json['nationality'],
+        primaryLanguages: List<String>.from(json['primaryLanguages']),
+        mobileNumber: json['mobileNumber'],
+        email: json['email'] ?? '',
+        highestEducationLevel: json['highestEducationLevel'],
+        certifications: List<String>.from(json['certifications']),
+        teachingExperience: json['teachingExperience'],
+        areasOfExpertise: List<String>.from(json['areasOfExpertise']),
+        preferredLocation: json['preferredLocation'],
+        willingnessToTravel: json['willingnessToTravel'],
+        availabilitySchedule: json['availabilitySchedule'],
+        preferredCampDuration: json['preferredCampDuration'],
+        enrolledCamps: List<String>.from(json['enrolledCamps']));
   }
 
   @override

@@ -20,7 +20,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           setState(() {
-            context.go(AppRouter.addCamp.path);
+            context.pushNamed(AppRouter.addCamp.name);
           });
         },
         child: Icon(Icons.add),

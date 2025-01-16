@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -11,65 +14,84 @@ class AddCamp extends ConsumerStatefulWidget {
 }
 
 class _AddCamp extends ConsumerState<AddCamp> {
-  late GoogleMapController _googleMapController;
-  static const CameraPosition initialCameraPosition =
-      CameraPosition(target: LatLng(37.42, -122), zoom: 14);
+  Completer<GoogleMapController> _googleMapController = Completer();
+  late LatLng _default;
+  CameraPosition? _initial;
 
-  Set<Marker> markers = {};
+  @override
+  void initState() {
+    _default = LatLng(25.3, 51.487);
+    _initial = CameraPosition(target: _default, zoom: 15);
+    _goToUserPostion();
 
-  Future<Position> getCurrentLocation() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return Future.error("Enable your Location.");
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        Future.error("Error.");
-      }
-    }
-
-    Position position = await Geolocator.getCurrentPosition();
-    return position;
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("User Current Location"),
-        centerTitle: true,
-      ),
-      body: GoogleMap(
-        initialCameraPosition: initialCameraPosition,
-        markers: markers,
-        zoomControlsEnabled: false,
-        mapType: MapType.hybrid,
-        onMapCreated: (GoogleMapController controller) {
-          _googleMapController = controller;
-        },
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-          onPressed: () async {
-            Position position = await getCurrentLocation();
-            _googleMapController.animateCamera(CameraUpdate.newCameraPosition(
-                CameraPosition(
-                    target: LatLng(position.latitude, position.longitude),
-                    zoom: 14)));
-
-            markers.add(Marker(
-                markerId: const MarkerId("Current Location"),
-                position: LatLng(position.latitude, position.longitude)));
-
-            setState(() {});
-          },
-          label: Text("Get Current Location"),
-          icon: Icon(Icons.location_city)),
+      body: _body(),
     );
+  }
+
+  Widget _body() {
+    return Stack(
+      children: [_getMap()],
+    );
+  }
+
+  Widget _getMap() {
+    return GoogleMap(
+      initialCameraPosition: _initial!,
+      mapType: MapType.hybrid,
+      onCameraIdle: () {},
+      onCameraMove: (position) {},
+      onMapCreated: (GoogleMapController controller) {
+        if (!_googleMapController.isCompleted) {
+          _googleMapController.complete(controller);
+        }
+      },
+    );
+  }
+
+  Future _goToUserPostion() async {
+    Position currentPostion = await _userPosition();
+    _goToPosition(LatLng(currentPostion.latitude, currentPostion.longitude));
+  }
+
+  Future _goToPosition(LatLng position) async {
+    GoogleMapController googleMapController = await _googleMapController.future;
+    googleMapController.animateCamera(CameraUpdate.newCameraPosition(
+        CameraPosition(target: position, zoom: 15)));
+  }
+
+  Future _userPosition() async {
+    LocationPermission locationPermission;
+    bool isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
+
+    if (!isLocationServiceEnabled) {
+      print("Please enable Location Permission.");
+    }
+
+    locationPermission = await Geolocator.checkPermission();
+
+    if (locationPermission == LocationPermission.denied) {
+      locationPermission = await Geolocator.requestPermission();
+      if (locationPermission == LocationPermission.denied) {
+        Future.error("Permission denied");
+      }
+    }
+
+    if (locationPermission == LocationPermission.deniedForever) {
+      Future.error("Permission denied.");
+    }
+
+    // ignore: deprecated_member_use
+    return await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+  }
+
+  Widget _customPin() {
+    return Container();
   }
 }

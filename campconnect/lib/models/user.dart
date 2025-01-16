@@ -1,4 +1,5 @@
 class User {
+  String? id;
   String firstName;
   String lastName;
   DateTime dateOfBirth;
@@ -10,6 +11,7 @@ class User {
   String role; // 'student' or 'teacher'
 
   User({
+    this.id,
     required this.firstName,
     required this.lastName,
     required this.dateOfBirth,
@@ -23,6 +25,7 @@ class User {
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
+      id: json['id'],
       firstName: json['firstName'],
       lastName: json['lastName'],
       dateOfBirth: DateTime.parse(json['dateOfBirth']),
@@ -37,6 +40,7 @@ class User {
 
   Map<String, dynamic> toJson() {
     return {
+      "id": id,
       'firstName': firstName,
       'lastName': lastName,
       'dateOfBirth': dateOfBirth.toIso8601String(),
