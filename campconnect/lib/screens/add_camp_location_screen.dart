@@ -18,7 +18,7 @@ class AddCampLocationScreen extends ConsumerStatefulWidget {
 }
 
 class _AddCamp extends ConsumerState<AddCampLocationScreen> {
-  Completer<GoogleMapController> _googleMapController = Completer();
+  final Completer<GoogleMapController> _googleMapController = Completer();
   late LatLng _default;
   late LatLng _scrolledLocation;
   late String _transferString;
