@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:lottie/lottie.dart';
 
 class AddCamp extends ConsumerStatefulWidget {
   const AddCamp({super.key});
@@ -92,6 +93,6 @@ class _AddCamp extends ConsumerState<AddCamp> {
   }
 
   Widget _customPin() {
-    return Container();
+    return Container(child: Lottie.asset('/'));
   }
 }

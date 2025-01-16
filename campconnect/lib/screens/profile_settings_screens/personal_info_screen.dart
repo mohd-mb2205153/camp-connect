@@ -2,6 +2,7 @@ import 'package:campconnect/providers/show_bot_nav_provider.dart';
 import 'package:campconnect/theme/frosted_glass.dart';
 import 'package:campconnect/theme/styling_constants.dart';
 import 'package:campconnect/widgets/details_row.dart';
+import 'package:campconnect/widgets/filter_dropdown.dart';
 import 'package:campconnect/widgets/section_title_with_icon.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
   bool isEditing = false;
   String? dateOfBirth;
   String? countryName;
+  String? selectedLanguage;
 
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
@@ -51,7 +53,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
       showPhoneCode: false,
       onSelect: (Country country) {
         setState(() {
-          countryName = country.displayName;
+          countryName = '${country.flagEmoji} ${country.name}';
         });
       },
       countryListTheme: CountryListThemeData(
@@ -144,6 +146,13 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                       countryName: countryName,
                       selectDate: selectDate,
                       selectNationality: selectNationality,
+                      selectedLanguage: selectedLanguage ?? 'Arabic', // Dummy
+                      languages: [],
+                      onLanguageSelected: (newLanguage) {
+                        setState(() {
+                          selectedLanguage = newLanguage;
+                        });
+                      },
                     ),
                   ),
                 ),
@@ -177,8 +186,11 @@ class NameSection extends StatelessWidget {
   final List<TextEditingController> controllers;
   final String? dateOfBirth;
   final String? countryName;
+  final String selectedLanguage;
+  final List<String> languages;
   final Function(BuildContext) selectDate;
   final Function(BuildContext) selectNationality;
+  final Function(String) onLanguageSelected;
   // final User user;
 
   const NameSection({
@@ -189,6 +201,9 @@ class NameSection extends StatelessWidget {
     required this.selectDate,
     required this.countryName,
     required this.selectNationality,
+    required this.selectedLanguage,
+    required this.languages,
+    required this.onLanguageSelected,
     // required this.user,
   });
 
@@ -224,13 +239,32 @@ class NameSection extends StatelessWidget {
                       label: "Date of Birth",
                       value: dateOfBirth ?? '11-09-2004',
                     ),
-              DetailsRow(
-                label: "First Language",
-                value: 'Arabic',
-                controller: isEditing ? controllers[2] : null,
-                divider: /*(user.role == 'Student')*/
-                    false,
-              ),
+              isEditing
+                  ? Row(
+                      children: [
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 12.0),
+                            child: FilterDropdown(
+                              selectedFilter: selectedLanguage,
+                              options: languages,
+                              onSelected: (String? newLanguage) {
+                                if (newLanguage != null) {
+                                  onLanguageSelected(newLanguage);
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  : DetailsRow(
+                      label: "First Language",
+                      value: 'Arabic',
+                      controller: isEditing ? controllers[2] : null,
+                      divider: /*(user.role == 'Student')*/
+                          false,
+                    ),
               // if (user.role == 'Student' || user.specialNeeds != '')
               // DetailsRow(
               //   label: "Special Needs",
@@ -240,7 +274,7 @@ class NameSection extends StatelessWidget {
               // )
             ],
           ),
-        )
+        ),
       ],
     );
   }
