@@ -1,5 +1,6 @@
 import 'package:campconnect/google_map.dart';
-import 'package:campconnect/screens/add_Camp.dart';
+import 'package:campconnect/screens/add_camp_location_screen.dart';
+import 'package:campconnect/screens/add_camp_screen.dart';
 import 'package:campconnect/screens/home_screen.dart';
 import 'package:campconnect/screens/onboarding_screens/login_screen.dart';
 import 'package:campconnect/screens/maps_screen.dart';
@@ -15,17 +16,21 @@ class AppRouter {
   static const onboarding = (name: 'onboarding', path: '/');
   static const login = (name: 'login', path: '/login');
   static const register = (name: 'register', path: '/register');
-  static const home = (name: 'home', path: '/home');
-  static const map = (name: 'maps', path: '/maps');
-  static const profile = (name: 'profile', path: '/profile');
-  static const notifications = (name: 'notifications', path: '/notifications');
+  static const home = (name: 'home', path: '/login/home');
+  static const map = (name: 'maps', path: '/login/maps');
+  static const profile = (name: 'profile', path: '/login/profile');
+  static const notifications =
+      (name: 'notifications', path: '/login/notifications');
 
-  static const addCamp = (name: "addCamp", path: '/home/addCamp');
+  static const addCampLocation =
+      (name: "addCampLocation", path: '/login/home/addCampLocation');
+  static const addCamp =
+      (name: "addCamp", path: '/login/home/addCampLocation/addCamp:location');
 
   //Profile Settings routes
-  static const personal = (name: 'personal', path: '/profile/personal');
+  static const personal = (name: 'personal', path: '/login/profile/personal');
   static const educational =
-      (name: 'educational', path: '/profile/educational');
+      (name: 'educational', path: '/login/profile/educational');
 
   static final router = GoRouter(
     initialLocation: onboarding.path,
@@ -52,13 +57,22 @@ class AppRouter {
           GoRoute(
               name: home.name,
               path: home.path,
-              builder: (context, state) => const AddCamp(),
+              builder: (context, state) => const HomeScreen(),
               routes: [
                 GoRoute(
-                  name: addCamp.name,
-                  path: addCamp.path,
-                  builder: (context, state) => const AddCamp(),
-                )
+                    name: addCampLocation.name,
+                    path: addCampLocation.path,
+                    builder: (context, state) => const AddCampLocationScreen(),
+                    routes: [
+                      GoRoute(
+                          name: addCamp.name,
+                          path: addCamp.path,
+                          builder: (context, state) {
+                            final location = state.pathParameters['location'];
+
+                            return AddCampScreen(/*location: location!*/);
+                          })
+                    ])
               ]),
           GoRoute(
               name: map.name,
