@@ -28,7 +28,7 @@ class AppRouter {
       (name: 'educational', path: '/profile/educational');
 
   static final router = GoRouter(
-    initialLocation: map.path,
+    initialLocation: onboarding.path,
     routes: [
       GoRoute(
         path: onboarding.path,
