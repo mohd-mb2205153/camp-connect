@@ -78,12 +78,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             buildMenuItem(
               const Icon(Icons.person),
               'Personal Information',
-              () => context.push(AppRouter.personal.path),
+              () => context.pushNamed(AppRouter.personal.name),
             ),
             buildMenuItem(
                 const Icon(Icons.menu_book_rounded),
                 'Educational Information',
-                () => context.push(AppRouter.home.path)),
+                () => context.pushNamed(AppRouter.educational.name)),
             buildMenuItem(const Icon(Icons.tune), 'Preferences'),
             buildMenuItem(const Icon(Icons.language), 'Language'),
             buildMenuItem(const Icon(Icons.power_settings_new), 'Logout'),

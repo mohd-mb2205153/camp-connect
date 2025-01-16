@@ -1,4 +1,4 @@
-import 'package:campconnect/providers/language_provider.dart';
+import 'package:campconnect/providers/json_provider.dart';
 import 'package:campconnect/providers/show_bot_nav_provider.dart';
 import 'package:campconnect/theme/frosted_glass.dart';
 import 'package:campconnect/theme/styling_constants.dart';
@@ -284,7 +284,7 @@ class NameSection extends StatelessWidget {
               // DetailsRow(
               //   label: "Special Needs",
               //   value: '...',
-              //   controller: isEditing ? controllers[5] : null,
+              //   controller: isEditing ? controllers[2] : null,
               //   divider: false,
               // )
             ],
