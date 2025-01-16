@@ -7,14 +7,14 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:lottie/lottie.dart';
 
-class AddCamp extends ConsumerStatefulWidget {
-  const AddCamp({super.key});
+class AddCampLocationScreen extends ConsumerStatefulWidget {
+  const AddCampLocationScreen({super.key});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _AddCamp();
 }
 
-class _AddCamp extends ConsumerState<AddCamp> {
+class _AddCamp extends ConsumerState<AddCampLocationScreen> {
   Completer<GoogleMapController> _googleMapController = Completer();
   late LatLng _default;
   late LatLng _scrolledLocation;
@@ -48,7 +48,20 @@ class _AddCamp extends ConsumerState<AddCamp> {
 
   Widget _body() {
     return Stack(
-      children: [_getMap(), _customPin(), showAddress()],
+      children: [
+        _getMap(),
+        _customPin(),
+        showAddress(),
+        Positioned(
+            bottom: MediaQuery.of(context).size.height * 0.01,
+            right: MediaQuery.of(context).size.width * 0.4,
+            child: SizedBox(
+              width: 80,
+              child: ElevatedButton(onPressed: () {
+                
+              }, child: Text("Set")),
+            ))
+      ],
     );
   }
 
