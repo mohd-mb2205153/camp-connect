@@ -26,20 +26,24 @@ class AppRouter {
   static const personal = (name: 'personal', path: '/profile/personal');
 
   static final router = GoRouter(
-    initialLocation: home.path,
+    initialLocation: onboarding.path,
     routes: [
       GoRoute(
-          path: onboarding.path,
-          name: onboarding.name,
-          builder: (context, state) => const OnboardingScreen()),
-      GoRoute(
-          path: login.path,
-          name: login.name,
-          builder: (context, state) => const LoginScreen()),
-      GoRoute(
-        path: register.path,
-        name: register.name,
-        builder: (context, state) => const RegisterScreen(),
+        path: onboarding.path,
+        name: onboarding.name,
+        builder: (context, state) => const OnboardingScreen(),
+        routes: [
+          GoRoute(
+            path: login.path,
+            name: login.name,
+            builder: (context, state) => const LoginScreen(),
+          ),
+          GoRoute(
+            path: register.path,
+            name: register.name,
+            builder: (context, state) => const RegisterScreen(),
+          ),
+        ],
       ),
       ShellRoute(
         routes: [

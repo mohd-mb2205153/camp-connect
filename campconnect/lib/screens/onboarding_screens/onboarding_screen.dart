@@ -126,7 +126,7 @@ class LoginButton extends StatelessWidget {
         ),
         child: Text(
           "Sign in",
-          style: getTextStyle('smallBold', color: AppColors.lightTeal),
+          style: getTextStyle('mediumBold', color: AppColors.lightTeal),
         ),
       ),
     );
@@ -155,7 +155,7 @@ class RegisterButton extends StatelessWidget {
         ),
         child: Text(
           "Sign up",
-          style: getTextStyle('smallBold', color: Colors.white),
+          style: getTextStyle('mediumBold', color: Colors.white),
         ),
       ),
     );
