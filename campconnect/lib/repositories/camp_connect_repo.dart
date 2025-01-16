@@ -20,10 +20,8 @@ class CampConnectRepo {
           .map((doc) => Camp.fromJson(doc.data() as Map<String, dynamic>))
           .toList());
 
-  Future<Camp?> getCampById(String campId) {
-    // TODO: implement getCampById
-    throw UnimplementedError();
-  }
+  Future<Camp?> getCampById(String campId) => campsRef.doc(campId).get().then(
+      (snapshot) => Camp.fromJson(snapshot.data() as Map<String, dynamic>));
 
   Future<void> addCamp(Camp camp) async {
     final docId = campsRef.doc().id;
@@ -37,15 +35,41 @@ class CampConnectRepo {
   Future<void> deleteCamp(Camp camp) => campsRef.doc(camp.id).delete();
 
   // (*) Student Repository ===================================================================
+  Stream<List<Student>> observeStudents() =>
+  studentsRef.snapshots().map((snapshot) => snapshot.docs
+          .map((doc) => Student.fromJson(doc.data() as Map<String, dynamic>))
+          .toList());
+
+  Future<Student?> getStudentById(String studentId) => studentsRef.doc(studentId).get().then(
+      (snapshot) => Student.fromJson(snapshot.data() as Map<String, dynamic>));
+
   Future<void> addStudent(Student student) async {
     final docId = studentsRef.doc().id;
     student.id = docId;
     await campsRef.doc(student.id).set(student.toJson());
+
+  Future<void> updateStudent(Student student) =>
+      studentsRef.doc(student.id).update(student.toJson());
+
+  Future<void> deleteStudent(Student student) => studentsRef.doc(student.id).delete();
   }
   // (*) Teacher Repository ===================================================================
+  Stream<List<Teacher>> observeTeachers() =>
+  teachersRef.snapshots().map((snapshot) => snapshot.docs
+          .map((doc) => Teacher.fromJson(doc.data() as Map<String, dynamic>))
+          .toList());
+
+  Future<Teacher?> getTeacherById(String teacherId) => teachersRef.doc(teacherId).get().then(
+      (snapshot) => Teacher.fromJson(snapshot.data() as Map<String, dynamic>));
+
   Future<void> addTeacher(Teacher teacher) async {
     final docId = campsRef.doc().id;
     teacher.id = docId;
     await campsRef.doc(teacher.id).set(teacher.toJson());
   }
+
+  Future<void> updateTeacher(Teacher teacher) =>
+    teachersRef.doc(teacher.id).update(teacher.toJson());
+
+  Future<void> deleteTeacher(Teacher teacher) => teachersRef.doc(teacher.id).delete();
 }
