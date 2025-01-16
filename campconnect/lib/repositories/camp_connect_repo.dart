@@ -13,8 +13,9 @@ class CampConnectRepo {
       {required this.studentsRef,
       required this.teachersRef,
       required this.campsRef});
-
-  Stream<List<Camp>> observecCamps() =>
+  
+  // (*) Camp Repository ===================================================================
+  Stream<List<Camp>> observeCamps() =>
   campsRef.snapshots().map((snapshot) => snapshot.docs
           .map((doc) => Camp.fromJson(doc.data() as Map<String, dynamic>))
           .toList());
@@ -35,12 +36,13 @@ class CampConnectRepo {
 
   Future<void> deleteCamp(Camp camp) => campsRef.doc(camp.id).delete();
 
+  // (*) Student Repository ===================================================================
   Future<void> addStudent(Student student) async {
     final docId = studentsRef.doc().id;
     student.id = docId;
     await campsRef.doc(student.id).set(student.toJson());
   }
-
+  // (*) Teacher Repository ===================================================================
   Future<void> addTeacher(Teacher teacher) async {
     final docId = campsRef.doc().id;
     teacher.id = docId;
