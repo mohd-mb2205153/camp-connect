@@ -1,4 +1,5 @@
 import 'package:campconnect/google_map.dart';
+import 'package:campconnect/screens/add_Camp.dart';
 import 'package:campconnect/screens/home_screen.dart';
 import 'package:campconnect/screens/onboarding_screens/login_screen.dart';
 import 'package:campconnect/screens/maps_screen.dart';
@@ -18,6 +19,8 @@ class AppRouter {
   static const map = (name: 'maps', path: '/maps');
   static const profile = (name: 'profile', path: '/profile');
   static const notifications = (name: 'notifications', path: '/notifications');
+
+  static const addCamp = (name: "addCamp", path: '/home/addCamp');
 
   //Profile Settings routes
   static const personal = (name: 'personal', path: '/profile/personal');
@@ -41,10 +44,16 @@ class AppRouter {
       ShellRoute(
         routes: [
           GoRoute(
-            name: home.name,
-            path: home.path,
-            builder: (context, state) => const HomeScreen(),
-          ),
+              name: home.name,
+              path: home.path,
+              builder: (context, state) => const AddCamp(),
+              routes: [
+                GoRoute(
+                  name: addCamp.name,
+                  path: addCamp.path,
+                  builder: (context, state) => const AddCamp(),
+                )
+              ]),
           GoRoute(
               name: map.name,
               path: map.path,
