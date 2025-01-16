@@ -59,14 +59,14 @@ class _AddCamp extends ConsumerState<AddCamp> {
             Position position = await getCurrentLocation();
             _googleMapController.animateCamera(CameraUpdate.newCameraPosition(
                 CameraPosition(
-                    target: LatLng(position.latitude, position.longitude),zoom: 14)));
+                    target: LatLng(position.latitude, position.longitude),
+                    zoom: 14)));
 
-            markers.add(Marker(markerId: const MarkerId("Current Location"), position: LatLng(position.latitude, position.longitude)));
+            markers.add(Marker(
+                markerId: const MarkerId("Current Location"),
+                position: LatLng(position.latitude, position.longitude)));
 
-            setState(() {
-              
-            });
-
+            setState(() {});
           },
           label: Text("Get Current Location"),
           icon: Icon(Icons.location_city)),

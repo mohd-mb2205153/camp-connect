@@ -50,7 +50,7 @@ class AppRouter {
           GoRoute(
               name: home.name,
               path: home.path,
-              builder: (context, state) => const AddCamp(),
+              builder: (context, state) => const HomeScreen(),
               routes: [
                 GoRoute(
                   name: addCamp.name,
@@ -61,7 +61,7 @@ class AppRouter {
           GoRoute(
               name: map.name,
               path: map.path,
-              builder: (context, state) => const MapSample()),
+              builder: (context, state) => const MapsScreen()),
           GoRoute(
             name: profile.name,
             path: profile.path,
