@@ -10,12 +10,14 @@ class DetailsRow extends StatelessWidget {
   final bool special;
   final bool divider;
   final String? count;
+  final TextInputType keyboardType;
 
   const DetailsRow({
     super.key,
     required this.label,
     this.controller,
     required this.value,
+    this.keyboardType = TextInputType.text,
     this.special = false,
     this.divider = true,
     this.count,
@@ -49,6 +51,7 @@ class DetailsRow extends StatelessWidget {
                     child: EditScreenTextField(
                       label: "~$value~",
                       controller: controller!,
+                      type: keyboardType,
                     ),
                   )
                 : Align(

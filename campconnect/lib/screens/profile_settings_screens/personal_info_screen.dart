@@ -1,7 +1,9 @@
 import 'package:campconnect/providers/show_bot_nav_provider.dart';
 import 'package:campconnect/theme/frosted_glass.dart';
+import 'package:campconnect/theme/styling_constants.dart';
 import 'package:campconnect/widgets/details_row.dart';
 import 'package:campconnect/widgets/section_title_with_icon.dart';
+import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -14,17 +16,64 @@ class PersonalInfoScreen extends ConsumerStatefulWidget {
 
 class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
   bool isEditing = false;
+  String? dateOfBirth;
+  String? countryName;
 
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
-  final TextEditingController nationalityController = TextEditingController();
-  final TextEditingController dobController = TextEditingController();
   final TextEditingController primaryLangController = TextEditingController();
   final TextEditingController specialNeedsController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController mobileController = TextEditingController();
   final TextEditingController guardianMobileController =
       TextEditingController();
+
+  Future<void> selectDate(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (pickedDate != null) {
+      setState(() {
+        dateOfBirth =
+            "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
+      });
+    }
+  }
+
+  void selectNationality(BuildContext context) {
+    showCountryPicker(
+      useSafeArea: true,
+      context: context,
+      showPhoneCode: false,
+      onSelect: (Country country) {
+        setState(() {
+          countryName = country.displayName;
+        });
+      },
+      countryListTheme: CountryListThemeData(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(40.0),
+          topRight: Radius.circular(40.0),
+        ),
+        inputDecoration: InputDecoration(
+          labelText: 'Search Nationality',
+          prefixIcon: const Icon(Icons.search),
+          border: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: AppColors.darkBlue,
+            ),
+          ),
+        ),
+        searchTextStyle: TextStyle(
+          color: AppColors.darkBlue,
+          fontSize: 18,
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -87,11 +136,13 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                       controllers: [
                         firstNameController,
                         lastNameController,
-                        nationalityController,
-                        dobController,
                         primaryLangController,
                         specialNeedsController,
                       ],
+                      dateOfBirth: dateOfBirth,
+                      countryName: countryName,
+                      selectDate: selectDate,
+                      selectNationality: selectNationality,
                     ),
                   ),
                 ),
@@ -123,12 +174,20 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
 class NameSection extends StatelessWidget {
   final bool isEditing;
   final List<TextEditingController> controllers;
+  final String? dateOfBirth;
+  final String? countryName;
+  final Function(BuildContext) selectDate;
+  final Function(BuildContext) selectNationality;
   // final User user;
 
   const NameSection({
     super.key,
     required this.isEditing,
     required this.controllers,
+    required this.dateOfBirth,
+    required this.selectDate,
+    required this.countryName,
+    required this.selectNationality,
     // required this.user,
   });
 
@@ -152,21 +211,23 @@ class NameSection extends StatelessWidget {
                 value: 'Ahad',
                 controller: isEditing ? controllers[1] : null,
               ),
-              DetailsRow(
-                label: "Nationality",
-                value: 'Iraq',
-                controller: isEditing ? controllers[2] : null,
-              ),
-              DetailsRow(
-                label: "Date of Birth",
-                value: '11-09-2004',
-                controller: isEditing ? controllers[3] : null,
-              ),
+              isEditing
+                  ? buildNationalityPicker(context)
+                  : DetailsRow(
+                      label: "Nationality",
+                      value: countryName ?? 'Iraq', // Dummy values
+                    ),
+              isEditing
+                  ? buildDatePicker(context)
+                  : DetailsRow(
+                      label: "Date of Birth",
+                      value: dateOfBirth ?? '11-09-2004',
+                    ),
               DetailsRow(
                 label: "Language",
                 value: 'Arabic',
-                controller: isEditing ? controllers[4] : null,
-                divider: /*(user.role == 'Student' || user.specialNeeds != '')*/
+                controller: isEditing ? controllers[2] : null,
+                divider: /*(user.role == 'Student')*/
                     false,
               ),
               // if (user.role == 'Student' || user.specialNeeds != '')
@@ -180,6 +241,100 @@ class NameSection extends StatelessWidget {
           ),
         )
       ],
+    );
+  }
+
+  Widget buildNationalityPicker(BuildContext context) {
+    return GestureDetector(
+      onTap: () => selectNationality(context),
+      child: Container(
+        decoration: const BoxDecoration(
+          border: Border(
+            bottom: BorderSide(color: AppColors.darkBlue, width: 1),
+          ),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: SizedBox(
+          height: 48,
+          width: MediaQuery.of(context).size.width * .8,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Nationality",
+                style: getTextStyle('smallBold', color: AppColors.darkBlue),
+              ),
+              Container(
+                height: 40,
+                width: 200,
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: AppColors.darkBlue,
+                    width: 2.0,
+                  ),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  countryName ?? 'Iraq', //For now dummy value
+                  style: getTextStyle('small', color: AppColors.darkBlue),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildDatePicker(BuildContext context) {
+    return GestureDetector(
+      onTap: () => selectDate(context),
+      child: Container(
+        decoration: const BoxDecoration(
+          border: Border(
+            bottom: BorderSide(color: AppColors.darkBlue, width: 1),
+          ),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: SizedBox(
+          height: 48,
+          width: MediaQuery.of(context).size.width * .8,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Date Of Birth",
+                style: getTextStyle('smallBold', color: AppColors.darkBlue),
+              ),
+              Container(
+                height: 40,
+                width: 200,
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: AppColors.darkBlue,
+                    width: 2.0,
+                  ),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  dateOfBirth ?? '11-09-2004', //For now dummy value
+                  style: getTextStyle('small', color: AppColors.darkBlue),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -202,7 +357,7 @@ class ContactSection extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         SectionTitleWithIcon(
-          icon: Icons.person,
+          icon: Icons.call,
           title: 'Contact Information',
           child: Column(
             children: [
@@ -210,11 +365,13 @@ class ContactSection extends StatelessWidget {
                 label: "Email",
                 value: 'enter@gmail.com',
                 controller: isEditing ? controllers[0] : null,
+                keyboardType: TextInputType.emailAddress,
               ),
               DetailsRow(
                 label: "Mobile No.",
                 value: '30334066',
                 controller: isEditing ? controllers[1] : null,
+                keyboardType: TextInputType.phone,
                 divider: /*(user.role == 'Student')*/ false,
               ),
               // if (user.role == 'Student')
@@ -222,6 +379,7 @@ class ContactSection extends StatelessWidget {
               //   label: "Guardian No.",
               //   value: '30224077',
               //   controller: isEditing ? controllers[2] : null,
+              //   keyboardType: TextInputType.phone,
               //   divider: false,
               // )
             ],
