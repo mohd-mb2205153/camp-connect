@@ -24,9 +24,11 @@ class AppRouter {
 
   //Profile Settings routes
   static const personal = (name: 'personal', path: '/profile/personal');
+  static const educational =
+      (name: 'educational', path: '/profile/educational');
 
   static final router = GoRouter(
-    initialLocation: onboarding.path,
+    initialLocation: map.path,
     routes: [
       GoRoute(
         path: onboarding.path,
