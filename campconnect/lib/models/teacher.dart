@@ -7,7 +7,6 @@ class Teacher extends User {
   List<String> certifications; // Relevant certifications or degrees
   int teachingExperience; // Number of years of experience
   List<String> areasOfExpertise; // Subjects taught
-  String preferredLocation; // Automatically detected via GPS or manually set
   String willingnessToTravel; // e.g., "Within 10 km"
   String availabilitySchedule; // Days and times available
   String preferredCampDuration; // e.g., "Short-term"
@@ -27,7 +26,6 @@ class Teacher extends User {
       required this.certifications,
       required this.teachingExperience,
       required this.areasOfExpertise,
-      required this.preferredLocation,
       required this.willingnessToTravel,
       required this.availabilitySchedule,
       required this.preferredCampDuration,
@@ -51,7 +49,6 @@ class Teacher extends User {
         certifications: List<String>.from(json['certifications']),
         teachingExperience: json['teachingExperience'],
         areasOfExpertise: List<String>.from(json['areasOfExpertise']),
-        preferredLocation: json['preferredLocation'],
         willingnessToTravel: json['willingnessToTravel'],
         availabilitySchedule: json['availabilitySchedule'],
         preferredCampDuration: json['preferredCampDuration'],
@@ -66,7 +63,6 @@ class Teacher extends User {
         'certifications': certifications,
         'teachingExperience': teachingExperience,
         'areasOfExpertise': areasOfExpertise,
-        'preferredLocation': preferredLocation,
         'willingnessToTravel': willingnessToTravel,
         'availabilitySchedule': availabilitySchedule,
         'preferredCampDuration': preferredCampDuration,

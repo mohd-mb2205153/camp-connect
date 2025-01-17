@@ -70,7 +70,7 @@ Widget buildTextArea({
   required TextEditingController controller,
   required String hintText,
   TextInputType? keyboardType,
-  int maxLines = 3,
+  int maxLines = 1,
   Widget? suffixIcon,
   Icon? prefixIcon,
   required FocusNode focusNode,
