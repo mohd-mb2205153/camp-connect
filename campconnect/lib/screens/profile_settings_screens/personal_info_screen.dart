@@ -1,9 +1,12 @@
+import 'package:campconnect/models/student.dart';
+import 'package:campconnect/models/user.dart';
 import 'package:campconnect/providers/json_provider.dart';
 import 'package:campconnect/providers/show_bot_nav_provider.dart';
 import 'package:campconnect/theme/frosted_glass.dart';
 import 'package:campconnect/theme/styling_constants.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
 import 'package:campconnect/widgets/details_row.dart';
+import 'package:campconnect/widgets/edit_screen_fields.dart';
 import 'package:campconnect/widgets/filter_dropdown.dart';
 import 'package:campconnect/widgets/section_title_with_icon.dart';
 import 'package:country_picker/country_picker.dart';
@@ -23,6 +26,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
   String? countryName;
   String? selectedLanguage;
   String? phoneCode;
+  String? selectedCountry;
 
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
@@ -48,19 +52,15 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
     }
   }
 
-  void countryPicker(BuildContext context, bool showPhoneCode) {
+  void phonePicker(BuildContext context) {
     showCountryPicker(
       exclude: <String>['IL'],
       useSafeArea: true,
       context: context,
-      showPhoneCode: showPhoneCode,
+      showPhoneCode: true,
       onSelect: (Country country) {
         setState(() {
-          if (showPhoneCode) {
-            phoneCode = '${country.flagEmoji} +${country.phoneCode}';
-          } else {
-            countryName = country.name;
-          }
+          phoneCode = '${country.flagEmoji} +${country.phoneCode}';
         });
       },
       countryListTheme: CountryListThemeData(
@@ -70,8 +70,12 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
           topRight: Radius.circular(40.0),
         ),
         inputDecoration: InputDecoration(
-          labelText: 'Search Nationality',
-          prefixIcon: const Icon(Icons.search),
+          labelText: 'Search Phone Code',
+          labelStyle: getTextStyle('medium', color: AppColors.darkBeige),
+          prefixIcon: const Icon(
+            Icons.search,
+            color: AppColors.darkBlue,
+          ),
           border: OutlineInputBorder(
             borderSide: BorderSide(
               color: AppColors.darkBlue,
@@ -178,11 +182,16 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                         dateOfBirth: dateOfBirth, //Dummy
                         countryName: countryName, //Dummy
                         selectDate: selectDate,
-                        selectNationality: countryPicker,
                         selectedLanguage: selectedLanguage ?? 'Arabic', // Dummy
                         onLanguageSelected: (newLanguage) {
                           setState(() {
                             selectedLanguage = newLanguage;
+                          });
+                        },
+                        selectedCountry: selectedCountry ?? "Iraq", //Dummy
+                        onCountrySelected: (newCountry) {
+                          setState(() {
+                            selectedCountry = newCountry;
                           });
                         },
                       ),
@@ -201,8 +210,8 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                           mobileController,
                           guardianMobileController,
                         ],
-                        selectPhoneCode: countryPicker,
-                        phoneCode: phoneCode ?? "",
+                        selectPhoneCode: phonePicker,
+                        phoneCode: phoneCode ?? "+974",
                       ),
                     ),
                   ),
@@ -224,9 +233,10 @@ class NameSection extends ConsumerWidget {
   final String? countryName;
   // -----
   final String selectedLanguage;
+  final String selectedCountry;
   final Function(BuildContext) selectDate;
-  final Function(BuildContext, bool) selectNationality;
   final Function(String) onLanguageSelected;
+  final Function(String) onCountrySelected;
   // final User user;
 
   const NameSection({
@@ -236,9 +246,10 @@ class NameSection extends ConsumerWidget {
     required this.dateOfBirth,
     required this.selectDate,
     required this.countryName,
-    required this.selectNationality,
+    required this.onCountrySelected,
     required this.selectedLanguage,
     required this.onLanguageSelected,
+    required this.selectedCountry,
     // required this.user,
   });
 
@@ -263,7 +274,7 @@ class NameSection extends ConsumerWidget {
                 controller: isEditing ? controllers[1] : null,
               ),
               isEditing
-                  ? buildNationalityPicker(context)
+                  ? buildNationalityPicker(context, ref)
                   : DetailsRow(
                       label: "Nationality",
                       value: countryName ?? 'Iraq', // Dummy values
@@ -330,48 +341,35 @@ class NameSection extends ConsumerWidget {
     );
   }
 
-  Widget buildNationalityPicker(BuildContext context) {
-    return GestureDetector(
-      onTap: () => selectNationality(context, false),
-      child: Container(
-        decoration: const BoxDecoration(
-          border: Border(
-            bottom: BorderSide(color: AppColors.darkBlue, width: 1),
-          ),
-        ),
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: SizedBox(
-          height: 48,
-          width: screenWidth(context) * .8,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Nationality",
-                style: getTextStyle('smallBold', color: AppColors.darkBlue),
-              ),
-              Container(
-                height: 40,
-                width: 200,
-                decoration: BoxDecoration(
-                  color: Colors.transparent,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: AppColors.darkBlue,
-                    width: 2.0,
-                  ),
+  Widget buildNationalityPicker(BuildContext context, WidgetRef ref) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: SizedBox(
+        height: 48,
+        width: screenWidth(context) * .8,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              "Nationality",
+              style: getTextStyle('smallBold', color: AppColors.darkBlue),
+            ),
+            ref.watch(countryProvider).when(
+                  data: (data) {
+                    return FilterDropdown(
+                      selectedFilter: selectedCountry,
+                      options: data,
+                      onSelected: (String? newCountry) {
+                        if (newCountry != null) {
+                          onLanguageSelected(newCountry);
+                        }
+                      },
+                    );
+                  },
+                  loading: () => const CircularProgressIndicator(),
+                  error: (err, stack) => Text('Error: $err'),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  countryName ?? 'Iraq', //For now dummy value
-                  style: getTextStyle('small', color: AppColors.darkBlue),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                ),
-              ),
-            ],
-          ),
+          ],
         ),
       ),
     );
@@ -428,7 +426,7 @@ class NameSection extends ConsumerWidget {
 class ContactSection extends StatelessWidget {
   final bool isEditing;
   final List<TextEditingController> controllers;
-  final Function(BuildContext, bool) selectPhoneCode;
+  final Function(BuildContext) selectPhoneCode;
   final String? phoneCode;
   // final User user;
 
@@ -458,18 +456,16 @@ class ContactSection extends StatelessWidget {
                 keyboardType: TextInputType.emailAddress,
               ),
               isEditing
-                  ? buildPhoneCodePicker(context)
+                  ? buildMobilePicker(
+                      context,
+                      /*(user.role == 'Student')*/ false,
+                      controllers[1],
+                    )
                   : DetailsRow(
-                      label: "Phone Code",
-                      value: phoneCode ?? '+974', //Dummy
+                      label: "Mobile",
+                      value: '${phoneCode ?? '+974'} 30334066', //Dummy
+                      divider: /*(user.role == 'Student')*/ false,
                     ),
-              DetailsRow(
-                label: "Mobile No.",
-                value: '30334066', //Dummy
-                controller: isEditing ? controllers[1] : null,
-                keyboardType: TextInputType.phone,
-                divider: /*(user.role == 'Student')*/ false,
-              ),
               // if (user.role == 'Student')
               // DetailsRow(
               //   label: "Guardian No.",
@@ -485,48 +481,64 @@ class ContactSection extends StatelessWidget {
     );
   }
 
-  Widget buildPhoneCodePicker(BuildContext context) {
-    return GestureDetector(
-      onTap: () => selectPhoneCode(context, true),
-      child: Container(
-        decoration: const BoxDecoration(
-          border: Border(
-            bottom: BorderSide(color: AppColors.darkBlue, width: 1),
-          ),
-        ),
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: SizedBox(
-          height: 48,
-          width: screenWidth(context) * .8,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Phone Code",
-                style: getTextStyle('smallBold', color: AppColors.darkBlue),
-              ),
-              Container(
-                height: 40,
-                width: 200,
-                decoration: BoxDecoration(
-                  color: Colors.transparent,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: AppColors.darkBlue,
-                    width: 2.0,
+  Widget buildMobilePicker(
+      BuildContext context, bool divider, TextEditingController controller) {
+    return Container(
+      decoration: divider
+          ? const BoxDecoration(
+              border: Border(
+              bottom: BorderSide(color: AppColors.darkBlue, width: 1),
+            ))
+          : null,
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: SizedBox(
+        height: 48,
+        width: screenWidth(context) * .8,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              "Mobile",
+              style: getTextStyle('smallBold', color: AppColors.darkBlue),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                GestureDetector(
+                  onTap: () => selectPhoneCode(context),
+                  child: Container(
+                    height: 40,
+                    width: 85,
+                    decoration: BoxDecoration(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: AppColors.darkBlue,
+                        width: 2.0,
+                      ),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      phoneCode ?? '+974', //For now dummy value
+                      style: getTextStyle('small', color: AppColors.darkBlue),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
                   ),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  phoneCode ?? '+974', //For now dummy value
-                  style: getTextStyle('small', color: AppColors.darkBlue),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
+                SizedBox(
+                  width: 10,
                 ),
-              ),
-            ],
-          ),
+                EditScreenTextField(
+                  label: "~30334066~", //dummy
+                  controller: controller,
+                  type: TextInputType.phone,
+                  width: 150,
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

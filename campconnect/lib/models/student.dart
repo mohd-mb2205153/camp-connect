@@ -4,6 +4,7 @@ import 'user.dart';
 
 class Student extends User {
   String guardianContact; // For students under 15
+  String guardianCountryCode;
   String currentEducationLevel; // e.g., Primary, Secondary, High School
   List<String> preferredSubjects; // e.g., Math, Science
   String learningGoals; // Optional
@@ -23,6 +24,7 @@ class Student extends User {
       required super.mobileNumber,
       super.email = '',
       required this.guardianContact,
+      required this.guardianCountryCode,
       required this.currentEducationLevel,
       required this.preferredSubjects,
       this.learningGoals = '',
@@ -46,6 +48,7 @@ class Student extends User {
         mobileNumber: json['mobileNumber'],
         email: json['email'] ?? '',
         guardianContact: json['guardianContact'],
+        guardianCountryCode: json['guardianCountryCode'],
         currentEducationLevel: json['currentEducationLevel'],
         preferredSubjects: List<String>.from(json['preferredSubjects']),
         learningGoals: json['learningGoals'] ?? '',
@@ -60,6 +63,7 @@ class Student extends User {
     return super.toJson()
       ..addAll({
         'guardianContact': guardianContact,
+        'guardianCountryCode': guardianCountryCode,
         'currentEducationLevel': currentEducationLevel,
         'preferredSubjects': preferredSubjects,
         'learningGoals': learningGoals,

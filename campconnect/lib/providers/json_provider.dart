@@ -15,3 +15,8 @@ final subjectsProvider = FutureProvider<List<String>>((ref) async {
   CampConnectJsonRepo repo = CampConnectJsonRepo();
   return await repo.fetchSubjects();
 });
+
+final countryProvider = FutureProvider<List<String>>((ref) async {
+  CampConnectJsonRepo repo = CampConnectJsonRepo();
+  return await repo.fetchCountries();
+});
