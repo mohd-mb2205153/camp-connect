@@ -1,8 +1,12 @@
+import 'package:campconnect/models/camp.dart';
+import 'package:campconnect/providers/camp_provider.dart';
 import 'package:campconnect/providers/json_provider.dart';
+import 'package:campconnect/routes/app_router.dart';
 import 'package:campconnect/widgets/filter_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class AddCampScreen extends ConsumerStatefulWidget {
@@ -14,7 +18,7 @@ class AddCampScreen extends ConsumerStatefulWidget {
 }
 
 class _AddCampScreenState extends ConsumerState<AddCampScreen> {
-  final locationController = TextEditingController();
+  final namecontroller = TextEditingController();
   final descriptionController = TextEditingController();
   String? locationString;
   List<String>? latlng;
@@ -22,12 +26,14 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
   double? longitude;
   LatLng? location;
   String? address;
+  String? _selectedSpecNeeds;
 
   String? selectedEducationLevel;
   String? selectedSubject;
 
   @override
   void initState() {
+    ref.read(campProviderNotifier);
     super.initState();
     locationString = widget.location;
     latlng = locationString!.split("|");
@@ -44,15 +50,101 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
+            Column(
+              children: [
+                Text("Enter Name: "),
+                TextField(
+                  controller: namecontroller,
+                  decoration: InputDecoration(labelText: "Name"),
+                )
+              ],
+            ),
             Row(
               children: [Text("Location"), Text("$address")],
             ),
-            buildEduDropdown(),
-            buildSubjectsDropdown(),
+            Row(children: [Text("Choose level"), buildEduDropdown()]),
+            Row(
+              children: [
+                Text("Choose Subject"),
+                buildSubjectsDropdown(),
+              ],
+            ),
+            Column(children: [
+              Text("Description"),
+              TextField(
+                controller: descriptionController,
+                decoration: InputDecoration(labelText: "Enter Description"),
+              )
+            ]),
+            Row(
+              children: [
+                Expanded(
+                  child: RadioListTile(
+                    title: const Text('Yes'),
+                    value: 'Yes',
+                    groupValue: _selectedSpecNeeds,
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedSpecNeeds = value!;
+                      });
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: RadioListTile(
+                    title: const Text('No'),
+                    value: 'No',
+                    groupValue: _selectedSpecNeeds,
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedSpecNeeds = value!;
+                      });
+                    },
+                  ),
+                ),
+              ],
+            ),
+            ElevatedButton(
+                onPressed: () {
+                  addCamp(
+                      namecontroller,
+                      selectedEducationLevel!,
+                      selectedSubject!,
+                      descriptionController,
+                      _selectedSpecNeeds!,
+                      latitude!,
+                      longitude!);
+                  context.go(AppRouter.home.path);
+                },
+                child: Text("Add Camp"))
           ],
         ),
       ),
     );
+  }
+
+  //IMPORTANNTTTTT need to change so user info is updated
+  void addCamp(
+    TextEditingController name,
+    String selectedEducationLevel,
+    String selectedSubject,
+    TextEditingController description,
+    String specNeed,
+    double latitude,
+    double longitude,
+  ) {
+    bool specNeeds = specNeed == "Yes" ? true : false;
+    Camp camp = Camp(
+        name: name.text,
+        educationLevel: selectedEducationLevel,
+        subject: selectedSubject,
+        description: description.text,
+        specialNeeds: specNeeds,
+        latitude: latitude,
+        longitude: longitude,
+        teachers: [],
+        students: []);
+    ref.read(campProviderNotifier.notifier).addCamp(camp);
   }
 
   Widget buildEduDropdown() {
@@ -83,7 +175,7 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
             onSelected: (String? newLevel) {
               if (newLevel != null) {
                 setState(() {
-                  selectedEducationLevel = newLevel;
+                  selectedSubject = newLevel;
                 });
               }
             },
