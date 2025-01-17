@@ -22,6 +22,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
   String? dateOfBirth;
   String? countryName;
   String? selectedLanguage;
+  String? phoneCode;
 
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
@@ -47,15 +48,19 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
     }
   }
 
-  void selectNationality(BuildContext context) {
+  void countryPicker(BuildContext context, bool showPhoneCode) {
     showCountryPicker(
       exclude: <String>['IL'],
       useSafeArea: true,
       context: context,
-      showPhoneCode: false,
+      showPhoneCode: showPhoneCode,
       onSelect: (Country country) {
         setState(() {
-          countryName = country.name;
+          if (showPhoneCode) {
+            phoneCode = '${country.flagEmoji} +${country.phoneCode}';
+          } else {
+            countryName = country.name;
+          }
         });
       },
       countryListTheme: CountryListThemeData(
@@ -173,7 +178,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                         dateOfBirth: dateOfBirth, //Dummy
                         countryName: countryName, //Dummy
                         selectDate: selectDate,
-                        selectNationality: selectNationality,
+                        selectNationality: countryPicker,
                         selectedLanguage: selectedLanguage ?? 'Arabic', // Dummy
                         onLanguageSelected: (newLanguage) {
                           setState(() {
@@ -196,6 +201,8 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                           mobileController,
                           guardianMobileController,
                         ],
+                        selectPhoneCode: countryPicker,
+                        phoneCode: phoneCode ?? "",
                       ),
                     ),
                   ),
@@ -218,7 +225,7 @@ class NameSection extends ConsumerWidget {
   // -----
   final String selectedLanguage;
   final Function(BuildContext) selectDate;
-  final Function(BuildContext) selectNationality;
+  final Function(BuildContext, bool) selectNationality;
   final Function(String) onLanguageSelected;
   // final User user;
 
@@ -325,7 +332,7 @@ class NameSection extends ConsumerWidget {
 
   Widget buildNationalityPicker(BuildContext context) {
     return GestureDetector(
-      onTap: () => selectNationality(context),
+      onTap: () => selectNationality(context, false),
       child: Container(
         decoration: const BoxDecoration(
           border: Border(
@@ -421,12 +428,16 @@ class NameSection extends ConsumerWidget {
 class ContactSection extends StatelessWidget {
   final bool isEditing;
   final List<TextEditingController> controllers;
+  final Function(BuildContext, bool) selectPhoneCode;
+  final String? phoneCode;
   // final User user;
 
   const ContactSection({
     super.key,
     required this.isEditing,
     required this.controllers,
+    required this.selectPhoneCode,
+    required this.phoneCode,
     // required this.user,
   });
 
@@ -446,6 +457,12 @@ class ContactSection extends StatelessWidget {
                 controller: isEditing ? controllers[0] : null,
                 keyboardType: TextInputType.emailAddress,
               ),
+              isEditing
+                  ? buildPhoneCodePicker(context)
+                  : DetailsRow(
+                      label: "Phone Code",
+                      value: phoneCode ?? '+974', //Dummy
+                    ),
               DetailsRow(
                 label: "Mobile No.",
                 value: '30334066', //Dummy
@@ -465,6 +482,53 @@ class ContactSection extends StatelessWidget {
           ),
         )
       ],
+    );
+  }
+
+  Widget buildPhoneCodePicker(BuildContext context) {
+    return GestureDetector(
+      onTap: () => selectPhoneCode(context, true),
+      child: Container(
+        decoration: const BoxDecoration(
+          border: Border(
+            bottom: BorderSide(color: AppColors.darkBlue, width: 1),
+          ),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: SizedBox(
+          height: 48,
+          width: screenWidth(context) * .8,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Phone Code",
+                style: getTextStyle('smallBold', color: AppColors.darkBlue),
+              ),
+              Container(
+                height: 40,
+                width: 200,
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: AppColors.darkBlue,
+                    width: 2.0,
+                  ),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  phoneCode ?? '+974', //For now dummy value
+                  style: getTextStyle('small', color: AppColors.darkBlue),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
