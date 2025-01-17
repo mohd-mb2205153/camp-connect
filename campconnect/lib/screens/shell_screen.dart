@@ -1,3 +1,4 @@
+import 'package:campconnect/providers/show_bot_nav_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -33,33 +34,34 @@ class _ShellScreenState extends ConsumerState<ShellScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: widget.child,
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.grey,
-        backgroundColor: Colors.white,
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.map),
-            label: 'Maps',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
-            label: 'Notifications',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
-      ),
-    );
+        body: widget.child,
+        bottomNavigationBar: ref.watch(showBotNavNotifierProvider)
+            ? BottomNavigationBar(
+                currentIndex: _selectedIndex,
+                onTap: _onItemTapped,
+                selectedItemColor: Colors.blue,
+                unselectedItemColor: Colors.grey,
+                backgroundColor: Colors.white,
+                type: BottomNavigationBarType.fixed,
+                items: const [
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.home),
+                    label: 'Home',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.map),
+                    label: 'Maps',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.notifications),
+                    label: 'Notifications',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.person),
+                    label: 'Profile',
+                  ),
+                ],
+              )
+            : null);
   }
 }

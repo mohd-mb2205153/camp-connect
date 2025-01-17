@@ -1,3 +1,4 @@
+import 'package:campconnect/providers/show_bot_nav_provider.dart';
 import 'package:campconnect/routes/app_router.dart';
 import 'package:campconnect/theme/styling_constants.dart';
 import 'package:flutter/material.dart';
@@ -79,10 +80,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             buildMenuItem(
               Icons.person,
               'Personal Information',
-              () => context.pushNamed(AppRouter.personal.name),
+              () {
+                context.pushNamed(AppRouter.personal.name);
+                ref
+                    .read(showBotNavNotifierProvider.notifier)
+                    .showBottomNavBar(false);
+              },
             ),
             buildMenuItem(Icons.menu_book_rounded, 'Educational Information',
-                () => context.pushNamed(AppRouter.educational.name)),
+                () {
+              context.pushNamed(AppRouter.educational.name);
+              ref
+                  .read(showBotNavNotifierProvider.notifier)
+                  .showBottomNavBar(false);
+            }),
             buildMenuItem(Icons.tune, 'Preferences'),
             buildMenuItem(Icons.language, 'Language'),
             buildMenuItem(Icons.power_settings_new, 'Log out',

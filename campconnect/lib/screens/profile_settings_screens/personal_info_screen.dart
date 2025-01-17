@@ -26,12 +26,11 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
   String? userPhoneCode;
   String? selectedCountry;
   String? guardianPhoneCode;
-  User?
+  dynamic
       user; //Testing for now, later we will get user that is logged in thru provider.
 
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
-  final TextEditingController primaryLangController = TextEditingController();
   final TextEditingController specialNeedsController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController mobileController = TextEditingController();
@@ -64,6 +63,28 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
     );
   }
 
+  @override
+  void dispose() {
+    specialNeedsController.dispose();
+    guardianMobileController.dispose();
+    firstNameController.dispose();
+    lastNameController.dispose();
+    emailController.dispose();
+    mobileController.dispose();
+    super.dispose();
+  }
+
+  void initializeControllers(user) {
+    firstNameController.text = user.firstName;
+    lastNameController.text = user.lastName;
+    emailController.text = user.email;
+    mobileController.text = user.mobileNumber;
+    if (user is Student) {
+      guardianMobileController.text = user.guardianContact;
+      specialNeedsController.text = user.specialNeeds;
+    }
+  }
+
   Future<void> selectDate(BuildContext context) async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
@@ -75,12 +96,12 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
       setState(() {
         String dateOfBirth =
             "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
-        user!.dateOfBirth = DateTime.parse(dateOfBirth);
+        user.dateOfBirth = DateTime.parse(dateOfBirth);
       });
     }
   }
 
-  void phonePicker(BuildContext context) {
+  void phonePicker(BuildContext context, bool isGuardian) {
     showCountryPicker(
       exclude: <String>['IL'],
       useSafeArea: true,
@@ -88,7 +109,11 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
       showPhoneCode: true,
       onSelect: (Country country) {
         setState(() {
-          userPhoneCode = '${country.flagEmoji} +${country.phoneCode}';
+          if (!isGuardian) {
+            user.countryCode = '+${country.phoneCode}';
+          } else {
+            user.guardianCountryCode = '+${country.phoneCode}';
+          }
         });
       },
       countryListTheme: CountryListThemeData(
@@ -157,7 +182,8 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                 setState(() {
                   isEditing = !isEditing;
                   if (isEditing) {
-                    // initializeControllers(customer);
+                    initializeControllers(user);
+                    // UPDATE USER...
                   }
                 });
               },
@@ -188,7 +214,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                   ),
                   //Dummy
                   Text(
-                    'Hello, ${user?.firstName} ${user?.lastName}',
+                    'Hello, ${user.firstName} ${user.lastName}',
                     style: getTextStyle('largeBold', color: AppColors.teal),
                   ),
                   SizedBox(
@@ -204,8 +230,6 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                         controllers: [
                           firstNameController,
                           lastNameController,
-                          primaryLangController,
-                          specialNeedsController,
                         ],
                         selectDate: selectDate,
                         selectedLanguage: selectedLanguage ?? 'Arabic', // Dummy
@@ -214,14 +238,13 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                             selectedLanguage = newLanguage;
                           });
                         },
-                        selectedCountry:
-                            selectedCountry ?? user!.nationality, //Dummy
+                        selectedCountry: selectedCountry ?? user.nationality,
                         onCountrySelected: (newCountry) {
                           setState(() {
                             selectedCountry = newCountry;
                           });
                         },
-                        user: user!,
+                        user: user,
                       ),
                     ),
                   ),
@@ -260,6 +283,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
         ),
         FrostedGlassBox(
           boxWidth: double.infinity,
+          // boxHeight: ,
           isCurved: true,
           boxChild: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -486,9 +510,12 @@ class SpecialNeedsSection extends StatelessWidget {
       children: [
         if (isEditing)
           EditScreenTextField(
-            label: 'Special Needs',
+            height: 100,
+            label: '~${user.specialNeeds}~',
             controller: controller,
             width: MediaQuery.of(context).size.width,
+            type: TextInputType.multiline,
+            maxLines: 2,
           ),
         if (!isEditing) Text(user.specialNeeds),
       ],
@@ -499,7 +526,7 @@ class SpecialNeedsSection extends StatelessWidget {
 class ContactSection extends StatelessWidget {
   final bool isEditing;
   final List<TextEditingController> controllers;
-  final Function(BuildContext) selectPhoneCode;
+  final Function(BuildContext, bool) selectPhoneCode;
   final dynamic user;
 
   const ContactSection({
@@ -529,22 +556,31 @@ class ContactSection extends StatelessWidget {
               isEditing
                   ? buildMobileSection(
                       context: context,
-                      divider: user.role == 'student' ? false : true,
+                      divider: user.role == 'student' ? true : false,
                       controller: controllers[1],
-                      phoneCode: user.countryCode)
+                      phoneCode: user.countryCode,
+                      text: 'Mobile',
+                      mobileNo: user.mobileNumber)
                   : DetailsRow(
                       label: "Mobile",
-                      value: '${user.countryCode} ${user.mobileNumber}', //Dummy
-                      divider: /*(user.role == 'Student')*/ false,
+                      value: '${user.countryCode} ${user.mobileNumber}',
+                      divider: user.role == 'student' ? true : false,
                     ),
-              // if (user.role == 'Student')
-              // DetailsRow(
-              //   label: "Guardian No.",
-              //   value: '30224077',
-              //   controller: isEditing ? controllers[2] : null,
-              //   keyboardType: TextInputType.phone,
-              //   divider: false,
-              // )
+              if (user.role == 'student')
+                isEditing
+                    ? buildMobileSection(
+                        context: context,
+                        divider: false,
+                        controller: controllers[2],
+                        phoneCode: user.guardianCountryCode,
+                        mobileNo: user.guardianContact,
+                        text: 'Guardian No.')
+                    : DetailsRow(
+                        label: 'Guardian No.',
+                        value:
+                            '${user.guardianCountryCode} ${user.guardianContact}',
+                        divider: false,
+                      ),
             ],
           ),
         )
@@ -556,7 +592,9 @@ class ContactSection extends StatelessWidget {
       {required BuildContext context,
       required bool divider,
       required TextEditingController controller,
-      required String phoneCode}) {
+      required String phoneCode,
+      required String text,
+      required String mobileNo}) {
     return Container(
       decoration: divider
           ? const BoxDecoration(
@@ -572,17 +610,18 @@ class ContactSection extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              "Mobile",
+              text,
               style: getTextStyle('smallBold', color: AppColors.darkBlue),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 GestureDetector(
-                  onTap: () => selectPhoneCode(context),
+                  onTap: () =>
+                      selectPhoneCode(context, text == 'Mobile' ? false : true),
                   child: Container(
                     height: 40,
-                    width: 85,
+                    width: 60,
                     decoration: BoxDecoration(
                       color: Colors.transparent,
                       borderRadius: BorderRadius.circular(10),
@@ -605,7 +644,7 @@ class ContactSection extends StatelessWidget {
                   width: 10,
                 ),
                 EditScreenTextField(
-                  label: "~30334066~", //dummy
+                  label: "~$mobileNo~",
                   controller: controller,
                   type: TextInputType.phone,
                   width: 150,
