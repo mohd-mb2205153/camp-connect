@@ -1,5 +1,6 @@
 import 'package:campconnect/theme/styling_constants.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 Widget addVerticalSpace(double height) {
   return SizedBox(
@@ -77,6 +78,40 @@ InputDecoration buildInputDecoration(String hintText) {
     ),
     focusedBorder: const UnderlineInputBorder(
       borderSide: BorderSide(color: AppColors.lightTeal, width: 2),
+    ),
+  );
+}
+
+AppBar buildAppBar(BuildContext context) {
+  return AppBar(
+    scrolledUnderElevation: 0.0,
+    backgroundColor: Colors.transparent,
+    elevation: 0,
+    leading: IconButton(
+      icon: const Icon(Icons.arrow_back, color: AppColors.lightTeal),
+      onPressed: () => context.pop(),
+    ),
+  );
+}
+
+Widget buildHeader(String text) {
+  return Padding(
+    padding: const EdgeInsets.only(top: 120),
+    child: Align(
+      alignment: Alignment.topCenter,
+      child: Text(
+        text,
+        style: getTextStyle('largeBold', color: AppColors.lightTeal),
+      ),
+    ),
+  );
+}
+
+Widget buildBackground() {
+  return Positioned.fill(
+    child: Image.asset(
+      'assets/images/bg9.png',
+      fit: BoxFit.cover,
     ),
   );
 }

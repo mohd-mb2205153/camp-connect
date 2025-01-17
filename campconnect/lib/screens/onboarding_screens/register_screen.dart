@@ -104,7 +104,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           buildBackground(),
           Column(
             children: [
-              buildHeader(),
+              buildHeader("Let's create your account"),
               Center(
                 child: Padding(
                   padding: const EdgeInsets.only(top: 40.0),
@@ -116,40 +116,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           ),
           buildRegisterButton(),
         ],
-      ),
-    );
-  }
-
-  AppBar buildAppBar(BuildContext context) {
-    return AppBar(
-      scrolledUnderElevation: 0.0,
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back, color: AppColors.lightTeal),
-        onPressed: () => context.pop(),
-      ),
-    );
-  }
-
-  Widget buildBackground() {
-    return Positioned.fill(
-      child: Image.asset(
-        'assets/images/bg9.png',
-        fit: BoxFit.cover,
-      ),
-    );
-  }
-
-  Widget buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 120),
-      child: Align(
-        alignment: Alignment.topCenter,
-        child: Text(
-          "Let's create your account",
-          style: getTextStyle('largeBold', color: AppColors.lightTeal),
-        ),
       ),
     );
   }
@@ -553,7 +519,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           width: double.infinity,
           height: 44,
           child: ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              context.pushNamed(AppRouter.role.name);
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.lightTeal,
               shape: RoundedRectangleBorder(

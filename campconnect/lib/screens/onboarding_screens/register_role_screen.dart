@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../routes/app_router.dart';
+
 class RoleScreen extends ConsumerStatefulWidget {
   const RoleScreen({super.key});
 
@@ -29,7 +31,6 @@ class _RoleScreenState extends ConsumerState<RoleScreen> {
       ),
       body: Stack(
         children: [
-          // Background Image
           Positioned.fill(
             child: Image.asset(
               Assets.image('bg7.png'),
@@ -65,33 +66,10 @@ class _RoleScreenState extends ConsumerState<RoleScreen> {
                     style: getTextStyle('medium', color: Colors.white),
                   ),
                   addVerticalSpace(96),
-                  StudentButton(
-                    onStudentPressed: () =>
-                        (), // context.pushReplacementNamed(AppRouter.home.name),
-                  ),
+                  StudentButton(),
                   addVerticalSpace(20),
-                  EducatorButton(
-                    onEducatorPressed: () =>
-                        (), // context.pushReplacementNamed(AppRouter.home.name),
-                  ),
+                  EducatorButton(),
                 ],
-              ),
-            ),
-          ),
-
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: SizedBox(
-              width: double.infinity,
-              height: screenHeight(context) * 0.55,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(24, 0, 24, 60),
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [],
-                  ),
-                ),
               ),
             ),
           ),
@@ -102,9 +80,7 @@ class _RoleScreenState extends ConsumerState<RoleScreen> {
 }
 
 class StudentButton extends StatelessWidget {
-  final VoidCallback onStudentPressed;
-
-  const StudentButton({super.key, required this.onStudentPressed});
+  const StudentButton({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -114,7 +90,7 @@ class StudentButton extends StatelessWidget {
         width: double.infinity,
         height: 44,
         child: ElevatedButton(
-          onPressed: onStudentPressed,
+          onPressed: () => context.pushNamed(AppRouter.studentOnboarding.name),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.white,
             shape: RoundedRectangleBorder(
@@ -128,7 +104,7 @@ class StudentButton extends StatelessWidget {
             children: [
               Image.asset(
                 Assets.image('student_icon_teal.png'),
-                height: 20, // Adjust the size of the icon as needed
+                height: 20,
               ),
               addHorizontalSpace(16),
               Text(
@@ -144,9 +120,7 @@ class StudentButton extends StatelessWidget {
 }
 
 class EducatorButton extends StatelessWidget {
-  final VoidCallback onEducatorPressed;
-
-  const EducatorButton({super.key, required this.onEducatorPressed});
+  const EducatorButton({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -156,7 +130,7 @@ class EducatorButton extends StatelessWidget {
         width: double.infinity,
         height: 44,
         child: ElevatedButton(
-          onPressed: onEducatorPressed,
+          onPressed: () => context.pushNamed(AppRouter.educatorOnboarding.name),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.white,
             shape: RoundedRectangleBorder(

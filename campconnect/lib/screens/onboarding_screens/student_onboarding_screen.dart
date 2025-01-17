@@ -1,0 +1,43 @@
+import 'package:campconnect/utils/helper_widgets.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+class StudentOnboardingScreen extends ConsumerStatefulWidget {
+  const StudentOnboardingScreen({super.key});
+
+  @override
+  ConsumerState<StudentOnboardingScreen> createState() =>
+      _StudentOnboardingScreenState();
+}
+
+class _StudentOnboardingScreenState
+    extends ConsumerState<StudentOnboardingScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      extendBodyBehindAppBar: true,
+      appBar: buildAppBar(context),
+      body: Stack(
+        children: [
+          buildBackground(),
+          Column(
+            children: [
+              buildHeader("Personal Information"),
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 40.0),
+                  child: buildContent(context),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildContent(context) {
+    return Column();
+  }
+}
