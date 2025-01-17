@@ -29,6 +29,9 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
     double longitude = double.parse(latlng[1]);
     LatLng location = LatLng(latitude, longitude);
 
+    
+    final descriptionController = TextEditingController();
+    
     return const Placeholder(
       child: Text("it is working lattidue"),
     );

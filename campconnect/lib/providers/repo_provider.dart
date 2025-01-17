@@ -1,4 +1,4 @@
-import 'package:campconnect/repositories/camp_Connect_repo.dart';
+import 'package:campconnect/repositories/camp_connect_repo.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -11,5 +11,3 @@ final repoProvider = FutureProvider<CampConnectRepo>((ref) async {
   return CampConnectRepo(
       studentsRef: studentsRef, teachersRef: teachersRef, campsRef: campsRef);
 });
-
-

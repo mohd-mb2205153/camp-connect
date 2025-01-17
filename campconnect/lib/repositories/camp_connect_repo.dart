@@ -46,7 +46,7 @@ class CampConnectRepo {
   Future<void> addStudent(Student student) async {
     final docId = studentsRef.doc().id;
     student.id = docId;
-    await campsRef.doc(student.id).set(student.toJson());
+    await studentsRef.doc(student.id).set(student.toJson());
 
   Future<void> updateStudent(Student student) =>
       studentsRef.doc(student.id).update(student.toJson());
@@ -63,9 +63,9 @@ class CampConnectRepo {
       (snapshot) => Teacher.fromJson(snapshot.data() as Map<String, dynamic>));
 
   Future<void> addTeacher(Teacher teacher) async {
-    final docId = campsRef.doc().id;
+    final docId = teachersRef.doc().id;
     teacher.id = docId;
-    await campsRef.doc(teacher.id).set(teacher.toJson());
+    await teachersRef.doc(teacher.id).set(teacher.toJson());
   }
 
   Future<void> updateTeacher(Teacher teacher) =>

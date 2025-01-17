@@ -17,8 +17,25 @@ class CampProvider extends AsyncNotifier<List<Camp>> {
   Future<void> initializeCamps() async {
     _repo.observeCamps().listen((camp) {
       state = AsyncData(camp);
-    }).onError((error)=> print(error));
+    }).onError((error) => print(error));
   }
 
+  void showAll() => initializeCamps();
 
+  Future<Camp?> getCampById(String id) => _repo.getCampById(id);
+
+  void addCamp(Camp camp) {
+    _repo.addCamp(camp);
+  }
+
+  void deleteCamp(Camp camp) {
+    _repo.deleteCamp(camp);
+  }
+
+  void updateCamp(Camp camp) {
+    _repo.updateCamp(camp);
+  }
 }
+
+final campProviderNotifier =
+    AsyncNotifierProvider<CampProvider, List<Camp>>(() => CampProvider());

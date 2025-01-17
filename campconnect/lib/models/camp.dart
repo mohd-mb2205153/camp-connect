@@ -2,6 +2,8 @@ import 'package:campconnect/models/student.dart';
 import 'package:campconnect/models/teacher.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Camp {
   String? id;
   String educationLevel;
@@ -10,9 +12,8 @@ class Camp {
   bool specialNeeds;
   double latitude;
   double longitude;
-
-  // List<Teacher> teachers;
-  // List<Student> students;
+  List<String>? teachers; // Store teacher IDs (Firestore references)
+  List<String>? students; // Store student IDs (Firestore references)
 
   Camp({
     this.id,
@@ -22,36 +23,36 @@ class Camp {
     required this.specialNeeds,
     required this.latitude,
     required this.longitude,
-
-    // required this.teachers,
-    // required this.students
+    this.teachers,
+    this.students,
   });
 
+  // Factory method to create a Camp from JSON (Firestore document)
   factory Camp.fromJson(Map<String, dynamic> json) {
     return Camp(
-        id: json['id'],
-        educationLevel: json['educationLevel'],
-        subjects: json['subjects'],
-        description: json['description'],
-        specialNeeds: json['specialNeeds'],
-        latitude: json['latitude'],
-        longitude: json['longitude']
-        // teachers: List<Teacher>.from(json['teachers']),
-        // students: List<Student>.from(json['students'])
-        );
+      id: json['id'],
+      educationLevel: json['educationLevel'] ?? '',
+      subjects: List<String>.from(json['subjects'] ?? []), // Ensure List<String>
+      description: json['description'] ?? '',
+      specialNeeds: json['specialNeeds'] ?? false,
+      latitude: (json['latitude'] as num).toDouble(), // Ensure double type
+      longitude: (json['longitude'] as num).toDouble(), // Ensure double type
+      teachers: json['teachers'] != null ? List<String>.from(json['teachers']) : [],
+      students: json['students'] != null ? List<String>.from(json['students']) : [],
+    );
   }
 
+  // Convert a Camp object to JSON for Firestore
   Map<String, dynamic> toJson() {
     return {
-      "id": id,
       "educationLevel": educationLevel,
       "subjects": subjects,
       "description": description,
       "specialNeeds": specialNeeds,
       "longitude": longitude,
-      "latitude": latitude
-      // "teachers": teachers,
-      // "students": students
+      "latitude": latitude,
+      "teachers": teachers ?? [],
+      "students": students ?? [],
     };
   }
 }
