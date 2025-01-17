@@ -18,19 +18,14 @@ class _StudentOnboardingScreenState
       resizeToAvoidBottomInset: false,
       extendBodyBehindAppBar: true,
       appBar: buildAppBar(context),
-      body: Stack(
+      body: Column(
         children: [
-          buildBackground(),
-          Column(
-            children: [
-              buildHeader("Personal Information"),
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 40.0),
-                  child: buildContent(context),
-                ),
-              ),
-            ],
+          buildHeader("Personal Information"),
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 40.0),
+              child: buildContent(context),
+            ),
           ),
         ],
       ),

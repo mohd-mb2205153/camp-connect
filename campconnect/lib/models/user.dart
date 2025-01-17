@@ -3,9 +3,9 @@ class User {
   String firstName;
   String lastName;
   DateTime dateOfBirth;
-  String gender; // Optional
   String nationality;
   List<String> primaryLanguages;
+  String countryCode;
   String mobileNumber;
   String email;
   String role; // 'student' or 'teacher'
@@ -15,9 +15,9 @@ class User {
     required this.firstName,
     required this.lastName,
     required this.dateOfBirth,
-    this.gender = '',
     required this.nationality,
     required this.primaryLanguages,
+    required this.countryCode,
     required this.mobileNumber,
     required this.email,
     required this.role,
@@ -29,9 +29,9 @@ class User {
       firstName: json['firstName'],
       lastName: json['lastName'],
       dateOfBirth: DateTime.parse(json['dateOfBirth']),
-      gender: json['gender'] ?? '',
       nationality: json['nationality'],
       primaryLanguages: List<String>.from(json['primaryLanguages']),
+      countryCode: json['countryCode'],
       mobileNumber: json['mobileNumber'],
       email: json['email'] ?? '',
       role: json['role'],
@@ -44,9 +44,9 @@ class User {
       'firstName': firstName,
       'lastName': lastName,
       'dateOfBirth': dateOfBirth.toIso8601String(),
-      'gender': gender,
       'nationality': nationality,
       'primaryLanguages': primaryLanguages,
+      'countryCode': countryCode,
       'mobileNumber': mobileNumber,
       'email': email,
       'role': role,
