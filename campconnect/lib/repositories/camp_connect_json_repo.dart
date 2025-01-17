@@ -21,4 +21,11 @@ class CampConnectJsonRepo {
     final data = json.decode(response);
     return List<String>.from(data);
   }
+
+  Future<List<String>> fetchSubjects() async{
+    final String response =
+        await rootBundle.loadString('assets/data/subjects.json');
+    final data = json.decode(response);
+    return List<String>.from(data);
+  }
 }
