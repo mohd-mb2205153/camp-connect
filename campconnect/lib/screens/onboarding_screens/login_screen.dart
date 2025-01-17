@@ -40,7 +40,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       });
     });
 
-    // Listener to rebuild when focus state changes
     emailFocusNode.addListener(() {
       setState(() {});
     });

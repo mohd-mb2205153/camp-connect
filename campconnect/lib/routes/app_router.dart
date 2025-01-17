@@ -9,14 +9,17 @@ import 'package:campconnect/screens/onboarding_screens/onboarding_screen.dart';
 import 'package:campconnect/screens/profile_settings_screens/educational_info_screen.dart';
 import 'package:campconnect/screens/profile_settings_screens/personal_info_screen.dart';
 import 'package:campconnect/screens/profile_settings_screens/profile_screen.dart';
-import 'package:campconnect/screens/onboarding_screens/register_screen.dart';
+import 'package:campconnect/screens/onboarding_screens/register_role_screen.dart';
 import 'package:campconnect/screens/shell_screen.dart';
 import 'package:go_router/go_router.dart';
+
+import '../screens/onboarding_screens/register_screen.dart';
 
 class AppRouter {
   static const onboarding = (name: 'onboarding', path: '/');
   static const login = (name: 'login', path: '/login');
   static const register = (name: 'register', path: '/register');
+  static const role = (name: 'role', path: '/role');
   static const home = (name: 'home', path: '/home');
   static const map = (name: 'maps', path: '/maps');
   static const profile = (name: 'profile', path: '/profile');
@@ -49,6 +52,13 @@ class AppRouter {
             path: register.path,
             name: register.name,
             builder: (context, state) => const RegisterScreen(),
+            routes: [
+              GoRoute(
+                path: role.path,
+                name: role.name,
+                builder: (context, state) => const RoleScreen(),
+              ),
+            ],
           ),
         ],
       ),

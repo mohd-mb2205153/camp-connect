@@ -27,7 +27,6 @@ class AppTheme {
     ),
   );
 
-  // You can define a dark theme here if needed
   static ThemeData darkTheme = ThemeData(
     brightness: Brightness.dark,
     scaffoldBackgroundColor: AppColors.darkTeal,

@@ -37,32 +37,30 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
     Position position = await Geolocator.getCurrentPosition();
     return position;
   }
-  
-  BitmapDescriptor customIcon =  BitmapDescriptor.defaultMarker;
+
+  BitmapDescriptor customIcon = BitmapDescriptor.defaultMarker;
   @override
   void initState() {
     customMarker();
     super.initState();
   }
+
   void customMarker() {
     BitmapDescriptor.asset(
-      const ImageConfiguration(), 
+      const ImageConfiguration(),
       "assets/images/tent-icon.png",
-      ).then((icon){
+    ).then((icon) {
       setState(() {
         customIcon = icon;
       });
     });
   }
- 
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          onPressed: (){}, 
-          icon: Icon(Icons.search)),
+        leading: IconButton(onPressed: () {}, icon: Icon(Icons.search)),
         title: Text("User Current Location"),
         centerTitle: true,
       ),
@@ -82,100 +80,110 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
             markers.add(Marker(
                 markerId: const MarkerId("Current Location"),
                 position: LatLng(position.latitude, position.longitude)));
-            
+
             markers.add(Marker(
               markerId: MarkerId("Camp 1"),
               position: LatLng(25.252094, 51.517181),
               infoWindow: InfoWindow(
-                title: "Camp 1",
-                snippet: "This is an educational camp for elementary school students"
-                ),
+                  title: "Camp 1",
+                  snippet:
+                      "This is an educational camp for elementary school students"),
               icon: customIcon,
               onTap: () {
                 showModalBottomSheet(
-                  context: context, 
-                  builder: (BuildContext context) {
-                    return Container(
-                      height: 300,
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Text("Camp #1", 
-                                style: TextStyle(
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.bold),),
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Container(
-                                  child: Text("An educational camp ", 
+                    context: context,
+                    builder: (BuildContext context) {
+                      return Container(
+                        height: 300,
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Camp #1",
+                                    style: TextStyle(
+                                        fontSize: 30,
+                                        fontWeight: FontWeight.bold),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                ElevatedButton(
-                                  onPressed: (){},
-                                  style: ElevatedButton.styleFrom(
-                                  elevation: 0,
-                                  backgroundColor: (Colors.blue),
-                                  minimumSize: Size(120, 50),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  )
-                                ), 
-                                  child: Text("Directions",
-                                  style: TextStyle(color: Colors.white),),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    child: Text(
+                                      "An educational camp ",
+                                    ),
                                   ),
-                                ElevatedButton(
-                                  onPressed: (){},
-                                  style: ElevatedButton.styleFrom(
-                                  elevation: 0,
-                                  backgroundColor: (Colors.greenAccent),
-                                  minimumSize: Size(120, 50),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  )
-                                ), 
-                                  child: Text("Teachers",
-                                  style: TextStyle(color: Colors.white),), 
-                                  ),
-                                ElevatedButton(
-                                  onPressed: (){},
-                                  style: ElevatedButton.styleFrom(
-                                  elevation: 0,
-                                  backgroundColor: (Colors.blueAccent),
-                                  minimumSize: Size(120, 50),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  )
-                                ), 
-                                  child: Text("Subjects",
-                                  style: TextStyle(color: Colors.white),),
-                                  )
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    );
-                  });
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  ElevatedButton(
+                                    onPressed: () {},
+                                    style: ElevatedButton.styleFrom(
+                                        elevation: 0,
+                                        backgroundColor: (Colors.blue),
+                                        minimumSize: Size(120, 50),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                        )),
+                                    child: Text(
+                                      "Directions",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () {},
+                                    style: ElevatedButton.styleFrom(
+                                        elevation: 0,
+                                        backgroundColor: (Colors.greenAccent),
+                                        minimumSize: Size(120, 50),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                        )),
+                                    child: Text(
+                                      "Teachers",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () {},
+                                    style: ElevatedButton.styleFrom(
+                                        elevation: 0,
+                                        backgroundColor: (Colors.blueAccent),
+                                        minimumSize: Size(120, 50),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                        )),
+                                    child: Text(
+                                      "Subjects",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    });
               },
-              ));
+            ));
             setState(() {});
           },
           label: Text("Get Current Location"),

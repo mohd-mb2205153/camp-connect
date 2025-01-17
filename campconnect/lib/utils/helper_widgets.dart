@@ -1,3 +1,4 @@
+import 'package:campconnect/theme/styling_constants.dart';
 import 'package:flutter/material.dart';
 
 Widget addVerticalSpace(double height) {
@@ -27,6 +28,52 @@ String wrapText(String text, int maxCharsPerLine) {
   }
 
   return buffer.toString().trim();
+}
+
+Widget buildTextField({
+  required TextEditingController controller,
+  required String hintText,
+  TextInputType? keyboardType,
+  bool obscureText = false,
+  Widget? suffixIcon,
+  Icon? prefixIcon,
+  required FocusNode focusNode,
+}) {
+  return TextField(
+    controller: controller,
+    keyboardType: keyboardType,
+    obscureText: obscureText,
+    focusNode: focusNode,
+    decoration: InputDecoration(
+      hintText: hintText,
+      prefixIcon: prefixIcon,
+      hintStyle: const TextStyle(color: Colors.grey),
+      enabledBorder: const UnderlineInputBorder(
+        borderSide: BorderSide(color: Colors.grey),
+      ),
+      focusedBorder: const UnderlineInputBorder(
+        borderSide: BorderSide(color: AppColors.lightTeal, width: 2),
+      ),
+      suffixIcon: suffixIcon,
+    ),
+    style: getTextStyle(
+      'medium',
+      color: focusNode.hasFocus ? AppColors.lightTeal : Colors.grey,
+    ),
+  );
+}
+
+InputDecoration buildInputDecoration(String hintText) {
+  return InputDecoration(
+    hintText: hintText,
+    hintStyle: const TextStyle(color: Colors.grey),
+    enabledBorder: const UnderlineInputBorder(
+      borderSide: BorderSide(color: Colors.grey),
+    ),
+    focusedBorder: const UnderlineInputBorder(
+      borderSide: BorderSide(color: AppColors.lightTeal, width: 2),
+    ),
+  );
 }
 
 class Assets {
