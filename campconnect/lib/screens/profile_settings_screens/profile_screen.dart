@@ -1,4 +1,5 @@
 import 'package:campconnect/routes/app_router.dart';
+import 'package:campconnect/theme/styling_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -29,7 +30,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   children: [
                     const CircleAvatar(
                       radius: 50,
-                      backgroundColor: Colors.black54,
+                      backgroundColor: AppColors.darkTeal,
                       child: Icon(
                         Icons.person,
                         size: 40,
@@ -70,23 +71,21 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
             const Divider(
               thickness: 5,
-              color: Colors.black,
+              color: AppColors.darkBlue,
             ),
             const SizedBox(
               height: 10,
             ),
             buildMenuItem(
-              const Icon(Icons.person),
+              Icons.person,
               'Personal Information',
               () => context.pushNamed(AppRouter.personal.name),
             ),
-            buildMenuItem(
-                const Icon(Icons.menu_book_rounded),
-                'Educational Information',
+            buildMenuItem(Icons.menu_book_rounded, 'Educational Information',
                 () => context.pushNamed(AppRouter.educational.name)),
-            buildMenuItem(const Icon(Icons.tune), 'Preferences'),
-            buildMenuItem(const Icon(Icons.language), 'Language'),
-            buildMenuItem(const Icon(Icons.power_settings_new), 'Logout'),
+            buildMenuItem(Icons.tune, 'Preferences'),
+            buildMenuItem(Icons.language, 'Language'),
+            buildMenuItem(Icons.power_settings_new, 'Logout'),
           ],
         ),
       ),
@@ -94,11 +93,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   //For now onPressed is optional.
-  Widget buildMenuItem(Icon icon, String title, [Function()? onPressed]) {
+  Widget buildMenuItem(IconData icon, String title, [Function()? onPressed]) {
     return Column(
       children: [
         ListTile(
-          leading: icon,
+          leading: Icon(
+            icon,
+            color: AppColors.darkTeal,
+          ),
           title: Text(
             title,
             style: const TextStyle(fontSize: 16),
@@ -110,7 +112,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         ),
         Divider(
           height: 1,
-          color: Colors.grey[300],
+          color: AppColors.darkBeige,
         ),
       ],
     );

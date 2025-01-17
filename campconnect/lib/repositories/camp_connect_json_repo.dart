@@ -14,4 +14,11 @@ class CampConnectJsonRepo {
     }
     return languages;
   }
+
+  Future<List<String>> fetchEducationLevel() async {
+    final String response =
+        await rootBundle.loadString('assets/data/education_level.json');
+    final data = json.decode(response);
+    return List<String>.from(data);
+  }
 }

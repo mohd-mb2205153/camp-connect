@@ -5,3 +5,8 @@ final languagesProvider = FutureProvider<List<String>>((ref) async {
   CampConnectJsonRepo repo = CampConnectJsonRepo();
   return await repo.fetchLanguages();
 });
+
+final educationLevelProvider = FutureProvider<List<String>>((ref) async {
+  CampConnectJsonRepo repo = CampConnectJsonRepo();
+  return await repo.fetchEducationLevel();
+});
