@@ -2,6 +2,7 @@ import 'package:campconnect/providers/json_provider.dart';
 import 'package:campconnect/providers/show_bot_nav_provider.dart';
 import 'package:campconnect/theme/frosted_glass.dart';
 import 'package:campconnect/theme/styling_constants.dart';
+import 'package:campconnect/utils/helper_widgets.dart';
 import 'package:campconnect/widgets/details_row.dart';
 import 'package:campconnect/widgets/filter_dropdown.dart';
 import 'package:campconnect/widgets/section_title_with_icon.dart';
@@ -54,10 +55,11 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
       showPhoneCode: false,
       onSelect: (Country country) {
         setState(() {
-          countryName = '${country.flagEmoji} ${country.name}';
+          countryName = country.name;
         });
       },
       countryListTheme: CountryListThemeData(
+        bottomSheetHeight: screenHeight(context) * .7,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(40.0),
           topRight: Radius.circular(40.0),
@@ -81,7 +83,6 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final languages = ref.watch(languagesProvider);
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
@@ -161,32 +162,24 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                     isCurved: true,
                     boxChild: Padding(
                       padding: const EdgeInsets.all(16.0),
-                      child: languages.when(
-                        data: (list) {
-                          return NameSection(
-                            isEditing: isEditing,
-                            controllers: [
-                              firstNameController,
-                              lastNameController,
-                              primaryLangController,
-                              specialNeedsController,
-                            ],
-                            dateOfBirth: dateOfBirth, //Dummy
-                            countryName: countryName, //Dummy
-                            selectDate: selectDate,
-                            selectNationality: selectNationality,
-                            selectedLanguage:
-                                selectedLanguage ?? 'Arabic', // Dummy
-                            languages: list,
-                            onLanguageSelected: (newLanguage) {
-                              setState(() {
-                                selectedLanguage = newLanguage;
-                              });
-                            },
-                          );
+                      child: NameSection(
+                        isEditing: isEditing,
+                        controllers: [
+                          firstNameController,
+                          lastNameController,
+                          primaryLangController,
+                          specialNeedsController,
+                        ],
+                        dateOfBirth: dateOfBirth, //Dummy
+                        countryName: countryName, //Dummy
+                        selectDate: selectDate,
+                        selectNationality: selectNationality,
+                        selectedLanguage: selectedLanguage ?? 'Arabic', // Dummy
+                        onLanguageSelected: (newLanguage) {
+                          setState(() {
+                            selectedLanguage = newLanguage;
+                          });
                         },
-                        error: (err, stack) => Text('Error: $err'),
-                        loading: () => const CircularProgressIndicator(),
                       ),
                     ),
                   ),
@@ -216,7 +209,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
   }
 }
 
-class NameSection extends StatelessWidget {
+class NameSection extends ConsumerWidget {
   final bool isEditing;
   final List<TextEditingController> controllers;
   //The two below will not be used once user authentication is used.
@@ -224,7 +217,6 @@ class NameSection extends StatelessWidget {
   final String? countryName;
   // -----
   final String selectedLanguage;
-  final List<String> languages;
   final Function(BuildContext) selectDate;
   final Function(BuildContext) selectNationality;
   final Function(String) onLanguageSelected;
@@ -239,13 +231,12 @@ class NameSection extends StatelessWidget {
     required this.countryName,
     required this.selectNationality,
     required this.selectedLanguage,
-    required this.languages,
     required this.onLanguageSelected,
     // required this.user,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -277,32 +268,7 @@ class NameSection extends StatelessWidget {
                       value: dateOfBirth ?? '11-09-2004', //Dummy
                     ),
               isEditing
-                  ? Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: SizedBox(
-                        height: 48,
-                        width: MediaQuery.of(context).size.width * .8,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "First Language",
-                              style: getTextStyle('smallBold',
-                                  color: AppColors.darkBlue),
-                            ),
-                            FilterDropdown(
-                              selectedFilter: selectedLanguage,
-                              options: languages,
-                              onSelected: (String? newLanguage) {
-                                if (newLanguage != null) {
-                                  onLanguageSelected(newLanguage);
-                                }
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    )
+                  ? buildLanguagePicker(context, ref)
                   : DetailsRow(
                       label: "First Language",
                       value: selectedLanguage,
@@ -323,6 +289,40 @@ class NameSection extends StatelessWidget {
     );
   }
 
+  Widget buildLanguagePicker(BuildContext context, WidgetRef ref) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: SizedBox(
+        height: 48,
+        width: screenWidth(context) * .8,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              "First Language",
+              style: getTextStyle('smallBold', color: AppColors.darkBlue),
+            ),
+            ref.watch(languagesProvider).when(
+                  data: (data) {
+                    return FilterDropdown(
+                      selectedFilter: selectedLanguage,
+                      options: data,
+                      onSelected: (String? newLanguage) {
+                        if (newLanguage != null) {
+                          onLanguageSelected(newLanguage);
+                        }
+                      },
+                    );
+                  },
+                  loading: () => const CircularProgressIndicator(),
+                  error: (err, stack) => Text('Error: $err'),
+                ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget buildNationalityPicker(BuildContext context) {
     return GestureDetector(
       onTap: () => selectNationality(context),
@@ -335,7 +335,7 @@ class NameSection extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: SizedBox(
           height: 48,
-          width: MediaQuery.of(context).size.width * .8,
+          width: screenWidth(context) * .8,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -382,7 +382,7 @@ class NameSection extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: SizedBox(
           height: 48,
-          width: MediaQuery.of(context).size.width * .8,
+          width: screenWidth(context) * .8,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
