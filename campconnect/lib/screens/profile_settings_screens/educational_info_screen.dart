@@ -30,14 +30,16 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
     super.initState();
     //Dummy value
     user = User(
-        firstName: 'Ahmad',
-        lastName: 'John',
-        dateOfBirth: DateTime(2004, 11, 9),
-        nationality: 'Iraq',
-        primaryLanguages: ['Arabic', 'English'],
-        mobileNumber: '3033067',
-        email: 'enter@gmail.com',
-        role: 'Student');
+      firstName: 'Ahmad',
+      lastName: 'John',
+      dateOfBirth: DateTime(2004, 11, 9),
+      nationality: 'Iraq',
+      primaryLanguages: ['Arabic', 'English'],
+      countryCode: '974',
+      mobileNumber: '3033067',
+      email: 'enter@gmail.com',
+      role: 'Student',
+    );
   }
 
   @override
