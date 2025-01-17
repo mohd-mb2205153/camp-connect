@@ -95,53 +95,57 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      extendBodyBehindAppBar: true,
-      appBar: buildAppBar(context),
-      body: Stack(
-        children: [
-          buildBackground(),
-          Column(
-            children: [
-              buildHeader("Let's create your account"),
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 40.0),
-                  child: buildScrollableContent(context),
-                ),
-              ),
-              buildTermsCheckbox(),
-            ],
-          ),
-          buildRegisterButton(),
-        ],
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        extendBodyBehindAppBar: true,
+        appBar: buildAppBar(context),
+        body: Stack(
+          children: [
+            buildBackground(),
+            Column(
+              children: [
+                buildHeader("Let's create your account",
+                    "Join us and ignite your passion for learning today"),
+                addVerticalSpace(16),
+                buildScrollableContent(context),
+                buildTermsCheckbox(),
+              ],
+            ),
+            buildRegisterButton(),
+          ],
+        ),
       ),
     );
   }
 
   Widget buildScrollableContent(BuildContext context) {
-    return SizedBox(
-      height: 420,
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            addVerticalSpace(20),
-            buildNameFields(),
-            addVerticalSpace(20),
-            buildEmailField(),
-            addVerticalSpace(20),
-            buildPasswordField(),
-            addVerticalSpace(20),
-            buildPhoneField(),
-            addVerticalSpace(20),
-            buildDOBAndNationalityFields(context),
-            addVerticalSpace(20),
-            buildLanguages(),
-            addVerticalSpace(20),
-          ],
+    return Center(
+      child: SizedBox(
+        height: 400,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              addVerticalSpace(20),
+              buildNameFields(),
+              addVerticalSpace(20),
+              buildEmailField(),
+              addVerticalSpace(20),
+              buildPasswordField(),
+              addVerticalSpace(20),
+              buildPhoneField(),
+              addVerticalSpace(20),
+              buildDOBAndNationalityFields(context),
+              addVerticalSpace(20),
+              buildLanguages(),
+              addVerticalSpace(20),
+            ],
+          ),
         ),
       ),
     );
@@ -149,7 +153,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   Widget buildTermsCheckbox() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Row(
         children: [
           Theme(
@@ -262,11 +266,21 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   Widget buildPhoneField() {
     return Row(
       children: [
-        CountryCodePicker(
-          hideSearch: true,
-          onChanged: (code) {},
-          initialSelection: 'QA',
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.lightTeal,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: CountryCodePicker(
+            textStyle: getTextStyle("small", color: Colors.white),
+            hideSearch: true,
+            onChanged: (code) {},
+            initialSelection: 'QA',
+            showFlag: true,
+            showFlagDialog: true,
+          ),
         ),
+        addHorizontalSpace(12),
         addHorizontalSpace(8),
         Expanded(
           child: buildTextField(
@@ -329,7 +343,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 );
               },
             ),
-            child: buildDecoratedInput(selectedDateOfBirth),
+            child: buildDecoratedInput(selectedDateOfBirth, Icons.date_range),
           ),
         ),
         addHorizontalSpace(16),
@@ -388,33 +402,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 );
               },
             ),
-            child: buildDecoratedInput(selectedNationality),
+            child: buildDecoratedInput(selectedNationality, Icons.flag),
           ),
         ),
       ],
-    );
-  }
-
-  Widget buildDecoratedInput(String text) {
-    return InputDecorator(
-      decoration: buildInputDecoration(""),
-      child: Row(
-        children: [
-          const Icon(Icons.flag, color: Colors.grey),
-          addHorizontalSpace(8),
-          Expanded(
-            child: Text(
-              text,
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-              style: getTextStyle(
-                'medium',
-                color: Colors.grey,
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -426,12 +417,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                Icon(Icons.language, color: Colors.grey),
+                addHorizontalSpace(10),
                 Text(
                   "Add Language",
                   style: getTextStyle('medium', color: Colors.grey),
                 ),
+                const Spacer(),
                 IconButton(
                   icon: const Icon(
                     Icons.add,

@@ -59,61 +59,66 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            context.pop();
-          },
-        ),
-      ),
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.asset(
-              Assets.image('bg6.png'),
-              fit: BoxFit.cover,
-            ),
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () {
+              context.pop();
+            },
           ),
-          Positioned(
-            top: screenHeight(context) * 0.20,
-            left: 24,
-            child: SizedBox(
-              child: Text(
-                wrapText("Sign in", 10),
-                style: getTextStyle('xlargeBold', color: Colors.white),
+        ),
+        body: Stack(
+          children: [
+            Positioned.fill(
+              child: Image.asset(
+                Assets.image('bg6.png'),
+                fit: BoxFit.cover,
               ),
             ),
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: SizedBox(
-              width: double.infinity,
-              height: screenHeight(context) * 0.55,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(24, 0, 24, 60),
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      inputFields(context),
-                      addVerticalSpace(60),
-                      LoginButton(
-                        onLoginPressed: () =>
-                            context.pushReplacementNamed(AppRouter.home.name),
-                      ),
-                    ],
+            Positioned(
+              top: screenHeight(context) * 0.20,
+              left: 24,
+              child: SizedBox(
+                child: Text(
+                  wrapText("Sign in", 10),
+                  style: getTextStyle('xlargeBold', color: Colors.white),
+                ),
+              ),
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: SizedBox(
+                width: double.infinity,
+                height: screenHeight(context) * 0.55,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 0, 24, 60),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        inputFields(context),
+                        addVerticalSpace(60),
+                        LoginButton(
+                          onLoginPressed: () =>
+                              context.pushReplacementNamed(AppRouter.home.name),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

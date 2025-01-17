@@ -14,20 +14,25 @@ class _EducatorOnboardingScreenState
     extends ConsumerState<EducatorOnboardingScreen> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      extendBodyBehindAppBar: true,
-      appBar: buildAppBar(context),
-      body: Column(
-        children: [
-          buildHeader("Personal Information"),
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 40.0),
-              child: buildContent(context),
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        extendBodyBehindAppBar: true,
+        appBar: buildAppBar(context),
+        body: Column(
+          children: [
+            buildHeader("Personal Information", ""),
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 40.0),
+                child: buildContent(context),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
