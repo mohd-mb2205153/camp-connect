@@ -1,5 +1,12 @@
+import 'package:campconnect/models/user.dart';
+import 'package:campconnect/providers/json_provider.dart';
 import 'package:campconnect/providers/show_bot_nav_provider.dart';
 import 'package:campconnect/theme/frosted_glass.dart';
+import 'package:campconnect/theme/styling_constants.dart';
+import 'package:campconnect/widgets/details_row.dart';
+import 'package:campconnect/widgets/edit_screen_fields.dart';
+import 'package:campconnect/widgets/filter_dropdown.dart';
+import 'package:campconnect/widgets/section_title_with_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -12,17 +19,26 @@ class EducationalInfoScreen extends ConsumerStatefulWidget {
 
 class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
   bool isEditing = false;
+  String? selectedEducationLevel;
+  User?
+      user; //Testing for now, later we will get user that is logged in thru provider.
 
-  final TextEditingController firstNameController = TextEditingController();
-  final TextEditingController lastNameController = TextEditingController();
-  final TextEditingController nationalityController = TextEditingController();
-  final TextEditingController dobController = TextEditingController();
-  final TextEditingController primaryLangController = TextEditingController();
-  final TextEditingController specialNeedsController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController mobileController = TextEditingController();
-  final TextEditingController guardianMobileController =
-      TextEditingController();
+  final TextEditingController learningGoalsController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    //Dummy value
+    user = User(
+        firstName: 'Ahmad',
+        lastName: 'John',
+        dateOfBirth: DateTime(2004, 11, 9),
+        nationality: 'Iraq',
+        primaryLanguages: ['Arabic', 'English'],
+        mobileNumber: '3033067',
+        email: 'enter@gmail.com',
+        role: 'Student');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,45 +89,243 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(15),
-            child: Column(
-              children: [
-                FrostedGlassBox(
-                  boxWidth: double.infinity,
-                  isCurved: true,
-                  boxChild: Padding(
+            child: Expanded(
+              child: Column(
+                children: [
+                  Padding(
                     padding: const EdgeInsets.all(16.0),
-                    // child: NameSection(
-                    //   isEditing: isEditing,
-                    //   controllers: [
-                    //     firstNameController,
-                    //     lastNameController,
-                    //     nationalityController,
-                    //     dobController,
-                    //     primaryLangController,
-                    //     specialNeedsController,
-                    //   ],
-                    // ),
+                    child: Container(
+                        width: 75,
+                        height: 75,
+                        decoration: const BoxDecoration(
+                          color: AppColors.darkTeal,
+                          shape: BoxShape.circle,
+                        ),
+                        child: user?.role == 'Student'
+                            ? Stack(
+                                children: [
+                                  Center(
+                                    child: const Icon(
+                                      Icons.person_2_rounded,
+                                      color: Colors.white,
+                                      size: 50,
+                                    ),
+                                  ),
+                                  Positioned(
+                                    bottom: 10,
+                                    left: 40,
+                                    child: const Icon(
+                                      Icons.menu_book_rounded,
+                                      color: AppColors.darkBeige,
+                                      size: 20,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : Stack(
+                                children: [
+                                  Center(
+                                    child: const Icon(
+                                      Icons.person_2_rounded,
+                                      color: Colors.white,
+                                      size: 50,
+                                    ),
+                                  ),
+                                  Positioned(
+                                    bottom: 10,
+                                    left: 40,
+                                    child: const Icon(
+                                      Icons.school_rounded,
+                                      color: AppColors.darkBeige,
+                                      size: 20,
+                                    ),
+                                  ),
+                                ],
+                              )),
                   ),
-                ),
-                const SizedBox(height: 20),
-                FrostedGlassBox(
-                  boxWidth: double.infinity,
-                  isCurved: true,
-                  boxChild: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    // child: ContactSection(
-                    //   isEditing: isEditing,
-                    //   controllers: [
-                    //     emailController,
-                    //     mobileController,
-                    //     guardianMobileController,
-                    //   ],
-                    // ),
+                  Text(
+                    user!.role,
+                    style: getTextStyle('largeBold', color: AppColors.darkBlue),
                   ),
-                ),
-              ],
+                  SizedBox(
+                    height: 10,
+                  ),
+                  if (user?.role == 'Student')
+                    FrostedGlassBox(
+                      boxWidth: double.infinity,
+                      isCurved: true,
+                      boxChild: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: ref.watch(educationLevelProvider).when(
+                              data: (list) {
+                                return StudentEducationSection(
+                                  isEditing: isEditing,
+                                  educationLevels: list,
+                                  selectedEducationLevel:
+                                      selectedEducationLevel ??
+                                          'Primary School', //Dummy
+                                  onEducationLevelSelected: (newLevel) {
+                                    setState(() {
+                                      selectedEducationLevel = newLevel;
+                                    });
+                                  },
+                                );
+                              },
+                              error: (err, stack) => Text('Error: $err'),
+                              loading: () => const CircularProgressIndicator(),
+                            ),
+                      ),
+                    ),
+                  const SizedBox(height: 20),
+                  if (user?.role == 'Student')
+                    FrostedGlassBox(
+                      boxWidth: double.infinity,
+                      isCurved: true,
+                      boxChild: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: LearningGoalsSection(
+                          isEditing: isEditing,
+                          controller: learningGoalsController,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class StudentEducationSection extends StatelessWidget {
+  final bool isEditing;
+  final List<String> educationLevels;
+  final String selectedEducationLevel;
+  final Function(String) onEducationLevelSelected;
+  // final User user;
+
+  const StudentEducationSection({
+    super.key,
+    required this.isEditing,
+    required this.educationLevels,
+    required this.selectedEducationLevel,
+    required this.onEducationLevelSelected,
+    // required this.user,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SectionTitleWithIcon(
+          icon: Icons.menu_book_rounded,
+          title: 'Educational Information',
+          child: Column(
+            children: [
+              isEditing
+                  ? Container(
+                      decoration: BoxDecoration(
+                        border: const Border(
+                          bottom:
+                              BorderSide(color: AppColors.darkBlue, width: 1),
+                        ),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: SizedBox(
+                          height: 48,
+                          width: MediaQuery.of(context).size.width * .8,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Education Level",
+                                style: getTextStyle('smallBold',
+                                    color: AppColors.darkBlue),
+                              ),
+                              FilterDropdown(
+                                selectedFilter: selectedEducationLevel,
+                                options: educationLevels,
+                                onSelected: (String? newLevel) {
+                                  if (newLevel != null) {
+                                    onEducationLevelSelected(newLevel);
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    )
+                  : DetailsRow(
+                      label: "Education Level",
+                      value: selectedEducationLevel,
+                    ),
+            ],
+          ),
+        )
+      ],
+    );
+  }
+}
+
+class LearningGoalsSection extends StatelessWidget {
+  final bool isEditing;
+  final TextEditingController controller;
+  // final User user;
+
+  const LearningGoalsSection({
+    super.key,
+    required this.isEditing,
+    required this.controller,
+    // required this.user,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return DetailsSection(
+      title: "Learning Goals",
+      icon: Icons.emoji_events,
+      children: [
+        if (isEditing)
+          EditScreenTextField(
+            label: 'Learning Goal',
+            controller: controller,
+            width: MediaQuery.of(context).size.width,
+          ),
+        if (!isEditing)
+          //Dummy
+          Text(
+              'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'),
+      ],
+    );
+  }
+}
+
+class DetailsSection extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final List<Widget> children;
+
+  const DetailsSection({
+    super.key,
+    required this.title,
+    required this.icon,
+    required this.children,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: SectionTitleWithIcon(
+        icon: icon,
+        title: title,
+        child: Column(
+          children: children,
         ),
       ),
     );

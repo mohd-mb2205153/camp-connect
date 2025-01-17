@@ -42,10 +42,10 @@ class FilterDropdown extends StatelessWidget {
                   ))
               .toList(),
           onChanged: onSelected,
-          // icon: const Icon(
-          //   Icons.arrow_drop_down,
-          //   color: AppColors.darkBlue,
-          // ),
+          icon: const Icon(
+            Icons.arrow_drop_down,
+            color: AppColors.darkBlue,
+          ),
         ),
       ),
     );

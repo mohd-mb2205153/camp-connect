@@ -147,8 +147,8 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                               primaryLangController,
                               specialNeedsController,
                             ],
-                            dateOfBirth: dateOfBirth,
-                            countryName: countryName,
+                            dateOfBirth: dateOfBirth, //Dummy
+                            countryName: countryName, //Dummy
                             selectDate: selectDate,
                             selectNationality: selectNationality,
                             selectedLanguage:
@@ -195,8 +195,10 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
 class NameSection extends StatelessWidget {
   final bool isEditing;
   final List<TextEditingController> controllers;
+  //The two below will not be used once user authentication is used.
   final String? dateOfBirth;
   final String? countryName;
+  // -----
   final String selectedLanguage;
   final List<String> languages;
   final Function(BuildContext) selectDate;
@@ -230,12 +232,12 @@ class NameSection extends StatelessWidget {
             children: [
               DetailsRow(
                 label: "First Name",
-                value: 'Amr',
+                value: 'Amr', //Dummy
                 controller: isEditing ? controllers[0] : null,
               ),
               DetailsRow(
                 label: "Last Name",
-                value: 'Ahad',
+                value: 'Ahad', //Dummy
                 controller: isEditing ? controllers[1] : null,
               ),
               isEditing
@@ -248,30 +250,33 @@ class NameSection extends StatelessWidget {
                   ? buildDatePicker(context)
                   : DetailsRow(
                       label: "Date of Birth",
-                      value: dateOfBirth ?? '11-09-2004',
+                      value: dateOfBirth ?? '11-09-2004', //Dummy
                     ),
               isEditing
-                  ? SizedBox(
-                      height: 48,
-                      width: MediaQuery.of(context).size.width * .8,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "First Language",
-                            style: getTextStyle('smallBold',
-                                color: AppColors.darkBlue),
-                          ),
-                          FilterDropdown(
-                            selectedFilter: selectedLanguage,
-                            options: languages,
-                            onSelected: (String? newLanguage) {
-                              if (newLanguage != null) {
-                                onLanguageSelected(newLanguage);
-                              }
-                            },
-                          ),
-                        ],
+                  ? Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: SizedBox(
+                        height: 48,
+                        width: MediaQuery.of(context).size.width * .8,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "First Language",
+                              style: getTextStyle('smallBold',
+                                  color: AppColors.darkBlue),
+                            ),
+                            FilterDropdown(
+                              selectedFilter: selectedLanguage,
+                              options: languages,
+                              onSelected: (String? newLanguage) {
+                                if (newLanguage != null) {
+                                  onLanguageSelected(newLanguage);
+                                }
+                              },
+                            ),
+                          ],
+                        ),
                       ),
                     )
                   : DetailsRow(
@@ -413,13 +418,13 @@ class ContactSection extends StatelessWidget {
             children: [
               DetailsRow(
                 label: "Email",
-                value: 'enter@gmail.com',
+                value: 'enter@gmail.com', //Dummy
                 controller: isEditing ? controllers[0] : null,
                 keyboardType: TextInputType.emailAddress,
               ),
               DetailsRow(
                 label: "Mobile No.",
-                value: '30334066',
+                value: '30334066', //Dummy
                 controller: isEditing ? controllers[1] : null,
                 keyboardType: TextInputType.phone,
                 divider: /*(user.role == 'Student')*/ false,
