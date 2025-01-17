@@ -85,130 +85,127 @@ class _StudentOnboardingScreenState
         resizeToAvoidBottomInset: false,
         extendBodyBehindAppBar: true,
         appBar: buildAppBar(context),
-        body: SafeArea(
-          child: Column(
-            children: [
-              Expanded(
-                child: PageView(
-                  controller: pageController,
-                  onPageChanged: (index) {
-                    setState(() {
-                      currentPage = index;
-                    });
-                  },
-                  children: [
-                    FirstPageContent(
-                      emergencyPhoneField: buildEmergencyPhoneField(),
-                      specialNeedsField: buildSpecialNeedsField(),
-                    ),
-                    SecondPageContent(
-                      selectedEducationLevel: selectedEducationLevel,
-                      onEducationLevelChanged: (level) {
-                        setState(() {
-                          selectedEducationLevel = level;
-                        });
-                      },
-                      educationLevels: educationLevels,
-                      subjects: subjects,
-                      selectedSubjects: selectedSubjects,
-                      onSubjectsChanged: (subject) {
-                        setState(() {
-                          if (selectedSubjects.contains(subject)) {
-                            selectedSubjects.remove(subject);
-                          } else {
-                            selectedSubjects.add(subject);
-                          }
-                        });
-                      },
-                      learningGoalsField: buildLearningGoalsField(),
-                    ),
-                    ThirdPageContent(
-                      selectedDistance: selectedDistance,
-                      onDistanceChanged: (distance) {
-                        setState(() {
-                          selectedDistance = distance;
-                        });
-                      },
-                    ),
-                  ],
-                ),
+        body: Column(
+          children: [
+            Expanded(
+              child: PageView(
+                controller: pageController,
+                onPageChanged: (index) {
+                  setState(() {
+                    currentPage = index;
+                  });
+                },
+                children: [
+                  FirstPageContent(
+                    emergencyPhoneField: buildEmergencyPhoneField(),
+                    specialNeedsField: buildSpecialNeedsField(),
+                  ),
+                  SecondPageContent(
+                    selectedEducationLevel: selectedEducationLevel,
+                    onEducationLevelChanged: (level) {
+                      setState(() {
+                        selectedEducationLevel = level;
+                      });
+                    },
+                    educationLevels: educationLevels,
+                    subjects: subjects,
+                    selectedSubjects: selectedSubjects,
+                    onSubjectsChanged: (subject) {
+                      setState(() {
+                        if (selectedSubjects.contains(subject)) {
+                          selectedSubjects.remove(subject);
+                        } else {
+                          selectedSubjects.add(subject);
+                        }
+                      });
+                    },
+                    learningGoalsField: buildLearningGoalsField(),
+                  ),
+                  ThirdPageContent(
+                    selectedDistance: selectedDistance,
+                    onDistanceChanged: (distance) {
+                      setState(() {
+                        selectedDistance = distance;
+                      });
+                    },
+                  ),
+                ],
               ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    SizedBox(
-                      width: 100,
-                      child: ElevatedButton(
-                        onPressed: currentPage > 0
-                            ? () {
-                                pageController.previousPage(
-                                  duration: const Duration(milliseconds: 300),
-                                  curve: Curves.ease,
-                                );
-                              }
-                            : null,
-                        style: ElevatedButton.styleFrom(
-                          elevation: 0,
-                          backgroundColor: Colors.transparent,
-                          disabledForegroundColor: Colors.transparent,
-                          disabledBackgroundColor: Colors.transparent,
-                        ),
-                        child: Text(
-                          "BACK",
-                          style: getTextStyle(
-                            "small",
-                            color: currentPage > 0
-                                ? Colors.grey
-                                : Colors.transparent,
-                          ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SizedBox(
+                    width: 100,
+                    child: ElevatedButton(
+                      onPressed: currentPage > 0
+                          ? () {
+                              pageController.previousPage(
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.ease,
+                              );
+                            }
+                          : null,
+                      style: ElevatedButton.styleFrom(
+                        elevation: 0,
+                        backgroundColor: Colors.transparent,
+                        disabledForegroundColor: Colors.transparent,
+                        disabledBackgroundColor: Colors.transparent,
+                      ),
+                      child: Text(
+                        "BACK",
+                        style: getTextStyle(
+                          "small",
+                          color: currentPage > 0
+                              ? Colors.grey
+                              : Colors.transparent,
                         ),
                       ),
                     ),
-                    SmoothPageIndicator(
-                      controller: pageController,
-                      count: 3,
-                      effect: const WormEffect(
-                        dotHeight: 6,
-                        dotWidth: 6,
-                        spacing: 8,
-                        dotColor: Colors.grey,
-                        activeDotColor: AppColors.lightTeal,
+                  ),
+                  SmoothPageIndicator(
+                    controller: pageController,
+                    count: 3,
+                    effect: const WormEffect(
+                      dotHeight: 6,
+                      dotWidth: 6,
+                      spacing: 8,
+                      dotColor: Colors.grey,
+                      activeDotColor: AppColors.lightTeal,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 100,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (currentPage < 2) {
+                          pageController.nextPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.ease,
+                          );
+                        } else {
+                          context.goNamed(AppRouter.home.name);
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        elevation: 0,
+                        backgroundColor: Colors.transparent,
+                      ),
+                      child: Text(
+                        currentPage < 2 ? "NEXT" : "FINISH",
+                        style: getTextStyle(
+                          "small",
+                          color: AppColors.lightTeal,
+                        ),
                       ),
                     ),
-                    SizedBox(
-                      width: 100,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          if (currentPage < 2) {
-                            pageController.nextPage(
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.ease,
-                            );
-                          } else {
-                            context.goNamed(AppRouter.home.name);
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          elevation: 0,
-                          backgroundColor: Colors.transparent,
-                        ),
-                        child: Text(
-                          currentPage < 2 ? "NEXT" : "FINISH",
-                          style: getTextStyle(
-                            "small",
-                            color: AppColors.lightTeal,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -217,6 +214,17 @@ class _StudentOnboardingScreenState
   Widget buildEmergencyPhoneField() {
     return Column(
       children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              "Emergency Phone",
+              textAlign: TextAlign.start,
+              style: getTextStyle("small", color: AppColors.lightTeal),
+            ),
+          ],
+        ),
+        addVerticalSpace(8),
         Row(
           children: [
             Container(
@@ -265,6 +273,17 @@ class _StudentOnboardingScreenState
   Widget buildSpecialNeedsField() {
     return Column(
       children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              "Special Needs",
+              textAlign: TextAlign.start,
+              style: getTextStyle("small", color: AppColors.lightTeal),
+            ),
+          ],
+        ),
+        addVerticalSpace(8),
         buildTextArea(
           controller: txtSpecialNeedsController,
           hintText: "Special Needs",
@@ -292,6 +311,17 @@ class _StudentOnboardingScreenState
   Widget buildLearningGoalsField() {
     return Column(
       children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              "Learning Goals",
+              textAlign: TextAlign.start,
+              style: getTextStyle("small", color: AppColors.lightTeal),
+            ),
+          ],
+        ),
+        addVerticalSpace(8),
         buildTextArea(
           controller: txtLearningGoalsController,
           hintText: "Learning Goals",
@@ -333,7 +363,7 @@ class FirstPageContent extends StatelessWidget {
       children: [
         buildHeader("Before we get started...",
             "Provide essential details to ensure your safety and comfort."),
-        addVerticalSpace(32),
+        addVerticalSpace(64),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Container(
@@ -379,7 +409,7 @@ class SecondPageContent extends StatelessWidget {
           "Education Details",
           "Tell us about your educational background and preferences.",
         ),
-        addVerticalSpace(32),
+        addVerticalSpace(64),
         SizedBox(
           height: 300,
           child: SingleChildScrollView(
@@ -407,6 +437,17 @@ class SecondPageContent extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                "Preferred Subjects",
+                textAlign: TextAlign.start,
+                style: getTextStyle("small", color: AppColors.lightTeal),
+              ),
+            ],
+          ),
+          addVerticalSpace(8),
           Row(
             children: [
               Icon(Icons.book, color: Colors.grey),
@@ -486,6 +527,17 @@ class SecondPageContent extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
         children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                "Educational Level",
+                textAlign: TextAlign.start,
+                style: getTextStyle("small", color: AppColors.lightTeal),
+              ),
+            ],
+          ),
+          addVerticalSpace(8),
           GestureDetector(
             onTap: () => showCupertinoModalPopup(
               context: context,
@@ -564,7 +616,7 @@ class ThirdPageContent extends StatelessWidget {
       children: [
         buildHeader("Camp Preferences",
             "Let us know your preferred distance for camps."),
-        addVerticalSpace(32),
+        addVerticalSpace(64),
         buildPreferredDistance(context),
       ],
     );
@@ -575,6 +627,17 @@ class ThirdPageContent extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
         children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                "Preferred Distance to Camps",
+                textAlign: TextAlign.start,
+                style: getTextStyle("small", color: AppColors.lightTeal),
+              ),
+            ],
+          ),
+          addVerticalSpace(8),
           GestureDetector(
             onTap: () => showCupertinoModalPopup(
               context: context,
