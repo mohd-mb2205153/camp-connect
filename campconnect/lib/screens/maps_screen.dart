@@ -1,3 +1,5 @@
+import 'package:campconnect/models/camp.dart';
+import 'package:campconnect/providers/camp_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
@@ -58,136 +60,142 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(onPressed: () {}, icon: Icon(Icons.search)),
-        title: Text("User Current Location"),
-        centerTitle: true,
-      ),
-      body: GoogleMap(
-        initialCameraPosition: initialCameraPosition,
-        markers: markers,
-        zoomControlsEnabled: false,
-        mapType: MapType.hybrid,
-        onMapCreated: (GoogleMapController controller) {
-          _googleMapController = controller;
+    return ref.watch(campProviderNotifier).when(
+        data: (data) {
+          markers.addAll(createMarkers(data));
+          return Scaffold(
+            appBar: AppBar(
+              leading: IconButton(onPressed: () {}, icon: Icon(Icons.search)),
+              title: Text("User Current Location"),
+              centerTitle: true,
+            ),
+            body: GoogleMap(
+              initialCameraPosition: initialCameraPosition,
+              markers: markers,
+              zoomControlsEnabled: false,
+              mapType: MapType.hybrid,
+              onMapCreated: (GoogleMapController controller) {
+                _googleMapController = controller;
+              },
+            ),
+            floatingActionButton: FloatingActionButton.extended(
+                onPressed: () async {
+                  Position position = await getCurrentLocation();
+
+                  markers.add(Marker(
+                      markerId: const MarkerId("Current Location"),
+                      position: LatLng(position.latitude, position.longitude)));
+                  setState(() {});
+                },
+                label: Text("Get Current Location"),
+                icon: Icon(Icons.location_city)),
+          );
         },
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-          onPressed: () async {
-            Position position = await getCurrentLocation();
+        error: (err, stack) => Text('Error: $err'),
+        loading: () => const CircularProgressIndicator());
+  }
 
-            markers.add(Marker(
-                markerId: const MarkerId("Current Location"),
-                position: LatLng(position.latitude, position.longitude)));
-
-            markers.add(Marker(
-              markerId: MarkerId("Camp 1"),
-              position: LatLng(25.252094, 51.517181),
-              infoWindow: InfoWindow(
-                  title: "Camp 1",
-                  snippet:
-                      "This is an educational camp for elementary school students"),
-              icon: customIcon,
-              onTap: () {
-                showModalBottomSheet(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return Container(
-                        height: 300,
-                        child: Column(
+  List<Marker> createMarkers(List<Camp> camps) {
+    List<Marker> markers = [];
+    for (int i = 0; i < camps.length; i++) {
+      Marker marker = Marker(
+        markerId: MarkerId("${camps[i].id}"),
+        position: LatLng(camps[i].latitude, camps[i].longitude),
+        infoWindow: InfoWindow(
+            title: "${camps[i].name}", snippet: "${camps[i].description}"),
+        icon: customIcon,
+        onTap: () {
+          showModalBottomSheet(
+              context: context,
+              builder: (BuildContext context) {
+                return Container(
+                  height: 300,
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Camp #1",
-                                    style: TextStyle(
-                                        fontSize: 30,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ],
-                              ),
+                            Text(
+                              "Camp #1",
+                              style: TextStyle(
+                                  fontSize: 30, fontWeight: FontWeight.bold),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    child: Text(
-                                      "An educational camp ",
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  ElevatedButton(
-                                    onPressed: () {},
-                                    style: ElevatedButton.styleFrom(
-                                        elevation: 0,
-                                        backgroundColor: (Colors.blue),
-                                        minimumSize: Size(120, 50),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        )),
-                                    child: Text(
-                                      "Directions",
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                  ),
-                                  ElevatedButton(
-                                    onPressed: () {},
-                                    style: ElevatedButton.styleFrom(
-                                        elevation: 0,
-                                        backgroundColor: (Colors.greenAccent),
-                                        minimumSize: Size(120, 50),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        )),
-                                    child: Text(
-                                      "Teachers",
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                  ),
-                                  ElevatedButton(
-                                    onPressed: () {},
-                                    style: ElevatedButton.styleFrom(
-                                        elevation: 0,
-                                        backgroundColor: (Colors.blueAccent),
-                                        minimumSize: Size(120, 50),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        )),
-                                    child: Text(
-                                      "Subjects",
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                  )
-                                ],
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              child: Text(
+                                "An educational camp ",
                               ),
                             ),
                           ],
                         ),
-                      );
-                    });
-              },
-            ));
-            setState(() {});
-          },
-          label: Text("Get Current Location"),
-          icon: Icon(Icons.location_city)),
-    );
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {},
+                              style: ElevatedButton.styleFrom(
+                                  elevation: 0,
+                                  backgroundColor: (Colors.blue),
+                                  minimumSize: Size(120, 50),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  )),
+                              child: Text(
+                                "Directions",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {},
+                              style: ElevatedButton.styleFrom(
+                                  elevation: 0,
+                                  backgroundColor: (Colors.greenAccent),
+                                  minimumSize: Size(120, 50),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  )),
+                              child: Text(
+                                "Teachers",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {},
+                              style: ElevatedButton.styleFrom(
+                                  elevation: 0,
+                                  backgroundColor: (Colors.blueAccent),
+                                  minimumSize: Size(120, 50),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  )),
+                              child: Text(
+                                "Subjects",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              });
+        },
+      );
+      markers.add(marker);
+    }
+    return markers;
   }
 }
