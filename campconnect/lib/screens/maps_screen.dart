@@ -62,11 +62,12 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
   Widget build(BuildContext context) {
     return ref.watch(campProviderNotifier).when(
         data: (data) {
+          print("The length of the camp list is: ${data.length}");
           markers.addAll(createMarkers(data));
           return Scaffold(
             appBar: AppBar(
               leading: IconButton(onPressed: () {}, icon: Icon(Icons.search)),
-              title: Text("User Current Location"),
+              title: Text("Camps around you"),
               centerTitle: true,
             ),
             body: GoogleMap(
@@ -118,7 +119,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Text(
-                              "Camp #1",
+                              camps[i].name,
                               style: TextStyle(
                                   fontSize: 30, fontWeight: FontWeight.bold),
                             ),
@@ -132,7 +133,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
                           children: [
                             Container(
                               child: Text(
-                                "An educational camp ",
+                                camps[i].description,
                               ),
                             ),
                           ],

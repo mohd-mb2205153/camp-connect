@@ -50,13 +50,14 @@ class Camp {
   // Convert a Camp object to JSON for Firestore
   Map<String, dynamic> toJson() {
     return {
+      "id": id,
       "name": name,
       "educationLevel": educationLevel,
-      "subjects": subject,
+      "subject": subject,
       "description": description,
       "specialNeeds": specialNeeds,
-      "longitude": longitude,
       "latitude": latitude,
+      "longitude": longitude,
       "teachers": teachers ?? [],
       "students": students ?? [],
     };
