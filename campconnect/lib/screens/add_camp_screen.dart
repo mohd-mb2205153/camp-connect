@@ -46,77 +46,125 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Create Camp")),
+      appBar: AppBar(title: Text("Enter new camp details")),
       body: SingleChildScrollView(
         child: Column(
           children: [
             Column(
               children: [
-                Text("Enter Name: "),
-                TextField(
-                  controller: namecontroller,
-                  decoration: InputDecoration(labelText: "Name"),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    controller: namecontroller,
+                    decoration: InputDecoration(
+                      labelText: "Name",
+                      border: OutlineInputBorder()
+                      ),
+                    
+                  ),
                 )
               ],
             ),
-            Row(
-              children: [Text("Location"), Text("$address")],
-            ),
-            Row(children: [Text("Choose level"), buildEduDropdown()]),
-            Row(
-              children: [
-                Text("Choose Subject"),
-                buildSubjectsDropdown(),
-              ],
-            ),
-            Column(children: [
-              Text("Description"),
-              TextField(
-                controller: descriptionController,
-                decoration: InputDecoration(labelText: "Enter Description"),
-              )
-            ]),
-            Row(
-              children: [
-                Expanded(
-                  child: RadioListTile(
-                    title: const Text('Yes'),
-                    value: 'Yes',
-                    groupValue: _selectedSpecNeeds,
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedSpecNeeds = value!;
-                      });
-                    },
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  const Text("Location: ", style: TextStyle(fontWeight: FontWeight.bold)),
+                  Expanded(
+                    child: Text(address ?? "", style: const TextStyle(fontSize: 16.0)),
                   ),
-                ),
-                Expanded(
-                  child: RadioListTile(
-                    title: const Text('No'),
-                    value: 'No',
-                    groupValue: _selectedSpecNeeds,
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedSpecNeeds = value!;
-                      });
-                    },
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
-            ElevatedButton(
-                onPressed: () {
-                  addCamp(
-                      namecontroller,
-                      selectedEducationLevel!,
-                      selectedSubject!,
-                      descriptionController,
-                      _selectedSpecNeeds!,
-                      latitude!,
-                      longitude!);
-                  context.go(AppRouter.home.path);
-                },
-                child: Text("Add Camp"))
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("Choose level"), buildEduDropdown()
+                ]),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("Choose Subject"),
+                  buildSubjectsDropdown(),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(children: [
+                TextField(
+                  controller: descriptionController,
+                  maxLines: 3,
+                  decoration: InputDecoration(
+                    labelText: "Enter Description",
+                    border: OutlineInputBorder()),
+                )
+              ]),
+            ),
+            const Text("Special Needs", style: TextStyle(fontWeight: FontWeight.bold)),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: RadioListTile(
+                      title: const Text('Yes'),
+                      value: 'Yes',
+                      groupValue: _selectedSpecNeeds,
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedSpecNeeds = value!;
+                        });
+                      },
+                    ),
+                  ),
+                  Expanded(
+                    child: RadioListTile(
+                      title: const Text('No'),
+                      value: 'No',
+                      groupValue: _selectedSpecNeeds,
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedSpecNeeds = value!;
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                    onPressed: () {
+                      addCamp(
+                          namecontroller,
+                          selectedEducationLevel!,
+                          selectedSubject!,
+                          descriptionController,
+                          _selectedSpecNeeds!,
+                          latitude!,
+                          longitude!);
+                      context.go(AppRouter.home.path);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white, backgroundColor: Colors.blue, // Text color
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12), // Padding
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12), // Rounded corners
+                      ),
+                      elevation: 4, // Shadow elevation
+                    ),
+                    child: Text("Add Camp")),
+              ),
+            )
           ],
         ),
       ),
