@@ -24,6 +24,7 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
       user; //Testing for now, later we will get user that is logged in thru provider.
 
   final TextEditingController learningGoalsController = TextEditingController();
+  final TextEditingController teachingExpController = TextEditingController();
 
   @override
   void initState() {
@@ -35,7 +36,7 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
       dateOfBirth: DateTime(2004, 11, 9),
       nationality: 'Iraq',
       primaryLanguages: ['Arabic', 'English'],
-      countryCode: '974',
+      countryCode: 'QA',
       mobileNumber: '3033067',
       email: 'enter@gmail.com',
       role: 'Student',
@@ -97,53 +98,14 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Container(
-                        width: 75,
-                        height: 75,
-                        decoration: const BoxDecoration(
-                          color: AppColors.darkTeal,
-                          shape: BoxShape.circle,
-                        ),
-                        child: user?.role == 'Student'
-                            ? Stack(
-                                children: [
-                                  Center(
-                                    child: const Icon(
-                                      Icons.person_2_rounded,
-                                      color: Colors.white,
-                                      size: 50,
-                                    ),
-                                  ),
-                                  Positioned(
-                                    bottom: 10,
-                                    left: 40,
-                                    child: const Icon(
-                                      Icons.menu_book_rounded,
-                                      color: AppColors.darkBeige,
-                                      size: 20,
-                                    ),
-                                  ),
-                                ],
-                              )
-                            : Stack(
-                                children: [
-                                  Center(
-                                    child: const Icon(
-                                      Icons.person_2_rounded,
-                                      color: Colors.white,
-                                      size: 50,
-                                    ),
-                                  ),
-                                  Positioned(
-                                    bottom: 10,
-                                    left: 40,
-                                    child: const Icon(
-                                      Icons.school_rounded,
-                                      color: AppColors.darkBeige,
-                                      size: 20,
-                                    ),
-                                  ),
-                                ],
-                              )),
+                      width: 75,
+                      height: 75,
+                      decoration: const BoxDecoration(
+                        color: AppColors.darkTeal,
+                        shape: BoxShape.circle,
+                      ),
+                      child: buildIcon(user!),
+                    ),
                   ),
                   Text(
                     user!.role,
@@ -152,45 +114,8 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
                   SizedBox(
                     height: 10,
                   ),
-                  if (user?.role == 'Student')
-                    FrostedGlassBox(
-                      boxWidth: double.infinity,
-                      isCurved: true,
-                      boxChild: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: ref.watch(educationLevelProvider).when(
-                              data: (list) {
-                                return StudentEducationSection(
-                                  isEditing: isEditing,
-                                  educationLevels: list,
-                                  selectedEducationLevel:
-                                      selectedEducationLevel ??
-                                          'Primary School', //Dummy
-                                  onEducationLevelSelected: (newLevel) {
-                                    setState(() {
-                                      selectedEducationLevel = newLevel;
-                                    });
-                                  },
-                                );
-                              },
-                              error: (err, stack) => Text('Error: $err'),
-                              loading: () => const CircularProgressIndicator(),
-                            ),
-                      ),
-                    ),
-                  const SizedBox(height: 20),
-                  if (user?.role == 'Student')
-                    FrostedGlassBox(
-                      boxWidth: double.infinity,
-                      isCurved: true,
-                      boxChild: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: LearningGoalsSection(
-                          isEditing: isEditing,
-                          controller: learningGoalsController,
-                        ),
-                      ),
-                    ),
+                  if (user?.role == 'Student') buildStudentInfo(),
+                  if (user?.role == 'Teacher') buildTeacherInfo(),
                 ],
               ),
             ),
@@ -199,11 +124,112 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
       ),
     );
   }
+
+  Widget buildStudentInfo() {
+    return Column(
+      children: [
+        FrostedGlassBox(
+          boxWidth: double.infinity,
+          isCurved: true,
+          boxChild: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: StudentEducationSection(
+              isEditing: isEditing,
+              selectedEducationLevel:
+                  selectedEducationLevel ?? 'Primary School', //Dummy
+              onEducationLevelSelected: (newLevel) {
+                setState(() {
+                  selectedEducationLevel = newLevel;
+                });
+              },
+            ),
+          ),
+        ),
+        const SizedBox(height: 20),
+        if (user?.role == 'Student')
+          FrostedGlassBox(
+            boxWidth: double.infinity,
+            isCurved: true,
+            boxChild: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: LearningGoalsSection(
+                isEditing: isEditing,
+                controller: learningGoalsController,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget buildTeacherInfo() {
+    return FrostedGlassBox(
+      boxWidth: double.infinity,
+      isCurved: true,
+      boxChild: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: TeacherEducationSection(
+          isEditing: isEditing,
+          controller: teachingExpController,
+          selectedEducationLevel:
+              selectedEducationLevel ?? 'Bachelor Degree', //Dummy
+          onEducationLevelSelected: (newLevel) {
+            setState(() {
+              selectedEducationLevel = newLevel;
+            });
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget buildIcon(User user) {
+    return user.role == 'Student'
+        ? Stack(
+            children: [
+              Center(
+                child: const Icon(
+                  Icons.person_2_rounded,
+                  color: Colors.white,
+                  size: 50,
+                ),
+              ),
+              Positioned(
+                bottom: 10,
+                left: 40,
+                child: const Icon(
+                  Icons.menu_book_rounded,
+                  color: AppColors.darkBeige,
+                  size: 20,
+                ),
+              ),
+            ],
+          )
+        : Stack(
+            children: [
+              Center(
+                child: const Icon(
+                  Icons.person_2_rounded,
+                  color: Colors.white,
+                  size: 50,
+                ),
+              ),
+              Positioned(
+                bottom: 10,
+                left: 40,
+                child: const Icon(
+                  Icons.school_rounded,
+                  color: AppColors.darkBeige,
+                  size: 20,
+                ),
+              ),
+            ],
+          );
+  }
 }
 
-class StudentEducationSection extends StatelessWidget {
+class StudentEducationSection extends ConsumerWidget {
   final bool isEditing;
-  final List<String> educationLevels;
   final String selectedEducationLevel;
   final Function(String) onEducationLevelSelected;
   // final User user;
@@ -211,20 +237,19 @@ class StudentEducationSection extends StatelessWidget {
   const StudentEducationSection({
     super.key,
     required this.isEditing,
-    required this.educationLevels,
     required this.selectedEducationLevel,
     required this.onEducationLevelSelected,
     // required this.user,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         SectionTitleWithIcon(
           icon: Icons.menu_book_rounded,
-          title: 'Educational Information',
+          title: 'Basic Information',
           child: Column(
             children: [
               isEditing
@@ -248,15 +273,24 @@ class StudentEducationSection extends StatelessWidget {
                                 style: getTextStyle('smallBold',
                                     color: AppColors.darkBlue),
                               ),
-                              FilterDropdown(
-                                selectedFilter: selectedEducationLevel,
-                                options: educationLevels,
-                                onSelected: (String? newLevel) {
-                                  if (newLevel != null) {
-                                    onEducationLevelSelected(newLevel);
-                                  }
-                                },
-                              ),
+                              ref.watch(educationLevelProvider).when(
+                                    data: (data) {
+                                      List<String> filteredList =
+                                          data.sublist(0, 3);
+                                      return FilterDropdown(
+                                        selectedFilter: selectedEducationLevel,
+                                        options: filteredList,
+                                        onSelected: (String? newLevel) {
+                                          if (newLevel != null) {
+                                            onEducationLevelSelected(newLevel);
+                                          }
+                                        },
+                                      );
+                                    },
+                                    loading: () =>
+                                        const CircularProgressIndicator(),
+                                    error: (err, stack) => Text('Error: $err'),
+                                  ),
                             ],
                           ),
                         ),
@@ -266,6 +300,96 @@ class StudentEducationSection extends StatelessWidget {
                       label: "Education Level",
                       value: selectedEducationLevel,
                     ),
+            ],
+          ),
+        )
+      ],
+    );
+  }
+}
+
+class TeacherEducationSection extends ConsumerWidget {
+  final bool isEditing;
+  final String selectedEducationLevel;
+  final Function(String) onEducationLevelSelected;
+  final TextEditingController controller;
+  // final User user;
+
+  const TeacherEducationSection({
+    super.key,
+    required this.isEditing,
+    required this.selectedEducationLevel,
+    required this.onEducationLevelSelected,
+    required this.controller,
+    // required this.user,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SectionTitleWithIcon(
+          icon: Icons.school_rounded,
+          title: 'Basic Information',
+          child: Column(
+            children: [
+              isEditing
+                  ? Container(
+                      decoration: BoxDecoration(
+                        border: const Border(
+                          bottom:
+                              BorderSide(color: AppColors.darkBlue, width: 1),
+                        ),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: SizedBox(
+                          height: 48,
+                          width: MediaQuery.of(context).size.width * .8,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Highest Degree",
+                                style: getTextStyle('smallBold',
+                                    color: AppColors.darkBlue),
+                              ),
+                              ref.watch(educationLevelProvider).when(
+                                    data: (data) {
+                                      List<String> filteredList =
+                                          data.sublist(2, 6);
+                                      return FilterDropdown(
+                                        selectedFilter: selectedEducationLevel,
+                                        options: filteredList,
+                                        onSelected: (String? newLevel) {
+                                          if (newLevel != null) {
+                                            onEducationLevelSelected(newLevel);
+                                          }
+                                        },
+                                      );
+                                    },
+                                    loading: () =>
+                                        const CircularProgressIndicator(),
+                                    error: (err, stack) => Text('Error: $err'),
+                                  ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    )
+                  : DetailsRow(
+                      label: "Highest Degree",
+                      value: selectedEducationLevel,
+                    ),
+              DetailsRow(
+                label: "Teaching Experience",
+                value: '2 year(s)', //Dummy
+                controller: isEditing ? controller : null,
+                editWidth: 165,
+                keyboardType: TextInputType.number,
+                divider: false,
+              ),
             ],
           ),
         )

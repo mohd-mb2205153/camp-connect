@@ -2,6 +2,7 @@ import 'package:campconnect/providers/json_provider.dart';
 import 'package:campconnect/providers/show_bot_nav_provider.dart';
 import 'package:campconnect/theme/frosted_glass.dart';
 import 'package:campconnect/theme/styling_constants.dart';
+import 'package:campconnect/utils/helper_widgets.dart';
 import 'package:campconnect/widgets/details_row.dart';
 import 'package:campconnect/widgets/filter_dropdown.dart';
 import 'package:campconnect/widgets/section_title_with_icon.dart';
@@ -21,6 +22,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
   String? dateOfBirth;
   String? countryName;
   String? selectedLanguage;
+  String? phoneCode;
 
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
@@ -46,18 +48,23 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
     }
   }
 
-  void selectNationality(BuildContext context) {
+  void countryPicker(BuildContext context, bool showPhoneCode) {
     showCountryPicker(
       exclude: <String>['IL'],
       useSafeArea: true,
       context: context,
-      showPhoneCode: false,
+      showPhoneCode: showPhoneCode,
       onSelect: (Country country) {
         setState(() {
-          countryName = '${country.flagEmoji} ${country.name}';
+          if (showPhoneCode) {
+            phoneCode = '${country.flagEmoji} +${country.phoneCode}';
+          } else {
+            countryName = country.name;
+          }
         });
       },
       countryListTheme: CountryListThemeData(
+        bottomSheetHeight: screenHeight(context) * .7,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(40.0),
           topRight: Radius.circular(40.0),
@@ -81,7 +88,6 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final languages = ref.watch(languagesProvider);
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
@@ -161,32 +167,24 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                     isCurved: true,
                     boxChild: Padding(
                       padding: const EdgeInsets.all(16.0),
-                      child: languages.when(
-                        data: (list) {
-                          return NameSection(
-                            isEditing: isEditing,
-                            controllers: [
-                              firstNameController,
-                              lastNameController,
-                              primaryLangController,
-                              specialNeedsController,
-                            ],
-                            dateOfBirth: dateOfBirth, //Dummy
-                            countryName: countryName, //Dummy
-                            selectDate: selectDate,
-                            selectNationality: selectNationality,
-                            selectedLanguage:
-                                selectedLanguage ?? 'Arabic', // Dummy
-                            languages: list,
-                            onLanguageSelected: (newLanguage) {
-                              setState(() {
-                                selectedLanguage = newLanguage;
-                              });
-                            },
-                          );
+                      child: NameSection(
+                        isEditing: isEditing,
+                        controllers: [
+                          firstNameController,
+                          lastNameController,
+                          primaryLangController,
+                          specialNeedsController,
+                        ],
+                        dateOfBirth: dateOfBirth, //Dummy
+                        countryName: countryName, //Dummy
+                        selectDate: selectDate,
+                        selectNationality: countryPicker,
+                        selectedLanguage: selectedLanguage ?? 'Arabic', // Dummy
+                        onLanguageSelected: (newLanguage) {
+                          setState(() {
+                            selectedLanguage = newLanguage;
+                          });
                         },
-                        error: (err, stack) => Text('Error: $err'),
-                        loading: () => const CircularProgressIndicator(),
                       ),
                     ),
                   ),
@@ -203,6 +201,8 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                           mobileController,
                           guardianMobileController,
                         ],
+                        selectPhoneCode: countryPicker,
+                        phoneCode: phoneCode ?? "",
                       ),
                     ),
                   ),
@@ -216,7 +216,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
   }
 }
 
-class NameSection extends StatelessWidget {
+class NameSection extends ConsumerWidget {
   final bool isEditing;
   final List<TextEditingController> controllers;
   //The two below will not be used once user authentication is used.
@@ -224,9 +224,8 @@ class NameSection extends StatelessWidget {
   final String? countryName;
   // -----
   final String selectedLanguage;
-  final List<String> languages;
   final Function(BuildContext) selectDate;
-  final Function(BuildContext) selectNationality;
+  final Function(BuildContext, bool) selectNationality;
   final Function(String) onLanguageSelected;
   // final User user;
 
@@ -239,13 +238,12 @@ class NameSection extends StatelessWidget {
     required this.countryName,
     required this.selectNationality,
     required this.selectedLanguage,
-    required this.languages,
     required this.onLanguageSelected,
     // required this.user,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -277,32 +275,7 @@ class NameSection extends StatelessWidget {
                       value: dateOfBirth ?? '11-09-2004', //Dummy
                     ),
               isEditing
-                  ? Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: SizedBox(
-                        height: 48,
-                        width: MediaQuery.of(context).size.width * .8,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "First Language",
-                              style: getTextStyle('smallBold',
-                                  color: AppColors.darkBlue),
-                            ),
-                            FilterDropdown(
-                              selectedFilter: selectedLanguage,
-                              options: languages,
-                              onSelected: (String? newLanguage) {
-                                if (newLanguage != null) {
-                                  onLanguageSelected(newLanguage);
-                                }
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    )
+                  ? buildLanguagePicker(context, ref)
                   : DetailsRow(
                       label: "First Language",
                       value: selectedLanguage,
@@ -323,9 +296,43 @@ class NameSection extends StatelessWidget {
     );
   }
 
+  Widget buildLanguagePicker(BuildContext context, WidgetRef ref) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: SizedBox(
+        height: 48,
+        width: screenWidth(context) * .8,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              "First Language",
+              style: getTextStyle('smallBold', color: AppColors.darkBlue),
+            ),
+            ref.watch(languagesProvider).when(
+                  data: (data) {
+                    return FilterDropdown(
+                      selectedFilter: selectedLanguage,
+                      options: data,
+                      onSelected: (String? newLanguage) {
+                        if (newLanguage != null) {
+                          onLanguageSelected(newLanguage);
+                        }
+                      },
+                    );
+                  },
+                  loading: () => const CircularProgressIndicator(),
+                  error: (err, stack) => Text('Error: $err'),
+                ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget buildNationalityPicker(BuildContext context) {
     return GestureDetector(
-      onTap: () => selectNationality(context),
+      onTap: () => selectNationality(context, false),
       child: Container(
         decoration: const BoxDecoration(
           border: Border(
@@ -335,7 +342,7 @@ class NameSection extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: SizedBox(
           height: 48,
-          width: MediaQuery.of(context).size.width * .8,
+          width: screenWidth(context) * .8,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -382,7 +389,7 @@ class NameSection extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: SizedBox(
           height: 48,
-          width: MediaQuery.of(context).size.width * .8,
+          width: screenWidth(context) * .8,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -421,12 +428,16 @@ class NameSection extends StatelessWidget {
 class ContactSection extends StatelessWidget {
   final bool isEditing;
   final List<TextEditingController> controllers;
+  final Function(BuildContext, bool) selectPhoneCode;
+  final String? phoneCode;
   // final User user;
 
   const ContactSection({
     super.key,
     required this.isEditing,
     required this.controllers,
+    required this.selectPhoneCode,
+    required this.phoneCode,
     // required this.user,
   });
 
@@ -446,6 +457,12 @@ class ContactSection extends StatelessWidget {
                 controller: isEditing ? controllers[0] : null,
                 keyboardType: TextInputType.emailAddress,
               ),
+              isEditing
+                  ? buildPhoneCodePicker(context)
+                  : DetailsRow(
+                      label: "Phone Code",
+                      value: phoneCode ?? '+974', //Dummy
+                    ),
               DetailsRow(
                 label: "Mobile No.",
                 value: '30334066', //Dummy
@@ -465,6 +482,53 @@ class ContactSection extends StatelessWidget {
           ),
         )
       ],
+    );
+  }
+
+  Widget buildPhoneCodePicker(BuildContext context) {
+    return GestureDetector(
+      onTap: () => selectPhoneCode(context, true),
+      child: Container(
+        decoration: const BoxDecoration(
+          border: Border(
+            bottom: BorderSide(color: AppColors.darkBlue, width: 1),
+          ),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: SizedBox(
+          height: 48,
+          width: screenWidth(context) * .8,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Phone Code",
+                style: getTextStyle('smallBold', color: AppColors.darkBlue),
+              ),
+              Container(
+                height: 40,
+                width: 200,
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: AppColors.darkBlue,
+                    width: 2.0,
+                  ),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  phoneCode ?? '+974', //For now dummy value
+                  style: getTextStyle('small', color: AppColors.darkBlue),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
