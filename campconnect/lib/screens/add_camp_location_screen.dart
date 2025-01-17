@@ -64,7 +64,7 @@ class _AddCamp extends ConsumerState<AddCampLocationScreen> {
               child: ElevatedButton(
                   onPressed: () {
                     _transferString =
-                        '${_scrolledLocation.latitude},${_scrolledLocation.longitude}';
+                        '${_scrolledLocation.latitude}|${_scrolledLocation.longitude}|$addressStr';
                     context.pushNamed(AppRouter.addCamp.name,
                         pathParameters: {'location': _transferString});
                   },
