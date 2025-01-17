@@ -39,7 +39,7 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
       countryCode: 'QA',
       mobileNumber: '3033067',
       email: 'enter@gmail.com',
-      role: 'Student',
+      role: 'student',
     );
   }
 
@@ -114,7 +114,7 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
                   SizedBox(
                     height: 10,
                   ),
-                  if (user?.role == 'Student') buildStudentInfo(),
+                  if (user?.role == 'student') buildStudentInfo(),
                   if (user?.role == 'Teacher') buildTeacherInfo(),
                 ],
               ),
@@ -146,18 +146,17 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
           ),
         ),
         const SizedBox(height: 20),
-        if (user?.role == 'Student')
-          FrostedGlassBox(
-            boxWidth: double.infinity,
-            isCurved: true,
-            boxChild: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: LearningGoalsSection(
-                isEditing: isEditing,
-                controller: learningGoalsController,
-              ),
+        FrostedGlassBox(
+          boxWidth: double.infinity,
+          isCurved: true,
+          boxChild: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: LearningGoalsSection(
+              isEditing: isEditing,
+              controller: learningGoalsController,
             ),
           ),
+        ),
       ],
     );
   }

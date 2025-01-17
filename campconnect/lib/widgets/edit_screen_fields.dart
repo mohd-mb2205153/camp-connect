@@ -9,16 +9,17 @@ class EditScreenTextField extends ConsumerWidget {
   final TextInputType type;
   final double height;
   final bool centerText;
+  final int maxLines;
 
-  const EditScreenTextField({
-    super.key,
-    required this.label,
-    required this.controller,
-    this.width = 200,
-    this.type = TextInputType.text,
-    this.height = 60,
-    this.centerText = false,
-  });
+  const EditScreenTextField(
+      {super.key,
+      required this.label,
+      required this.controller,
+      this.width = 200,
+      this.type = TextInputType.text,
+      this.height = 60,
+      this.centerText = false,
+      this.maxLines = 1});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -27,6 +28,7 @@ class EditScreenTextField extends ConsumerWidget {
       height: height,
       child: Center(
         child: TextField(
+          maxLines: maxLines,
           keyboardType: type,
           controller: controller,
           style: getTextStyle('small', color: AppColors.darkBlue),
