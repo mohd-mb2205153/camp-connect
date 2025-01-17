@@ -132,6 +132,30 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
             child: Expanded(
               child: Column(
                 children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Container(
+                      width: 75,
+                      height: 75,
+                      decoration: const BoxDecoration(
+                        color: AppColors.darkTeal,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.person_2_rounded,
+                        color: Colors.white,
+                        size: 50,
+                      ),
+                    ),
+                  ),
+                  //Dummy
+                  Text(
+                    'Hello, Amr Ahad!',
+                    style: getTextStyle('largeBold', color: AppColors.teal),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
                   FrostedGlassBox(
                     boxWidth: double.infinity,
                     isCurved: true,
