@@ -34,7 +34,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final FocusNode passwordFocus = FocusNode();
   final FocusNode phoneFocus = FocusNode();
 
-  String selectedNationality = "Select Nationality";
+  String selectedNationality = "Nationality";
   String selectedDateOfBirth = "Date of Birth";
 
   late List<String> nationalityOptions = [];
@@ -162,19 +162,19 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 20),
+            addVerticalSpace(20),
             buildNameFields(),
-            const SizedBox(height: 20),
+            addVerticalSpace(20),
             buildEmailField(),
-            const SizedBox(height: 20),
+            addVerticalSpace(20),
             buildPasswordField(),
-            const SizedBox(height: 20),
+            addVerticalSpace(20),
             buildPhoneField(),
-            const SizedBox(height: 20),
+            addVerticalSpace(20),
             buildDOBAndNationalityFields(context),
-            const SizedBox(height: 20),
+            addVerticalSpace(20),
             buildLanguages(),
-            const SizedBox(height: 20),
+            addVerticalSpace(20),
           ],
         ),
       ),
@@ -190,10 +190,19 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             data: ThemeData(
               checkboxTheme: CheckboxThemeData(
                 side: WidgetStateBorderSide.resolveWith(
-                  (states) => const BorderSide(
-                    width: 2.0,
-                    color: Colors.grey,
-                  ),
+                  (states) {
+                    if (states.contains(WidgetState.selected)) {
+                      return const BorderSide(
+                        width: 2.0,
+                        color: Colors
+                            .transparent, // Transparent border when checked
+                      );
+                    }
+                    return const BorderSide(
+                      width: 2.0,
+                      color: Colors.grey,
+                    );
+                  },
                 ),
               ),
             ),
@@ -241,7 +250,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             focusNode: firstNameFocus,
           ),
         ),
-        const SizedBox(width: 16),
+        addHorizontalSpace(16),
         Expanded(
           child: buildTextField(
             controller: txtLastNameController,
@@ -292,7 +301,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           onChanged: (code) {},
           initialSelection: 'QA',
         ),
-        const SizedBox(width: 8),
+        addHorizontalSpace(8),
         Expanded(
           child: buildTextField(
             controller: txtPhoneNumberController,
@@ -308,7 +317,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   Widget buildDOBAndNationalityFields(BuildContext context) {
     return Row(
       children: [
-        // Date of Birth Picker
         Expanded(
           child: GestureDetector(
             onTap: () => showCupertinoModalPopup(
@@ -358,8 +366,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             child: buildDecoratedInput(selectedDateOfBirth),
           ),
         ),
-        const SizedBox(width: 16),
-        // Nationality Picker
+        addHorizontalSpace(16),
         Expanded(
           child: GestureDetector(
             onTap: () => showCupertinoModalPopup(
@@ -424,16 +431,20 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   Widget buildDecoratedInput(String text) {
     return InputDecorator(
-      decoration: buildInputDecoration(text),
+      decoration: buildInputDecoration(""),
       child: Row(
         children: [
           const Icon(Icons.flag, color: Colors.grey),
-          const SizedBox(width: 8),
-          Text(
-            text,
-            style: getTextStyle(
-              'medium',
-              color: Colors.grey,
+          addHorizontalSpace(8),
+          Expanded(
+            child: Text(
+              text,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+              style: getTextStyle(
+                'medium',
+                color: Colors.grey,
+              ),
             ),
           ),
         ],
@@ -502,7 +513,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        addVerticalSpace(8),
         Wrap(
           spacing: 8,
           children: selectedLanguages

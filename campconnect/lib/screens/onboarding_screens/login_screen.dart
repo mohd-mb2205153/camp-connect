@@ -74,7 +74,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       ),
       body: Stack(
         children: [
-          // Background Image
           Positioned.fill(
             child: Image.asset(
               Assets.image('bg6.png'),
@@ -123,75 +122,42 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Email Field
-        TextField(
+        buildTextField(
           controller: txtEmailController,
-          focusNode: emailFocusNode,
-          decoration: InputDecoration(
-            prefixIcon: Icon(
-              Icons.email,
-              color:
-                  emailFocusNode.hasFocus ? AppColors.lightTeal : Colors.grey,
-            ),
-            suffixIcon: isEmailValid
-                ? const Icon(Icons.check, color: AppColors.lightTeal)
-                : null,
-            hintText: "Email",
-            hintStyle: const TextStyle(color: Colors.grey),
-            enabledBorder: const UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.grey),
-            ),
-            focusedBorder: const UnderlineInputBorder(
-              borderSide: BorderSide(color: AppColors.lightTeal, width: 2),
-            ),
-          ),
-          style: getTextStyle(
-            'medium',
+          hintText: "Email",
+          prefixIcon: Icon(
+            Icons.email,
             color: emailFocusNode.hasFocus ? AppColors.lightTeal : Colors.grey,
           ),
+          suffixIcon: isEmailValid
+              ? const Icon(Icons.check, color: AppColors.lightTeal)
+              : null,
+          focusNode: emailFocusNode,
         ),
         addVerticalSpace(20),
-
-        // Password Field
-        TextField(
+        buildTextField(
           controller: txtPasswordController,
-          focusNode: passwordFocusNode,
+          hintText: "Password",
           obscureText: notVisible,
-          decoration: InputDecoration(
-            prefixIcon: Icon(
-              Icons.lock,
-              color: passwordFocusNode.hasFocus
-                  ? AppColors.lightTeal
-                  : Colors.grey,
-            ),
-            suffixIcon: IconButton(
-              icon: Icon(
-                notVisible ? Icons.visibility_off : Icons.visibility,
-                color: Colors.grey,
-              ),
-              onPressed: () {
-                setState(() {
-                  notVisible = !notVisible;
-                });
-              },
-            ),
-            hintText: "Password",
-            hintStyle: const TextStyle(color: Colors.grey),
-            enabledBorder: const UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.grey),
-            ),
-            focusedBorder: const UnderlineInputBorder(
-              borderSide: BorderSide(color: AppColors.lightTeal, width: 2),
-            ),
-          ),
-          style: getTextStyle(
-            'medium',
+          prefixIcon: Icon(
+            Icons.lock,
             color:
                 passwordFocusNode.hasFocus ? AppColors.lightTeal : Colors.grey,
           ),
+          suffixIcon: IconButton(
+            icon: Icon(
+              notVisible ? Icons.visibility_off : Icons.visibility,
+              color: Colors.grey,
+            ),
+            onPressed: () {
+              setState(() {
+                notVisible = !notVisible;
+              });
+            },
+          ),
+          focusNode: passwordFocusNode,
         ),
         addVerticalSpace(12),
-
         Align(
           alignment: Alignment.centerRight,
           child: GestureDetector(

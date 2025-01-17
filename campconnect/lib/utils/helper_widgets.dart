@@ -66,7 +66,12 @@ Widget buildTextField({
 InputDecoration buildInputDecoration(String hintText) {
   return InputDecoration(
     hintText: hintText,
-    hintStyle: const TextStyle(color: Colors.grey),
+    hintStyle: const TextStyle(
+      color: Colors.grey,
+      overflow: TextOverflow.ellipsis,
+    ),
+    isDense: true,
+    hintMaxLines: 1,
     enabledBorder: const UnderlineInputBorder(
       borderSide: BorderSide(color: Colors.grey),
     ),
