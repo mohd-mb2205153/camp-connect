@@ -32,45 +32,46 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
   void initState() {
     super.initState();
     //Dummy value
-    // user = Student(
-    //   firstName: 'Ahmad',
-    //   lastName: 'John',
-    //   dateOfBirth: DateTime(2004, 11, 9),
-    //   nationality: 'Iraq',
-    //   primaryLanguages: ['Arabic', 'English'],
-    //   countryCode: 'QA',
-    //   mobileNumber: '3033067',
-    //   email: 'enter@gmail.com',
-    //   currentEducationLevel: 'High School',
-    //   currentLocation: '',
-    //   enrolledCamps: [],
-    //   guardianContact: '44450699',
-    //   guardianCountryCode: 'IN',
-    //   preferredDistanceForCamps: '',
-    //   preferredSubjects: [],
-    //   learningGoals: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit,',
-    //   specialNeeds: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
-    // );
-
-    user = Teacher(
-      firstName: 'Mark',
-      lastName: 'Johnny',
-      dateOfBirth: DateTime(1987, 11, 9),
-      nationality: 'USA',
-      primaryLanguages: ['English'],
-      countryCode: 'QA',
-      mobileNumber: '30993067',
+    user = Student(
+      guardianPhoneCode: '+974',
       phoneCode: '+974',
-      email: 'mark@gmail.com',
+      firstName: 'Ahmad',
+      lastName: 'John',
+      dateOfBirth: DateTime(2004, 11, 9),
+      nationality: 'Iraq',
+      primaryLanguages: ['Arabic', 'English'],
+      countryCode: 'QA',
+      mobileNumber: '3033067',
+      email: 'enter@gmail.com',
+      currentEducationLevel: 'High School',
       enrolledCamps: [],
-      areasOfExpertise: [],
-      availabilitySchedule: '',
-      certifications: [],
-      highestEducationLevel: 'Master Degree',
-      preferredCampDuration: '',
-      teachingExperience: 16,
-      willingnessToTravel: '',
+      guardianContact: '44450699',
+      guardianCountryCode: 'IN',
+      preferredDistanceForCamps: '',
+      preferredSubjects: [],
+      learningGoals: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit,',
+      specialNeeds: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
     );
+
+    // user = Teacher(
+    //   firstName: 'Mark',
+    //   lastName: 'Johnny',
+    //   dateOfBirth: DateTime(1987, 11, 9),
+    //   nationality: 'USA',
+    //   primaryLanguages: ['English'],
+    //   countryCode: 'QA',
+    //   mobileNumber: '30993067',
+    //   phoneCode: '+974',
+    //   email: 'mark@gmail.com',
+    //   enrolledCamps: [],
+    //   areasOfExpertise: [],
+    //   availabilitySchedule: '',
+    //   certifications: [],
+    //   highestEducationLevel: 'Master Degree',
+    //   preferredCampDuration: '',
+    //   teachingExperience: 16,
+    //   willingnessToTravel: '',
+    // );
   }
 
   @override
@@ -140,32 +141,30 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(15),
-            child: Expanded(
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Container(
-                      width: 75,
-                      height: 75,
-                      decoration: const BoxDecoration(
-                        color: AppColors.darkTeal,
-                        shape: BoxShape.circle,
-                      ),
-                      child: buildIcon(user!),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Container(
+                    width: 75,
+                    height: 75,
+                    decoration: const BoxDecoration(
+                      color: AppColors.darkTeal,
+                      shape: BoxShape.circle,
                     ),
+                    child: buildIcon(user!),
                   ),
-                  Text(
-                    user.role.toUpperCase(),
-                    style: getTextStyle('largeBold', color: AppColors.teal),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  if (user.role == 'student') buildStudentInfo(),
-                  if (user.role == 'teacher') buildTeacherInfo(),
-                ],
-              ),
+                ),
+                Text(
+                  user.role.toUpperCase(),
+                  style: getTextStyle('largeBold', color: AppColors.teal),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                if (user.role == 'student') buildStudentInfo(),
+                if (user.role == 'teacher') buildTeacherInfo(),
+              ],
             ),
           ),
         ),
@@ -235,45 +234,19 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
 
   Widget buildIcon(User user) {
     return user.role == 'student'
-        ? Stack(
-            children: [
-              Center(
-                child: const Icon(
-                  Icons.person_2_rounded,
-                  color: Colors.white,
-                  size: 50,
-                ),
-              ),
-              Positioned(
-                bottom: 10,
-                left: 40,
-                child: const Icon(
-                  Icons.menu_book_rounded,
-                  color: AppColors.darkBeige,
-                  size: 20,
-                ),
-              ),
-            ],
+        ? Center(
+            child: SizedBox(
+              height: 55,
+              width: 55,
+              child: Image.asset('assets/images/student_icon.png'),
+            ),
           )
-        : Stack(
-            children: [
-              Center(
-                child: const Icon(
-                  Icons.person_2_rounded,
-                  color: Colors.white,
-                  size: 50,
-                ),
-              ),
-              Positioned(
-                bottom: 10,
-                left: 40,
-                child: const Icon(
-                  Icons.school_rounded,
-                  color: AppColors.darkBeige,
-                  size: 20,
-                ),
-              ),
-            ],
+        : Center(
+            child: SizedBox(
+              height: 60,
+              width: 60,
+              child: Image.asset('assets/images/educator_icon.png'),
+            ),
           );
   }
 }
