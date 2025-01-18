@@ -1,4 +1,5 @@
 import 'package:campconnect/models/student.dart';
+import 'package:campconnect/models/teacher.dart';
 import 'package:campconnect/models/user.dart';
 import 'package:campconnect/providers/json_provider.dart';
 import 'package:campconnect/providers/show_bot_nav_provider.dart';
@@ -23,9 +24,10 @@ class PersonalInfoScreen extends ConsumerStatefulWidget {
 class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
   bool isEditing = false;
   String? selectedLanguage;
-  String? userPhoneCode;
   String? selectedCountry;
-  String? guardianPhoneCode;
+  String? dateOfBirth;
+  String? countryCode;
+  String? guardianCountryCode;
   dynamic
       user; //Testing for now, later we will get user that is logged in thru provider.
 
@@ -41,25 +43,44 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
   void initState() {
     super.initState();
     //Dummy value
-    user = Student(
-      firstName: 'Ahmad',
-      lastName: 'John',
-      dateOfBirth: DateTime(2004, 11, 9),
-      nationality: 'Iraq',
-      primaryLanguages: ['Arabic', 'English'],
+    // user = Student(
+    //   firstName: 'Ahmad',
+    //   lastName: 'John',
+    //   dateOfBirth: DateTime(2004, 11, 9),
+    //   nationality: 'Iraq',
+    //   primaryLanguages: ['Arabic', 'English'],
+    //   countryCode: 'QA',
+    //   mobileNumber: '3033067',
+    //   email: 'enter@gmail.com',
+    //   currentEducationLevel: 'High School',
+    //   currentLocation: '',
+    //   enrolledCamps: [],
+    //   guardianContact: '44450699',
+    //   guardianCountryCode: 'IN',
+    //   preferredDistanceForCamps: '',
+    //   preferredSubjects: [],
+    //   learningGoals:
+    //       'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+    //   specialNeeds: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
+    // );
+
+    user = Teacher(
+      firstName: 'Mark',
+      lastName: 'Johnny',
+      dateOfBirth: DateTime(1987, 11, 9),
+      nationality: 'Qatar',
+      primaryLanguages: ['English'],
       countryCode: 'QA',
-      mobileNumber: '3033067',
-      email: 'enter@gmail.com',
-      currentEducationLevel: 'High School',
-      currentLocation: '',
+      mobileNumber: '30993067',
+      email: 'mark@gmail.com',
       enrolledCamps: [],
-      guardianContact: '44450699',
-      guardianCountryCode: 'IN',
-      preferredDistanceForCamps: '',
-      preferredSubjects: [],
-      learningGoals:
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-      specialNeeds: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
+      areasOfExpertise: [],
+      availabilitySchedule: '',
+      certifications: [],
+      highestEducationLevel: 'Master Degree',
+      preferredCampDuration: '',
+      teachingExperience: 16,
+      willingnessToTravel: '',
     );
   }
 
@@ -94,9 +115,8 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
     );
     if (pickedDate != null) {
       setState(() {
-        String dateOfBirth =
+        dateOfBirth =
             "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
-        user.dateOfBirth = DateTime.parse(dateOfBirth);
       });
     }
   }
@@ -110,9 +130,9 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
       onSelect: (Country country) {
         setState(() {
           if (!isGuardian) {
-            user.countryCode = '+${country.phoneCode}';
+            countryCode = '+${country.phoneCode}';
           } else {
-            user.guardianCountryCode = '+${country.phoneCode}';
+            guardianCountryCode = '+${country.phoneCode}';
           }
         });
       },
@@ -180,10 +200,12 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
               icon: Icon(isEditing ? Icons.done : Icons.edit),
               onPressed: () {
                 setState(() {
+                  if (isEditing) {
+                    // UPDATE USER
+                  }
                   isEditing = !isEditing;
                   if (isEditing) {
                     initializeControllers(user);
-                    // UPDATE USER...
                   }
                 });
               },
@@ -249,6 +271,9 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                     ),
                   ),
                   if (user?.role == 'student') buildSpecialNeedSection(),
+                  SizedBox(
+                    height: 20,
+                  ),
                   FrostedGlassBox(
                     boxWidth: double.infinity,
                     isCurved: true,
@@ -293,9 +318,6 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
               user: user as Student,
             ),
           ),
-        ),
-        SizedBox(
-          height: 20,
         ),
       ],
     );
