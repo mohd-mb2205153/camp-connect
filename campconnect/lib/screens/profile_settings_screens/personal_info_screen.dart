@@ -72,6 +72,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
       primaryLanguages: ['English'],
       countryCode: 'QA',
       mobileNumber: '30993067',
+      phoneCode: '+974',
       email: 'mark@gmail.com',
       enrolledCamps: [],
       areasOfExpertise: [],
