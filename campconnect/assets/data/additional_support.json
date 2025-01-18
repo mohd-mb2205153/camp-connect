@@ -1,25 +1,23 @@
-{
-  "additionalSupport": [
-    "Trauma Support",
-    "Medical Clinic",
-    "WiFi Access",
-    "Food Stall",
-    "Water Station",
-    "Security Personnel",
-    "Counseling Services",
-    "Library Access",
-    "Recreational Activities",
-    "Transportation Assistance",
-    "Disability Assistance",
-    "Childcare Services",
-    "First Aid Station",
-    "Emergency Shelter",
-    "Educational Materials",
-    "Language Translation Services",
-    "Mental Health Support",
-    "Technology Access (Computers/Tablets)",
-    "Volunteer Training",
-    "Hygiene Facilities",
-    "Fitness Center"
-  ]
-}
+[
+  "Trauma Support",
+  "Medical Clinic",
+  "WiFi Access",
+  "Food Stall",
+  "Water Station",
+  "Security Personnel",
+  "Counseling Services",
+  "Library Access",
+  "Recreational Activities",
+  "Transportation Assistance",
+  "Disability Assistance",
+  "Childcare Services",
+  "First Aid Station",
+  "Emergency Shelter",
+  "Educational Materials",
+  "Language Translation Services",
+  "Mental Health Support",
+  "Technology Access (Computers/Tablets)",
+  "Volunteer Training",
+  "Hygiene Facilities",
+  "Fitness Center"
+]
