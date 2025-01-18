@@ -19,6 +19,10 @@ class EducatorOnboardingScreen extends ConsumerStatefulWidget {
 
 class _EducatorOnboardingScreenState
     extends ConsumerState<EducatorOnboardingScreen> {
+  TimeOfDay fromTime = TimeOfDay.now();
+  TimeOfDay toTime = TimeOfDay.fromDateTime(
+    DateTime.now().add(const Duration(hours: 1)),
+  );
   final TextEditingController txtCertificationsController =
       TextEditingController();
 
@@ -51,8 +55,8 @@ class _EducatorOnboardingScreenState
       final educationLevelData = await DefaultAssetBundle.of(context)
           .loadString("assets/data/teacher_education_level.json");
       final parsedEducationLevels = json.decode(educationLevelData) as Map;
-      educationLevels = parsedEducationLevels['concept']
-          .map<String>((e) => e['display'])
+      educationLevels = (parsedEducationLevels['concept'] as List)
+          .map<String>((e) => e['display'] as String)
           .toList();
 
       final campDurationData = await DefaultAssetBundle.of(context)
@@ -507,12 +511,7 @@ class _EducatorOnboardingScreenState
   }
 
   Widget buildAvailabilityPicker() {
-    TimeOfDay tempFromTime = TimeOfDay.now();
-    TimeOfDay tempToTime = TimeOfDay.fromDateTime(
-      DateTime.now().add(const Duration(hours: 1)),
-    );
-
-    void showTimePicker(BuildContext context, bool isFrom) {
+    void showHourPicker(BuildContext context, bool isFrom) {
       showCupertinoModalPopup(
         context: context,
         builder: (_) {
@@ -534,15 +533,19 @@ class _EducatorOnboardingScreenState
                       onPressed: () {
                         setState(() {
                           if (isFrom) {
-                            tempFromTime = TimeOfDay(
-                              hour: tempFromTime.hour,
-                              minute: tempFromTime.minute,
-                            );
+                            if (toTime.hour <= fromTime.hour) {
+                              toTime = TimeOfDay(
+                                hour: (fromTime.hour + 1) % 24,
+                                minute: 0,
+                              );
+                            }
                           } else {
-                            tempToTime = TimeOfDay(
-                              hour: tempToTime.hour,
-                              minute: tempToTime.minute,
-                            );
+                            if (toTime.hour <= fromTime.hour) {
+                              toTime = TimeOfDay(
+                                hour: (fromTime.hour + 1) % 24,
+                                minute: 0,
+                              );
+                            }
                           }
                         });
                         Navigator.pop(context);
@@ -552,30 +555,24 @@ class _EducatorOnboardingScreenState
                 ),
                 SizedBox(
                   height: 250,
-                  child: CupertinoDatePicker(
-                    mode: CupertinoDatePickerMode.time,
-                    initialDateTime: DateTime(
-                      DateTime.now().year,
-                      DateTime.now().month,
-                      DateTime.now().day,
-                      isFrom ? tempFromTime.hour : tempToTime.hour,
-                      isFrom ? tempFromTime.minute : tempToTime.minute,
-                    ),
-                    onDateTimeChanged: (pickedTime) {
+                  child: CupertinoPicker(
+                    itemExtent: 32,
+                    onSelectedItemChanged: (selectedHour) {
                       setState(() {
                         if (isFrom) {
-                          tempFromTime = TimeOfDay(
-                            hour: pickedTime.hour,
-                            minute: pickedTime.minute,
-                          );
+                          fromTime = TimeOfDay(hour: selectedHour, minute: 0);
                         } else {
-                          tempToTime = TimeOfDay(
-                            hour: pickedTime.hour,
-                            minute: pickedTime.minute,
-                          );
+                          toTime = TimeOfDay(hour: selectedHour, minute: 0);
                         }
                       });
                     },
+                    children: List.generate(
+                      24,
+                      (hour) => Text(
+                        "$hour:00",
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -603,9 +600,9 @@ class _EducatorOnboardingScreenState
           children: [
             Expanded(
               child: GestureDetector(
-                onTap: () => showTimePicker(context, true),
+                onTap: () => showHourPicker(context, true),
                 child: buildDecoratedInput(
-                  "${tempFromTime.format(context)}",
+                  "${fromTime.hour}:00",
                   Icons.access_time,
                 ),
               ),
@@ -613,9 +610,9 @@ class _EducatorOnboardingScreenState
             const SizedBox(width: 16),
             Expanded(
               child: GestureDetector(
-                onTap: () => showTimePicker(context, false),
+                onTap: () => showHourPicker(context, false),
                 child: buildDecoratedInput(
-                  "${tempToTime.format(context)}",
+                  "${toTime.hour}:00",
                   Icons.access_time,
                 ),
               ),
