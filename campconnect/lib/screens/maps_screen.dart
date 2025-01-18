@@ -1,5 +1,6 @@
 import 'package:campconnect/models/camp.dart';
 import 'package:campconnect/providers/camp_provider.dart';
+import 'package:campconnect/theme/styling_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
@@ -13,40 +14,67 @@ class MapsScreen extends ConsumerStatefulWidget {
 }
 
 class _MapsScreenState extends ConsumerState<MapsScreen> {
-  late GoogleMapController _googleMapController;
+  GoogleMapController? _googleMapController; // Make it nullable
   static const CameraPosition initialCameraPosition =
       CameraPosition(target: LatLng(25.3, 51.487), zoom: 10);
 
   Set<Marker> markers = {};
-
-  Future<Position> getCurrentLocation() async {
-    if (!await Geolocator.isLocationServiceEnabled()) {
-      return Future.error("Enable your Location.");
-    }
-
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return Future.error("Error.");
-      }
-    }
-
-    return await Geolocator.getCurrentPosition();
-  }
-
   BitmapDescriptor customIcon = BitmapDescriptor.defaultMarker;
+  BitmapDescriptor liveLocationIcon = BitmapDescriptor.defaultMarker;
 
   @override
   void initState() {
     super.initState();
+    _loadCustomIcons();
+    _startLiveLocationUpdates();
+  }
+
+  void _loadCustomIcons() {
     BitmapDescriptor.asset(
       const ImageConfiguration(size: Size(48, 48)),
-      "assets/images/tent-logo.png",
+      "assets/images/tent_icon.png",
     ).then((icon) {
       setState(() {
         customIcon = icon;
       });
+    });
+
+    BitmapDescriptor.asset(
+      const ImageConfiguration(size: Size(32, 32)),
+      "assets/images/current_location_icon.png",
+    ).then((icon) {
+      setState(() {
+        liveLocationIcon = icon;
+      });
+    });
+  }
+
+  Future<void> _startLiveLocationUpdates() async {
+    Geolocator.getPositionStream(
+      locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
+    ).listen((Position position) {
+      LatLng userLocation = LatLng(position.latitude, position.longitude);
+
+      // Update the live location marker
+      setState(() {
+        markers
+            .removeWhere((marker) => marker.markerId.value == "live_location");
+        markers.add(
+          Marker(
+            markerId: const MarkerId("live_location"),
+            position: userLocation,
+            icon: liveLocationIcon,
+            infoWindow: const InfoWindow(title: "You are here"),
+          ),
+        );
+      });
+
+      // Move the camera only if _googleMapController is initialized
+      if (_googleMapController != null) {
+        _googleMapController!.animateCamera(
+          CameraUpdate.newLatLng(userLocation),
+        );
+      }
     });
   }
 
@@ -57,7 +85,8 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
             markers.addAll(createMarkers(data));
             return Scaffold(
               appBar: AppBar(
-                leading: IconButton(onPressed: () {}, icon: Icon(Icons.search)),
+                leading: IconButton(
+                    onPressed: () {}, icon: const Icon(Icons.search)),
                 title: const Text("Camps around you"),
                 centerTitle: true,
               ),
@@ -66,26 +95,83 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
                 markers: markers,
                 zoomControlsEnabled: false,
                 mapType: MapType.normal,
+                myLocationButtonEnabled: false,
                 onMapCreated: (controller) {
                   _googleMapController = controller;
                 },
               ),
-              floatingActionButton: FloatingActionButton.extended(
-                onPressed: () async {
-                  Position position = await getCurrentLocation();
-                  markers.add(Marker(
-                      markerId: const MarkerId("Current Location"),
-                      position: LatLng(position.latitude, position.longitude)));
-                  setState(() {});
-                },
-                label: const Text(""),
-                icon: const Icon(Icons.my_location),
-              ),
+              floatingActionButton: floatingActionColumn(context),
             );
           },
           error: (err, stack) => Text('Error: $err'),
           loading: () => const CircularProgressIndicator(),
         );
+  }
+
+  Stack floatingActionColumn(BuildContext context) {
+    return Stack(
+      alignment: Alignment.bottomCenter,
+      children: [
+        // Small container under the FAB
+        Positioned(
+          bottom: 5, // Adjust position below the FAB
+          child: Container(
+            width: 20.0,
+            height: 5.0,
+            decoration: BoxDecoration(
+              color: AppColors.lightTeal, // Small container color
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+          ),
+        ),
+        // Floating Action Button
+        Padding(
+          padding: const EdgeInsets.only(bottom: 50.0),
+          child: Container(
+            width: 56.0,
+            height: 56.0,
+            decoration: BoxDecoration(
+              color: AppColors.lightTeal,
+              shape: BoxShape.circle, // Enforces circular shape
+            ),
+            child: IconButton(
+              onPressed: () async {
+                try {
+                  // Get the user's current position
+                  Position position = await Geolocator.getCurrentPosition();
+                  LatLng userLocation =
+                      LatLng(position.latitude, position.longitude);
+
+                  if (_googleMapController != null) {
+                    // Animate the camera to the user's location with zoom and compass reset
+                    _googleMapController!.animateCamera(
+                      CameraUpdate.newCameraPosition(
+                        CameraPosition(
+                          target: userLocation,
+                          zoom: 17.0, // Street-level zoom
+                          bearing: 0.0, // Resets compass direction to north
+                          tilt: 0.0, // Resets any tilt to a flat map view
+                        ),
+                      ),
+                    );
+                  }
+                } catch (e) {
+                  // Handle any errors, e.g., location permissions
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error fetching location: $e')),
+                  );
+                }
+              },
+              icon: Image.asset(
+                "assets/images/track_location_icon.png",
+                fit: BoxFit.contain,
+                height: 24,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   List<Marker> createMarkers(List<Camp> camps) {
