@@ -1,25 +1,84 @@
 {
   "additionalSupport": [
-    "Trauma Support",
-    "Medical Clinic",
-    "WiFi Access",
-    "Food Stall",
-    "Water Station",
-    "Security Personnel",
-    "Counseling Services",
-    "Library Access",
-    "Recreational Activities",
-    "Transportation Assistance",
-    "Disability Assistance",
-    "Childcare Services",
-    "First Aid Station",
-    "Emergency Shelter",
-    "Educational Materials",
-    "Language Translation Services",
-    "Mental Health Support",
-    "Technology Access (Computers/Tablets)",
-    "Volunteer Training",
-    "Hygiene Facilities",
-    "Fitness Center"
+    {
+      "label": "Trauma Support",
+      "icon": "Icons.healing"
+    },
+    {
+      "label": "Medical Clinic",
+      "icon": "Icons.local_hospital"
+    },
+    {
+      "label": "WiFi Access",
+      "icon": "Icons.wifi"
+    },
+    {
+      "label": "Food Stall",
+      "icon": "Icons.fastfood"
+    },
+    {
+      "label": "Water Station",
+      "icon": "Icons.water_drop"
+    },
+    {
+      "label": "Security Personnel",
+      "icon": "Icons.security"
+    },
+    {
+      "label": "Counseling Services",
+      "icon": "Icons.psychology"
+    },
+    {
+      "label": "Library Access",
+      "icon": "Icons.library_books"
+    },
+    {
+      "label": "Recreational Activities",
+      "icon": "Icons.sports_soccer"
+    },
+    {
+      "label": "Transportation Assistance",
+      "icon": "Icons.directions_bus"
+    },
+    {
+      "label": "Disability Assistance",
+      "icon": "Icons.accessible"
+    },
+    {
+      "label": "Childcare Services",
+      "icon": "Icons.child_care"
+    },
+    {
+      "label": "First Aid Station",
+      "icon": "Icons.health_and_safety"
+    },
+    {
+      "label": "Emergency Shelter",
+      "icon": "Icons.house"
+    },
+    {
+      "label": "Educational Materials",
+      "icon": "Icons.school"
+    },
+    {
+      "label": "Language Translation Services",
+      "icon": "Icons.translate"
+    },
+    {
+      "label": "Mental Health Support",
+      "icon": "Icons.support"
+    },
+    {
+      "label": "Technology Access",
+      "icon": "Icons.computer"
+    },
+    {
+      "label": "Volunteer Training",
+      "icon": "Icons.volunteer_activism"
+    },
+    {
+      "label": "Hygiene Facilities",
+      "icon": "Icons.soap"
+    }
   ]
 }

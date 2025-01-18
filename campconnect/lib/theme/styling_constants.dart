@@ -10,6 +10,7 @@ class AppColors {
   static const white = Color(0xFFFFFFFF);
   static const blue = Color(0xFF50BED7);
   static const darkBlue = Color(0xFF005F87);
+  static const orange = Color.fromARGB(255, 239, 148, 57);
 }
 
 class AppTextStyles {
