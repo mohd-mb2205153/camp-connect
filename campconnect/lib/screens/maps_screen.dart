@@ -20,37 +20,29 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
   Set<Marker> markers = {};
 
   Future<Position> getCurrentLocation() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
+    if (!await Geolocator.isLocationServiceEnabled()) {
       return Future.error("Enable your Location.");
     }
 
-    permission = await Geolocator.checkPermission();
+    LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        Future.error("Error.");
+        return Future.error("Error.");
       }
     }
 
-    Position position = await Geolocator.getCurrentPosition();
-    return position;
+    return await Geolocator.getCurrentPosition();
   }
 
   BitmapDescriptor customIcon = BitmapDescriptor.defaultMarker;
+
   @override
   void initState() {
-    customMarker();
     super.initState();
-  }
-
-  void customMarker() {
     BitmapDescriptor.asset(
-      const ImageConfiguration(),
-      "assets/images/tent-icon.png",
+      const ImageConfiguration(size: Size(48, 48)),
+      "assets/images/tent-logo.png",
     ).then((icon) {
       setState(() {
         customIcon = icon;
@@ -61,142 +53,136 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
   @override
   Widget build(BuildContext context) {
     return ref.watch(campProviderNotifier).when(
-        data: (data) {
-          print("The length of the camp list is: ${data.length}");
-          markers.addAll(createMarkers(data));
-          return Scaffold(
-            appBar: AppBar(
-              leading: IconButton(onPressed: () {}, icon: Icon(Icons.search)),
-              title: Text("Camps around you"),
-              centerTitle: true,
-            ),
-            body: GoogleMap(
-              initialCameraPosition: initialCameraPosition,
-              markers: markers,
-              zoomControlsEnabled: false,
-              mapType: MapType.hybrid,
-              onMapCreated: (GoogleMapController controller) {
-                _googleMapController = controller;
-              },
-            ),
-            floatingActionButton: FloatingActionButton.extended(
+          data: (data) {
+            markers.addAll(createMarkers(data));
+            return Scaffold(
+              appBar: AppBar(
+                leading: IconButton(onPressed: () {}, icon: Icon(Icons.search)),
+                title: const Text("Camps around you"),
+                centerTitle: true,
+              ),
+              body: GoogleMap(
+                initialCameraPosition: initialCameraPosition,
+                markers: markers,
+                zoomControlsEnabled: false,
+                mapType: MapType.normal,
+                onMapCreated: (controller) {
+                  _googleMapController = controller;
+                },
+              ),
+              floatingActionButton: FloatingActionButton.extended(
                 onPressed: () async {
                   Position position = await getCurrentLocation();
-
                   markers.add(Marker(
                       markerId: const MarkerId("Current Location"),
                       position: LatLng(position.latitude, position.longitude)));
                   setState(() {});
                 },
-                label: Text("Get Current Location"),
-                icon: Icon(Icons.location_city)),
-          );
-        },
-        error: (err, stack) => Text('Error: $err'),
-        loading: () => const CircularProgressIndicator());
+                label: const Text(""),
+                icon: const Icon(Icons.my_location),
+              ),
+            );
+          },
+          error: (err, stack) => Text('Error: $err'),
+          loading: () => const CircularProgressIndicator(),
+        );
   }
 
   List<Marker> createMarkers(List<Camp> camps) {
-    List<Marker> markers = [];
-    for (int i = 0; i < camps.length; i++) {
-      Marker marker = Marker(
-        markerId: MarkerId("${camps[i].id}"),
-        position: LatLng(camps[i].latitude, camps[i].longitude),
+    return camps.map((camp) {
+      return Marker(
+        markerId: MarkerId(camp.id.toString()),
+        position: LatLng(camp.latitude, camp.longitude),
         infoWindow: InfoWindow(
-            title: "${camps[i].name}", snippet: "${camps[i].description}"),
+          title: camp.name,
+          snippet: camp.description,
+        ),
         icon: customIcon,
         onTap: () {
           showModalBottomSheet(
-              context: context,
-              builder: (BuildContext context) {
-                return Container(
-                  height: 300,
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(
-                              camps[i].name,
-                              style: TextStyle(
-                                  fontSize: 30, fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              child: Text(
-                                camps[i].description,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            ElevatedButton(
-                              onPressed: () {},
-                              style: ElevatedButton.styleFrom(
-                                  elevation: 0,
-                                  backgroundColor: (Colors.blue),
-                                  minimumSize: Size(120, 50),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  )),
-                              child: Text(
-                                "Directions",
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                            ElevatedButton(
-                              onPressed: () {},
-                              style: ElevatedButton.styleFrom(
-                                  elevation: 0,
-                                  backgroundColor: (Colors.greenAccent),
-                                  minimumSize: Size(120, 50),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  )),
-                              child: Text(
-                                "Teachers",
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                            ElevatedButton(
-                              onPressed: () {},
-                              style: ElevatedButton.styleFrom(
-                                  elevation: 0,
-                                  backgroundColor: (Colors.blueAccent),
-                                  minimumSize: Size(120, 50),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  )),
-                              child: Text(
-                                "Subjects",
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              });
+            context: context,
+            builder: (context) => CampDetailsModal(camp: camp),
+          );
         },
       );
-      markers.add(marker);
-    }
-    return markers;
+    }).toList();
+  }
+}
+
+class CampDetailsModal extends StatelessWidget {
+  final Camp camp;
+
+  const CampDetailsModal({Key? key, required this.camp}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 300,
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            camp.name,
+            style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          Text(camp.description),
+          const Spacer(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _ActionButton(
+                text: "Directions",
+                color: Colors.blue,
+                onPressed: () {},
+              ),
+              _ActionButton(
+                text: "Teachers",
+                color: Colors.greenAccent,
+                onPressed: () {},
+              ),
+              _ActionButton(
+                text: "Subjects",
+                color: Colors.blueAccent,
+                onPressed: () {},
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ActionButton extends StatelessWidget {
+  final String text;
+  final Color color;
+  final VoidCallback onPressed;
+
+  const _ActionButton({
+    Key? key,
+    required this.text,
+    required this.color,
+    required this.onPressed,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        elevation: 0,
+        backgroundColor: color,
+        minimumSize: const Size(120, 50),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(color: Colors.white),
+      ),
+    );
   }
 }

@@ -1,4 +1,4 @@
-import 'package:campconnect/models/class.dart'; // Assuming a Class model exists
+import 'package:campconnect/models/class.dart';
 import 'package:campconnect/models/teacher.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 

@@ -77,7 +77,7 @@ class _AddCamp extends ConsumerState<AddCampLocationScreen> {
   Widget _getMap() {
     return GoogleMap(
       initialCameraPosition: _initial!,
-      mapType: MapType.hybrid,
+      mapType: MapType.normal,
       zoomControlsEnabled: false,
       onCameraIdle: () {
         getAddress(_scrolledLocation);
