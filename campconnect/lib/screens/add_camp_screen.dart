@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:campconnect/models/camp.dart';
 import 'package:campconnect/providers/camp_provider.dart';
 import 'package:campconnect/providers/json_provider.dart';
@@ -8,6 +10,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:campconnect/theme/styling_constants.dart';
+import 'package:campconnect/utils/helper_widgets.dart';
 
 class AddCampScreen extends ConsumerStatefulWidget {
   final String location;
@@ -31,6 +35,9 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
   String? selectedEducationLevel;
   String? selectedSubject;
 
+  List<String> subjects = [];
+  List<String> selectedSubjects = [];
+
   @override
   void initState() {
     ref.read(campProviderNotifier);
@@ -41,6 +48,18 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
     longitude = double.parse(latlng![1]);
     address = latlng![2];
     location = LatLng(latitude!, longitude!);
+    loadAdditionalSupports();
+  }
+
+  Future<void> loadAdditionalSupports() async {
+    try {
+      final subjectsData = await DefaultAssetBundle.of(context)
+          .loadString("assets/data/additional_support.json");
+      subjects = List<String>.from(json.decode(subjectsData) as List);
+      setState(() {});
+    } catch (error) {
+      debugPrint("Error loading additional supports data: $error");
+    }
   }
 
   @override
@@ -60,7 +79,7 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
                       labelText: "Name",
                       border: OutlineInputBorder()
                       ),
-                    
+                      
                   ),
                 )
               ],
@@ -69,7 +88,8 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: [
-                  const Text("Location: ", style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text("Location: ",
+                    style: getTextStyle("mediumBold", color: AppColors.lightTeal),),
                   Expanded(
                     child: Text(address ?? "", style: const TextStyle(fontSize: 16.0)),
                   ),
@@ -81,7 +101,8 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Choose level"), buildEduDropdown()
+                  Text("Choose level", 
+                    style: getTextStyle("mediumBold", color: AppColors.lightTeal),), buildEduDropdown()
                 ]),
             ),
             Padding(
@@ -89,7 +110,8 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Choose Subject"),
+                  Text("Choose Subject",
+                    style: getTextStyle("mediumBold", color: AppColors.lightTeal),),
                   buildSubjectsDropdown(),
                 ],
               ),
@@ -106,14 +128,16 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
                 )
               ]),
             ),
-            const Text("Special Needs", style: TextStyle(fontWeight: FontWeight.bold)),
+            Text("Special Needs",
+                    style: getTextStyle("mediumBold", color: AppColors.lightTeal),),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: [
                   Expanded(
                     child: RadioListTile(
-                      title: const Text('Yes'),
+                      title: Text('Yes',
+                      style: getTextStyle("medium", color: AppColors.lightTeal),),
                       value: 'Yes',
                       groupValue: _selectedSpecNeeds,
                       onChanged: (value) {
@@ -125,7 +149,8 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
                   ),
                   Expanded(
                     child: RadioListTile(
-                      title: const Text('No'),
+                      title: Text('No',
+                      style: getTextStyle("medium", color: AppColors.lightTeal),),
                       value: 'No',
                       groupValue: _selectedSpecNeeds,
                       onChanged: (value) {
@@ -138,6 +163,9 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
                 ],
               ),
             ),
+            const SizedBox(height: 16),
+            buildPreferredSubjectsPicker(),
+            const SizedBox(height: 16),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: SizedBox(
@@ -155,7 +183,7 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
                       context.go(AppRouter.home.path);
                     },
                     style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white, backgroundColor: Colors.blue, // Text color
+                      foregroundColor: Colors.white, backgroundColor: AppColors.lightTeal, // Text color
                       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12), // Padding
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12), // Rounded corners
@@ -171,7 +199,101 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
     );
   }
 
-  //IMPORTANNTTTTT need to change so user info is updated
+  Widget buildPreferredSubjectsPicker() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                "Additional Supports",
+                textAlign: TextAlign.start,
+                style: getTextStyle("small", color: AppColors.lightTeal),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Icon(Icons.book, color: Colors.grey),
+              const SizedBox(width: 10),
+              Text(
+                "Additional Supports",
+                style: getTextStyle('medium', color: Colors.grey),
+              ),
+              const Spacer(),
+              IconButton(
+                icon: const Icon(Icons.add, color: Colors.grey),
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(12),
+                      ),
+                    ),
+                    builder: (_) {
+                      return ListView.builder(
+                        itemCount: subjects.length,
+                        itemBuilder: (_, index) {
+                          return ListTile(
+                            title: Text(
+                              subjects[index],
+                              style: getTextStyle("small"),
+                            ),
+                            onTap: () {
+                              setState(() {
+                                if (!selectedSubjects.contains(subjects[index])) {
+                                  selectedSubjects.add(subjects[index]);
+                                }
+                              });
+                              Navigator.pop(context);
+                            },
+                          );
+                        },
+                      );
+                    },
+                  );
+                },
+              ),
+            ],
+          ),
+          const Divider(color: AppColors.lightTeal, thickness: 2),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            children: selectedSubjects
+                .map(
+                  (subject) => Chip(
+                    backgroundColor: AppColors.lightTeal,
+                    label: Text(
+                      subject,
+                      style: getTextStyle('small', color: Colors.white),
+                    ),
+                    deleteIcon: const Icon(Icons.close, color: Colors.white),
+                    onDeleted: () {
+                      setState(() {
+                        selectedSubjects.remove(subject);
+                      });
+                    },
+                    shape: RoundedRectangleBorder(
+                      side: const BorderSide(
+                        color: Colors.transparent,
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                )
+                .toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
   void addCamp(
     TextEditingController name,
     String selectedEducationLevel,

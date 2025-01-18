@@ -10,7 +10,6 @@ class Student extends User {
   List<String> preferredSubjects; // e.g., Math, Science
   String learningGoals; // Optional
   String specialNeeds; // Accessibility requirements (optional)
-  String currentLocation; // Automatically detected via GPS
   String preferredDistanceForCamps; // e.g., "Within 5 km"
   List<String> enrolledCamps;
 
@@ -32,7 +31,6 @@ class Student extends User {
       required this.preferredSubjects,
       this.learningGoals = '',
       this.specialNeeds = '',
-      required this.currentLocation,
       required this.preferredDistanceForCamps,
       required this.enrolledCamps})
       : super(
@@ -58,7 +56,6 @@ class Student extends User {
         preferredSubjects: List<String>.from(json['preferredSubjects']),
         learningGoals: json['learningGoals'] ?? '',
         specialNeeds: json['specialNeeds'] ?? '',
-        currentLocation: json['currentLocation'],
         preferredDistanceForCamps: json['preferredDistanceForCamps'],
         enrolledCamps: List<String>.from(json['enrolledCamps']));
   }
@@ -74,7 +71,6 @@ class Student extends User {
         'preferredSubjects': preferredSubjects,
         'learningGoals': learningGoals,
         'specialNeeds': specialNeeds,
-        'currentLocation': currentLocation,
         'preferredDistanceForCamps': preferredDistanceForCamps,
         'enrolledCamps': enrolledCamps
       });
