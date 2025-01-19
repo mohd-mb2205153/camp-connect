@@ -1,5 +1,6 @@
 import 'package:campconnect/routes/app_router.dart';
 import 'package:campconnect/theme/constants.dart';
+import 'package:campconnect/utils/helper_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -18,12 +19,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        scrolledUnderElevation: 0.0,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         centerTitle: true,
-        elevation: 5,
-        title: const Text("Your Profile"),
+        title: Text(
+          "Profile",
+          style: getTextStyle("largeBold", color: AppColors.teal),
+        ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(15.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             Row(
@@ -57,27 +63,44 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 const SizedBox(
                   width: 30,
                 ),
-                const Column(
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('First Name'),
-                    Text('Last Name'),
-                    Text('email@gmail.com'),
-                    Text('Role'),
+                    Text(
+                      wrapText('First Name Last Name', 24),
+                      style: getTextStyle("mediumBold",
+                          color: AppColors.lightTeal),
+                    ),
+                    Text(
+                      "email@gmail.com",
+                      style: getTextStyle("smallBold", color: Colors.grey),
+                    ),
+                    addVerticalSpace(12),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 4.0, horizontal: 8.0),
+                      decoration: BoxDecoration(
+                        color: AppColors.teal,
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                      child: Text(
+                        'Role',
+                        style: getTextStyle(
+                          "smallBold",
+                          color: Colors.white, // Text color
+                        ),
+                      ),
+                    )
                   ],
                 ),
               ],
             ),
-            const SizedBox(
-              height: 10,
-            ),
+            addVerticalSpace(12),
             const Divider(
-              thickness: 5,
-              color: AppColors.darkBlue,
+              thickness: 2,
+              color: AppColors.teal,
             ),
-            const SizedBox(
-              height: 10,
-            ),
+            addVerticalSpace(12),
             buildMenuItem(
               Icons.person,
               'Personal Information',
@@ -112,14 +135,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         ListTile(
           leading: Icon(
             icon,
-            color: AppColors.darkTeal,
+            color: AppColors.lightTeal,
           ),
           title: Text(
             title,
-            style: const TextStyle(fontSize: 16),
+            style: getTextStyle("small", color: Colors.black45),
           ),
           trailing: IconButton(
-            icon: const Icon(Icons.chevron_right),
+            icon: Icon(
+              Icons.chevron_right,
+              color: AppColors.lightTeal,
+            ),
             onPressed: onPressed,
           ),
         ),

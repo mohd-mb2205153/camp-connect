@@ -1,3 +1,4 @@
+import 'package:campconnect/providers/show_nav_bar_provider.dart';
 import 'package:campconnect/routes/app_router.dart';
 import 'package:campconnect/theme/constants.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
@@ -24,6 +25,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   void initState() {
     super.initState();
+    ref.read(showNavBarNotifierProvider.notifier);
     txtEmailController = TextEditingController();
     txtPasswordController = TextEditingController();
 
@@ -107,10 +109,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       children: [
                         inputFields(context),
                         addVerticalSpace(60),
-                        LoginButton(
-                          onLoginPressed: () =>
-                              context.pushReplacementNamed(AppRouter.home.name),
-                        ),
+                        LoginButton(onLoginPressed: () {
+                          ref
+                              .read(showNavBarNotifierProvider.notifier)
+                              .setActiveBottomNavBar(0);
+                          context.pushReplacementNamed(AppRouter.home.name);
+                        }),
                       ],
                     ),
                   ),

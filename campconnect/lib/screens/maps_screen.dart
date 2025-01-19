@@ -27,7 +27,6 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
   BitmapDescriptor liveLocationIcon = BitmapDescriptor.defaultMarker;
 
   late StreamSubscription<Position> _positionStreamSubscription;
-
   bool _followUserLocation = true;
 
   @override
@@ -35,59 +34,6 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
     super.initState();
     _loadCustomIcons();
     _startLiveLocationUpdates();
-  }
-
-  void _loadCustomIcons() {
-    BitmapDescriptor.asset(
-      const ImageConfiguration(size: Size(48, 48)),
-      "assets/images/tent_icon.png",
-    ).then((icon) {
-      if (mounted) {
-        setState(() {
-          customIcon = icon;
-        });
-      }
-    });
-
-    BitmapDescriptor.asset(
-      const ImageConfiguration(size: Size(32, 32)),
-      "assets/images/current_location_icon.png",
-    ).then((icon) {
-      if (mounted) {
-        setState(() {
-          liveLocationIcon = icon;
-        });
-      }
-    });
-  }
-
-  void _startLiveLocationUpdates() {
-    _positionStreamSubscription = Geolocator.getPositionStream(
-      locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
-    ).listen((Position position) {
-      LatLng userLocation = LatLng(position.latitude, position.longitude);
-
-      if (mounted) {
-        setState(() {
-          markers.removeWhere(
-              (marker) => marker.markerId.value == "live_location");
-          markers.add(
-            Marker(
-              markerId: const MarkerId("live_location"),
-              position: userLocation,
-              icon: liveLocationIcon,
-              infoWindow: const InfoWindow(title: "You are here"),
-            ),
-          );
-        });
-      }
-
-      if (_followUserLocation && _googleMapController != null) {
-        _googleMapController!.animateCamera(
-          CameraUpdate.newLatLng(userLocation),
-        );
-      }
-    });
   }
 
   @override
@@ -100,239 +46,319 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
   @override
   Widget build(BuildContext context) {
     return ref.watch(campProviderNotifier).when(
-          data: (data) {
-            markers.addAll(createMarkers(data));
-            return Scaffold(
-              extendBodyBehindAppBar: true,
-              appBar: AppBar(
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-              ),
-              body: Stack(
-                children: [
-                  GoogleMap(
-                    initialCameraPosition: initialCameraPosition,
-                    markers: markers,
-                    zoomControlsEnabled: false,
-                    mapType: MapType.terrain,
-                    myLocationButtonEnabled: false,
-                    onMapCreated: (controller) {
-                      _googleMapController = controller;
-                    },
-                    onTap: (LatLng location) {
-                      // Stop following user location when the map is tapped
-                      setState(() {
-                        _followUserLocation = false;
-                      });
-                    },
-                    onCameraMove: (CameraPosition position) {
-                      // Stop following user location when the user moves the map
-                      setState(() {
-                        _followUserLocation = false;
-                      });
-                    },
-                  ),
-                  Positioned(
-                    top: 64,
-                    left: 0,
-                    right: 0,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(left: 24.0),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: AppColors.lightTeal,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: IconButton(
-                                  icon: const Icon(Icons.search,
-                                      color: Colors.white),
-                                  onPressed: () {},
-                                ),
-                              ),
-                            ),
-                            const Spacer(),
-                            ElevatedButton(
-                              onPressed: () {
-                                // filter btn action
-                              },
-                              style: ElevatedButton.styleFrom(
-                                elevation: 2,
-                                backgroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 10,
-                                  horizontal: 50,
-                                ),
-                              ),
-                              child: Text(
-                                "Filter",
-                                style: getTextStyle("mediumBold",
-                                    color: AppColors.teal),
-                              ),
-                            ),
-                            const Spacer(),
-                            Padding(
-                              padding: const EdgeInsets.only(right: 24.0),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: AppColors.lightTeal,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: IconButton(
-                                  icon: const Icon(Icons.settings,
-                                      color: Colors.white),
-                                  onPressed: () {},
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        addVerticalSpace(12),
-                        Text(
-                          "Last Updated: " + "Now",
-                          style: getTextStyle(
-                            "small",
-                            color: AppColors.white,
-                          ).copyWith(
-                            shadows: [
-                              Shadow(
-                                offset: Offset(1.0, 1.0),
-                                blurRadius: 2.0,
-                                color: Colors.black.withOpacity(0.6),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              floatingActionButton: floatingActionColumn(context),
-            );
-          },
-          error: (err, stack) => Center(child: Text('Error: $err')),
-          loading: () => const Center(child: CircularProgressIndicator()),
+          data: (data) => _buildMapScreen(context, data),
+          error: (err, stack) => _buildErrorScreen(err),
+          loading: () => _buildLoadingScreen(),
         );
   }
 
-  Stack floatingActionColumn(BuildContext context) {
-    return Stack(
-      alignment: Alignment.bottomRight,
+  // Method to load custom marker icons
+  void _loadCustomIcons() {
+    _loadCustomIcon("assets/images/tent_icon.png", (icon) {
+      customIcon = icon;
+    });
+    _loadCustomIcon("assets/images/current_location_icon.png", (icon) {
+      liveLocationIcon = icon;
+    });
+  }
+
+  void _loadCustomIcon(String assetPath, Function(BitmapDescriptor) callback) {
+    BitmapDescriptor.asset(
+      const ImageConfiguration(size: Size(48, 48)),
+      assetPath,
+    ).then((icon) {
+      if (mounted) {
+        setState(() {
+          callback(icon);
+        });
+      }
+    });
+  }
+
+  // Method to start live location updates
+  void _startLiveLocationUpdates() {
+    _positionStreamSubscription = Geolocator.getPositionStream(
+      locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
+    ).listen(_updateLiveLocationMarker);
+  }
+
+  void _updateLiveLocationMarker(Position position) {
+    LatLng userLocation = LatLng(position.latitude, position.longitude);
+
+    if (mounted) {
+      setState(() {
+        markers
+            .removeWhere((marker) => marker.markerId.value == "live_location");
+        markers.add(
+          Marker(
+            markerId: const MarkerId("live_location"),
+            position: userLocation,
+            icon: liveLocationIcon,
+            infoWindow: const InfoWindow(title: "You are here"),
+          ),
+        );
+      });
+    }
+
+    if (_followUserLocation && _googleMapController != null) {
+      _googleMapController!.animateCamera(
+        CameraUpdate.newLatLng(userLocation),
+      );
+    }
+  }
+
+  // Method to build the main map screen
+  Widget _buildMapScreen(BuildContext context, List<Camp> data) {
+    markers.addAll(createMarkers(data));
+
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: _buildTransparentAppBar(),
+      body: Stack(
+        children: [
+          _buildGoogleMap(),
+          _buildHeader(context),
+        ],
+      ),
+      floatingActionButton: _buildFloatingActionButtons(context),
+    );
+  }
+
+  AppBar _buildTransparentAppBar() {
+    return AppBar(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+    );
+  }
+
+  GoogleMap _buildGoogleMap() {
+    return GoogleMap(
+      initialCameraPosition: initialCameraPosition,
+      markers: markers,
+      zoomControlsEnabled: false,
+      mapType: MapType.terrain,
+      myLocationButtonEnabled: false,
+      onMapCreated: (controller) {
+        _googleMapController = controller;
+      },
+      onTap: (_) => _stopFollowingUser(),
+      onCameraMove: (_) => _stopFollowingUser(),
+    );
+  }
+
+  void _stopFollowingUser() {
+    setState(() {
+      _followUserLocation = false;
+    });
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Positioned(
+      top: 64,
+      left: 0,
+      right: 0,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _buildHeaderButtons(context),
+          addVerticalSpace(12),
+          _buildLastUpdatedText(),
+        ],
+      ),
+    );
+  }
+
+  Row _buildHeaderButtons(BuildContext context) {
+    return Row(
       children: [
-        Positioned(
-          bottom: 5,
-          child: SizedBox(
-            width: 150,
-            height: 50.0,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: AppColors.lightTeal,
-                borderRadius: BorderRadius.circular(50.0),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  IconButton(
-                    onPressed: () {},
-                    icon: Image.asset(
-                      "assets/images/tent_icon_white.png",
-                      fit: BoxFit.contain,
-                      height: 24,
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(
-                      Icons.directions,
-                      color: Colors.white,
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () {},
-                    icon: Image.asset(
-                      "assets/images/add_icon.png",
-                      fit: BoxFit.contain,
-                      height: 24,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        Positioned(
-          bottom: 70.0,
-          child: Container(
-            decoration: BoxDecoration(
-              color: AppColors.lightTeal,
-              shape: BoxShape.circle,
-            ),
-            child: IconButton(
-              onPressed: () async {
-                setState(() {
-                  _followUserLocation = true; // Re-enable location tracking
-                });
-                try {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Fetching your location...")),
-                  );
-
-                  Position position = await Geolocator.getCurrentPosition(
-                    locationSettings: const LocationSettings(
-                      accuracy: LocationAccuracy.high,
-                      distanceFilter: 10,
-                    ),
-                  );
-
-                  LatLng userLocation =
-                      LatLng(position.latitude, position.longitude);
-
-                  if (_googleMapController != null) {
-                    _googleMapController!.animateCamera(
-                      CameraUpdate.newLatLngZoom(userLocation, 17),
-                    );
-                  }
-
-                  setState(() {
-                    markers.removeWhere(
-                        (marker) => marker.markerId.value == "live_location");
-                    markers.add(
-                      Marker(
-                        markerId: const MarkerId("live_location"),
-                        position: userLocation,
-                        icon: liveLocationIcon,
-                        infoWindow: const InfoWindow(title: "You are here"),
-                      ),
-                    );
-                  });
-
-                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Error getting location: $e")),
-                  );
-                }
-              },
-              icon: Image.asset(
-                "assets/images/track_location_icon.png",
-                fit: BoxFit.contain,
-                height: 24,
-              ),
-            ),
-          ),
-        )
+        _buildCircleIconButton(Icons.search, () {}),
+        const Spacer(),
+        _buildFilterButton(),
+        const Spacer(),
+        _buildCircleIconButton(Icons.settings, () {}),
       ],
     );
   }
 
+  Widget _buildCircleIconButton(IconData icon, VoidCallback onPressed) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.lightTeal,
+          shape: BoxShape.circle,
+        ),
+        child: IconButton(
+          icon: Icon(icon, color: Colors.white),
+          onPressed: onPressed,
+        ),
+      ),
+    );
+  }
+
+  ElevatedButton _buildFilterButton() {
+    return ElevatedButton(
+      onPressed: () {
+        // Filter button action
+      },
+      style: ElevatedButton.styleFrom(
+        elevation: 2,
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
+      ),
+      child: Text(
+        "Filter",
+        style: getTextStyle("mediumBold", color: AppColors.teal),
+      ),
+    );
+  }
+
+  Widget _buildLastUpdatedText() {
+    return Text(
+      "Last Updated: Now",
+      style: getTextStyle("small", color: AppColors.white).copyWith(
+        shadows: [
+          Shadow(
+            offset: Offset(1.0, 1.0),
+            blurRadius: 2.0,
+            color: Colors.black.withOpacity(0.6),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Stack _buildFloatingActionButtons(BuildContext context) {
+    return Stack(
+      alignment: Alignment.bottomRight,
+      children: [
+        _buildFloatingRowActions(),
+        _buildTrackUserLocationButton(context),
+      ],
+    );
+  }
+
+  Positioned _buildFloatingRowActions() {
+    return Positioned(
+      bottom: 5,
+      child: SizedBox(
+        width: 150,
+        height: 50.0,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: AppColors.lightTeal,
+            borderRadius: BorderRadius.circular(50.0),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              IconButton(
+                onPressed: () {},
+                icon: Image.asset(
+                  "assets/images/tent_icon_white.png",
+                  fit: BoxFit.contain,
+                  height: 24,
+                ),
+              ),
+              IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.directions, color: Colors.white),
+              ),
+              IconButton(
+                onPressed: () {},
+                icon: Image.asset(
+                  "assets/images/add_icon.png",
+                  fit: BoxFit.contain,
+                  height: 24,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Positioned _buildTrackUserLocationButton(BuildContext context) {
+    return Positioned(
+      bottom: 70.0,
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.lightTeal,
+          shape: BoxShape.circle,
+        ),
+        child: IconButton(
+          onPressed: () => _trackUserLocation(context),
+          icon: Image.asset(
+            "assets/images/track_location_icon.png",
+            fit: BoxFit.contain,
+            height: 24,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _trackUserLocation(BuildContext context) async {
+    setState(() {
+      _followUserLocation = true;
+    });
+
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Fetching your location...")),
+      );
+
+      Position position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          distanceFilter: 10,
+        ),
+      );
+
+      LatLng userLocation = LatLng(position.latitude, position.longitude);
+
+      if (_googleMapController != null) {
+        _googleMapController!.animateCamera(
+          CameraUpdate.newLatLngZoom(userLocation, 17),
+        );
+      }
+
+      setState(() {
+        markers
+            .removeWhere((marker) => marker.markerId.value == "live_location");
+        markers.add(
+          Marker(
+            markerId: const MarkerId("live_location"),
+            position: userLocation,
+            icon: liveLocationIcon,
+            infoWindow: const InfoWindow(title: "You are here"),
+          ),
+        );
+      });
+
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error getting location: $e")),
+      );
+    }
+  }
+
+  // Error screen builder
+  Widget _buildErrorScreen(Object error) {
+    return Center(child: Text('Error: $error'));
+  }
+
+  // Loading screen builder
+  Widget _buildLoadingScreen() {
+    return const Center(child: CircularProgressIndicator());
+  }
+
+  // Marker creation
   List<Marker> createMarkers(List<Camp> camps) {
     return camps.map((camp) {
       return Marker(
@@ -344,18 +370,20 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
         ),
         icon: customIcon,
         onTap: () {
-          showModalBottomSheet(
-            context: context,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(
-                top: Radius.circular(12),
-              ),
-            ),
-            builder: (context) => CampDetailsModal(camp: camp),
-          );
+          _showCampDetailsModal(context, camp);
         },
       );
     }).toList();
+  }
+
+  void _showCampDetailsModal(BuildContext context, Camp camp) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+      ),
+      builder: (context) => CampDetailsModal(camp: camp),
+    );
   }
 }
 
@@ -468,10 +496,12 @@ class CampDetailsModal extends StatelessWidget {
                       height: 36,
                       child: IconButton(
                         onPressed: () {},
-                        icon: Image.asset(
-                          "assets/images/upload_icon_teal.png",
-                          fit: BoxFit.contain,
-                          height: 20,
+                        icon: SizedBox(
+                          child: Icon(
+                            Icons.bookmark,
+                            color: AppColors.lightTeal,
+                            size: 20,
+                          ),
                         ),
                       ),
                     ),

@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
+import '../../providers/show_nav_bar_provider.dart';
 import '../../theme/constants.dart';
 
 class EducatorOnboardingScreen extends ConsumerStatefulWidget {
@@ -47,6 +48,7 @@ class _EducatorOnboardingScreenState
   @override
   void initState() {
     super.initState();
+    ref.read(showNavBarNotifierProvider.notifier);
     loadDropdownData();
   }
 
@@ -161,6 +163,9 @@ class _EducatorOnboardingScreenState
                             curve: Curves.ease,
                           );
                         } else {
+                          ref
+                              .read(showNavBarNotifierProvider.notifier)
+                              .setActiveBottomNavBar(0);
                           context.goNamed(AppRouter.home.name);
                         }
                       },

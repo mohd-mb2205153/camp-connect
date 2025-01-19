@@ -10,6 +10,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
+import '../../providers/show_nav_bar_provider.dart';
+
 class StudentOnboardingScreen extends ConsumerStatefulWidget {
   const StudentOnboardingScreen({super.key});
 
@@ -43,10 +45,11 @@ class _StudentOnboardingScreenState
   @override
   void initState() {
     super.initState();
-    loadDropdownData();
+    ref.read(showNavBarNotifierProvider.notifier);
+    loadDetailsData();
   }
 
-  Future<void> loadDropdownData() async {
+  Future<void> loadDetailsData() async {
     try {
       final educationLevelData = await DefaultAssetBundle.of(context)
           .loadString("assets/data/education_level.json");
@@ -186,6 +189,9 @@ class _StudentOnboardingScreenState
                             curve: Curves.ease,
                           );
                         } else {
+                          ref
+                              .read(showNavBarNotifierProvider.notifier)
+                              .setActiveBottomNavBar(0);
                           context.goNamed(AppRouter.home.name);
                         }
                       },
