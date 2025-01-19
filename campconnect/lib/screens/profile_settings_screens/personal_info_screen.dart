@@ -573,7 +573,7 @@ class SpecialNeedsSection extends StatelessWidget {
   }
 }
 
-class LanguagesSection extends ConsumerWidget {
+class LanguagesSection extends StatelessWidget {
   final bool isEditing;
   final BuildContext context;
   final Widget Function(BuildContext) builder;
@@ -590,7 +590,7 @@ class LanguagesSection extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return DetailsSection(
       title: "Languages",
       icon: Icons.language,
@@ -602,7 +602,7 @@ class LanguagesSection extends ConsumerWidget {
             style: getTextStyle('small', color: AppColors.darkBlue),
           ),
         ),
-        if (isEditing) buildLanguages(context, ref),
+        if (isEditing) buildLanguages(context),
         if (!isEditing)
           const Divider(
             color: AppColors.darkBlue,
@@ -643,7 +643,7 @@ class LanguagesSection extends ConsumerWidget {
     );
   }
 
-  Widget buildLanguages(BuildContext context, WidgetRef ref) {
+  Widget buildLanguages(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

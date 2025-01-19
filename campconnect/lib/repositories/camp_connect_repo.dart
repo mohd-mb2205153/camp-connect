@@ -1,5 +1,6 @@
 import 'package:campconnect/models/student.dart';
 import 'package:campconnect/models/teacher.dart';
+import 'package:campconnect/models/user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../models/camp.dart';
@@ -8,11 +9,13 @@ class CampConnectRepo {
   final CollectionReference studentsRef;
   final CollectionReference teachersRef;
   final CollectionReference campsRef;
+  final CollectionReference usersRef;
 
   CampConnectRepo(
       {required this.studentsRef,
       required this.teachersRef,
-      required this.campsRef});
+      required this.campsRef,
+      required this.usersRef});
   
   // (*) Camp Repository ===================================================================
   Stream<List<Camp>> observeCamps() =>
@@ -72,4 +75,24 @@ class CampConnectRepo {
     teachersRef.doc(teacher.id).update(teacher.toJson());
 
   Future<void> deleteTeacher(Teacher teacher) => teachersRef.doc(teacher.id).delete();
+
+  // (*) User Repository ===================================================================
+  Stream<List<User>> observeUsers() =>
+  usersRef.snapshots().map((snapshot) => snapshot.docs
+          .map((doc) => User.fromJson(doc.data() as Map<String, dynamic>))
+          .toList());
+
+  Future<User?> getUserById(String userId) => usersRef.doc(userId).get().then(
+      (snapshot) => User.fromJson(snapshot.data() as Map<String, dynamic>));
+
+  Future<void> addUser(User user) async {
+    final docId = usersRef.doc().id;
+    user.id = docId;
+    await usersRef.doc(user.id).set(user.toJson());
+  }
+
+  Future<void> updateUser(User user) =>
+    usersRef.doc(user.id).update(user.toJson());
+
+  Future<void> deleteUser(User user) => usersRef.doc(user.id).delete();
 }

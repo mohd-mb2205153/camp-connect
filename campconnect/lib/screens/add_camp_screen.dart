@@ -677,13 +677,4 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
       ],
     );
   }
-
-  Future<String> convertAddress(LatLng position) async {
-    List<Placemark> placemarks =
-        await placemarkFromCoordinates(position.latitude, position.longitude);
-    Placemark address = placemarks[0];
-    String fullAddress =
-        "${address.street},${address.locality},${address.administrativeArea},${address.country}";
-    return fullAddress;
-  }
 }

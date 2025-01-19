@@ -5,12 +5,14 @@ class SectionTitleWithIcon extends StatelessWidget {
   final IconData icon;
   final String title;
   final Widget child;
+  final bool centerTitle;
 
   const SectionTitleWithIcon({
     super.key,
     required this.icon,
     required this.title,
     required this.child,
+    this.centerTitle = false,
   });
 
   @override
@@ -18,6 +20,8 @@ class SectionTitleWithIcon extends StatelessWidget {
     return Column(
       children: [
         Row(
+          mainAxisAlignment:
+              centerTitle ? MainAxisAlignment.center : MainAxisAlignment.start,
           children: [
             Icon(
               icon,

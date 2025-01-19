@@ -7,7 +7,8 @@ final repoProvider = FutureProvider<CampConnectRepo>((ref) async {
   final studentsRef = db.collection("students");
   final teachersRef = db.collection("teachers");
   final campsRef = db.collection("camps");
+  final usersRef = db.collection("users");
 
   return CampConnectRepo(
-      studentsRef: studentsRef, teachersRef: teachersRef, campsRef: campsRef);
+      studentsRef: studentsRef, teachersRef: teachersRef, campsRef: campsRef, usersRef: usersRef);
 });

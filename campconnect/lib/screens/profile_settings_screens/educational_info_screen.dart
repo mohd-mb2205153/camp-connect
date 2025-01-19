@@ -5,6 +5,7 @@ import 'package:campconnect/providers/json_provider.dart';
 import 'package:campconnect/providers/show_bot_nav_provider.dart';
 import 'package:campconnect/theme/frosted_glass.dart';
 import 'package:campconnect/theme/styling_constants.dart';
+import 'package:campconnect/utils/helper_widgets.dart';
 import 'package:campconnect/widgets/details_row.dart';
 import 'package:campconnect/widgets/edit_screen_fields.dart';
 import 'package:campconnect/widgets/filter_dropdown.dart';
@@ -22,6 +23,7 @@ class EducationalInfoScreen extends ConsumerStatefulWidget {
 class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
   bool isEditing = false;
   String? selectedEducationLevel;
+  List<String> selectedSubjects = [];
   dynamic
       user; //Testing for now, later we will get user that is logged in thru provider.
 
@@ -32,46 +34,46 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
   void initState() {
     super.initState();
     //Dummy value
-    user = Student(
-      guardianPhoneCode: '+974',
-      phoneCode: '+974',
-      firstName: 'Ahmad',
-      lastName: 'John',
-      dateOfBirth: DateTime(2004, 11, 9),
-      nationality: 'Iraq',
-      primaryLanguages: ['Arabic', 'English'],
-      countryCode: 'QA',
-      mobileNumber: '3033067',
-      email: 'enter@gmail.com',
-      currentEducationLevel: 'High School',
-      enrolledCamps: [],
-      guardianContact: '44450699',
-      guardianCountryCode: 'IN',
-      preferredDistanceForCamps: '',
-      preferredSubjects: [],
-      learningGoals: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit,',
-      specialNeeds: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
-    );
-
-    // user = Teacher(
-    //   firstName: 'Mark',
-    //   lastName: 'Johnny',
-    //   dateOfBirth: DateTime(1987, 11, 9),
-    //   nationality: 'USA',
-    //   primaryLanguages: ['English'],
-    //   countryCode: 'QA',
-    //   mobileNumber: '30993067',
+    // user = Student(
+    //   guardianPhoneCode: '+974',
     //   phoneCode: '+974',
-    //   email: 'mark@gmail.com',
+    //   firstName: 'Ahmad',
+    //   lastName: 'John',
+    //   dateOfBirth: DateTime(2004, 11, 9),
+    //   nationality: 'Iraq',
+    //   primaryLanguages: ['Arabic', 'English'],
+    //   countryCode: 'QA',
+    //   mobileNumber: '3033067',
+    //   email: 'enter@gmail.com',
+    //   currentEducationLevel: 'High School',
     //   enrolledCamps: [],
-    //   areasOfExpertise: [],
-    //   availabilitySchedule: '',
-    //   certifications: [],
-    //   highestEducationLevel: 'Master Degree',
-    //   preferredCampDuration: '',
-    //   teachingExperience: 16,
-    //   willingnessToTravel: '',
+    //   guardianContact: '44450699',
+    //   guardianCountryCode: 'IN',
+    //   preferredDistanceForCamps: '',
+    //   preferredSubjects: ['Arabic', 'Art'],
+    //   learningGoals: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit,',
+    //   specialNeeds: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
     // );
+
+    user = Teacher(
+      firstName: 'Mark',
+      lastName: 'Johnny',
+      dateOfBirth: DateTime(1987, 11, 9),
+      nationality: 'USA',
+      primaryLanguages: ['English'],
+      countryCode: 'QA',
+      mobileNumber: '30993067',
+      phoneCode: '+974',
+      email: 'mark@gmail.com',
+      areasOfExpertise: [],
+      availabilitySchedule: '',
+      certifications: [],
+      highestEducationLevel: 'High School or secondary school degree complete',
+      preferredCampDuration: '',
+      teachingExperience: 16,
+      willingnessToTravel: '',
+      createdCamps: [],
+    );
   }
 
   @override
@@ -84,8 +86,11 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
   void initializeControllers(user) {
     if (user is Teacher) {
       teachingExpController.text = user.teachingExperience.toString();
+      selectedEducationLevel = user.highestEducationLevel;
     } else if (user is Student) {
       learningGoalsController.text = user.learningGoals;
+      selectedSubjects = List<String>.from(user.preferredSubjects);
+      selectedEducationLevel = user.currentEducationLevel;
     }
   }
 
@@ -180,17 +185,70 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
           isCurved: true,
           boxChild: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: StudentEducationSection(
-              isEditing: isEditing,
-              selectedEducationLevel:
-                  selectedEducationLevel ?? user.currentEducationLevel,
-              onEducationLevelSelected: (newLevel) {
-                setState(() {
-                  selectedEducationLevel = newLevel;
-                });
-              },
-              user: user!,
-            ),
+            child: ref.watch(subjectsProvider).when(
+                  data: (subjects) {
+                    return StudentEducationSection(
+                      isEditing: isEditing,
+                      selectedEducationLevel:
+                          selectedEducationLevel ?? user.currentEducationLevel,
+                      onEducationLevelSelected: (newLevel) {
+                        setState(() {
+                          selectedEducationLevel = newLevel;
+                        });
+                      },
+                      user: user ?? user.preferredSubjects,
+                      subjectsBuilder: (_) {
+                        return ListView.builder(
+                          itemCount: subjects.length,
+                          itemBuilder: (_, index) {
+                            return ListTile(
+                              title: Text(
+                                subjects[index],
+                                style: getTextStyle("small"),
+                              ),
+                              onTap: () {
+                                setState(() {
+                                  if (!selectedSubjects
+                                      .contains(subjects[index])) {
+                                    selectedSubjects.add(subjects[index]);
+                                  }
+                                });
+                                Navigator.pop(context);
+                              },
+                            );
+                          },
+                        );
+                      },
+                      subjectsChildren: selectedSubjects
+                          .map(
+                            (subject) => Chip(
+                              backgroundColor: AppColors.lightTeal,
+                              label: Text(
+                                subject,
+                                style:
+                                    getTextStyle('small', color: Colors.white),
+                              ),
+                              deleteIcon:
+                                  const Icon(Icons.close, color: Colors.white),
+                              onDeleted: () {
+                                setState(() {
+                                  selectedSubjects.remove(subject);
+                                });
+                              },
+                              shape: RoundedRectangleBorder(
+                                side: const BorderSide(
+                                  color: Colors.transparent,
+                                ),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            ),
+                          )
+                          .toList(),
+                    );
+                  },
+                  loading: () => const CircularProgressIndicator(),
+                  error: (err, stack) => Text('Error: $err'),
+                ),
           ),
         ),
         const SizedBox(height: 20),
@@ -256,6 +314,8 @@ class StudentEducationSection extends ConsumerWidget {
   final String selectedEducationLevel;
   final Function(String) onEducationLevelSelected;
   final Student user;
+  final Widget Function(BuildContext) subjectsBuilder;
+  final List<Widget> subjectsChildren;
 
   const StudentEducationSection({
     super.key,
@@ -263,63 +323,176 @@ class StudentEducationSection extends ConsumerWidget {
     required this.selectedEducationLevel,
     required this.onEducationLevelSelected,
     required this.user,
+    required this.subjectsBuilder,
+    required this.subjectsChildren,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        SectionTitleWithIcon(
-          icon: Icons.menu_book_rounded,
-          title: 'Basic Information',
-          child: Column(
-            children: [
-              isEditing
-                  ? Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: SizedBox(
-                        height: 48,
-                        width: MediaQuery.of(context).size.width * .8,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Education Level",
-                              style: getTextStyle('smallBold',
-                                  color: AppColors.darkBlue),
-                            ),
-                            ref.watch(educationLevelProvider).when(
-                                  data: (data) {
-                                    List<String> filteredList =
-                                        data.sublist(0, 3);
-                                    return FilterDropdown(
-                                      selectedFilter: selectedEducationLevel,
-                                      options: filteredList,
-                                      onSelected: (String? newLevel) {
-                                        if (newLevel != null) {
-                                          onEducationLevelSelected(newLevel);
-                                        }
-                                      },
-                                    );
-                                  },
-                                  loading: () =>
-                                      const CircularProgressIndicator(),
-                                  error: (err, stack) => Text('Error: $err'),
-                                ),
-                          ],
-                        ),
-                      ),
-                    )
-                  : DetailsRow(
-                      label: "Education Level",
-                      value: selectedEducationLevel,
-                      divider: false,
+    return SectionTitleWithIcon(
+      icon: Icons.menu_book_rounded,
+      title: 'Basic Information',
+      centerTitle: true,
+      child: Column(
+        children: [
+          isEditing
+              ? Container(
+                  decoration: BoxDecoration(
+                    border: const Border(
+                      bottom: BorderSide(color: AppColors.darkBlue, width: 1),
                     ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: SizedBox(
+                      height: 48,
+                      width: MediaQuery.of(context).size.width * .8,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Education Level",
+                            style: getTextStyle('smallBold',
+                                color: AppColors.darkBlue),
+                          ),
+                          ref.watch(studentEducationLevelProvider).when(
+                                data: (data) {
+                                  return FilterDropdown(
+                                    selectedFilter: selectedEducationLevel,
+                                    options: data,
+                                    onSelected: (String? newLevel) {
+                                      if (newLevel != null) {
+                                        onEducationLevelSelected(newLevel);
+                                      }
+                                    },
+                                  );
+                                },
+                                loading: () =>
+                                    const CircularProgressIndicator(),
+                                error: (err, stack) => Text('Error: $err'),
+                              ),
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+              : DetailsRow(
+                  label: "Education Level",
+                  value: user.currentEducationLevel,
+                ),
+          SizedBox(
+            height: 12,
+          ),
+          isEditing
+              ? buildEditPreferredSubjects(context)
+              : buildPreferedSubjects()
+        ],
+      ),
+    );
+  }
+
+  Widget buildPreferedSubjects() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+      child: Column(
+        children: [
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              'Preferred Subjects:',
+              style: getTextStyle('smallBold', color: AppColors.darkBlue),
+            ),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Column(
+            children: [
+              for (var subjects in user.preferredSubjects)
+                buildSubjectsContainer(subjects)
             ],
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildSubjectsContainer(String subjects) {
+    return Column(
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.lightTeal,
+            borderRadius: BorderRadius.circular(15),
+          ),
+          height: 35,
+          child: Center(
+            child: Text(
+              '   $subjects   ',
+              style: getTextStyle('small', color: AppColors.white),
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 5,
         )
       ],
+    );
+  }
+
+  Widget buildEditPreferredSubjects(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                "Preferred Subjects",
+                textAlign: TextAlign.start,
+                style: getTextStyle(
+                  "smallBold",
+                  color: AppColors.darkBlue,
+                ),
+              ),
+            ],
+          ),
+          addVerticalSpace(8),
+          Row(
+            children: [
+              Icon(Icons.book, color: Colors.grey),
+              addHorizontalSpace(10),
+              Text(
+                "Preferred Subjects",
+                style: getTextStyle('medium', color: Colors.grey),
+              ),
+              const Spacer(),
+              IconButton(
+                icon: const Icon(Icons.add, color: Colors.grey),
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(12),
+                      ),
+                    ),
+                    builder: subjectsBuilder,
+                  );
+                },
+              ),
+            ],
+          ),
+          const Divider(color: AppColors.lightTeal, thickness: 2),
+          addVerticalSpace(8),
+          Wrap(
+            spacing: 8,
+            children: subjectsChildren,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -371,13 +544,12 @@ class TeacherEducationSection extends ConsumerWidget {
                                 style: getTextStyle('smallBold',
                                     color: AppColors.darkBlue),
                               ),
-                              ref.watch(educationLevelProvider).when(
+                              ref.watch(teachedEducationLevelProvider).when(
                                     data: (data) {
-                                      List<String> filteredList =
-                                          data.sublist(2, 6);
                                       return FilterDropdown(
+                                        height: 48,
                                         selectedFilter: selectedEducationLevel,
-                                        options: filteredList,
+                                        options: data,
                                         onSelected: (String? newLevel) {
                                           if (newLevel != null) {
                                             onEducationLevelSelected(newLevel);
@@ -396,7 +568,7 @@ class TeacherEducationSection extends ConsumerWidget {
                     )
                   : DetailsRow(
                       label: "Highest Degree",
-                      value: selectedEducationLevel,
+                      value: user.highestEducationLevel,
                     ),
               DetailsRow(
                 label: "Teaching Experience",
