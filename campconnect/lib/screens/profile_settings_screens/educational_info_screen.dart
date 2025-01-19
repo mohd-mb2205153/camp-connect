@@ -65,7 +65,6 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
       mobileNumber: '30993067',
       phoneCode: '+974',
       email: 'mark@gmail.com',
-      enrolledCamps: [],
       areasOfExpertise: [],
       availabilitySchedule: '',
       certifications: [],
@@ -73,6 +72,7 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
       preferredCampDuration: '',
       teachingExperience: 16,
       willingnessToTravel: '',
+      createdCamps: [],
     );
   }
 
