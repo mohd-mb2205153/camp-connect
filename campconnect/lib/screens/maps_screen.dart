@@ -366,17 +366,8 @@ class CampDetailsModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<Map<String, dynamic>> additionalSupport = [
-      {"label": "Trauma Support", "icon": Icons.healing},
-      {"label": "Medical Clinic", "icon": Icons.local_hospital},
-      {"label": "WiFi Access", "icon": Icons.wifi},
-      {"label": "Food Stall", "icon": Icons.fastfood},
-      {"label": "Water Station", "icon": Icons.water_drop},
-      {"label": "Food Stall", "icon": Icons.fastfood},
-      {"label": "Water Station", "icon": Icons.water_drop},
-      {"label": "Food Stall", "icon": Icons.fastfood},
-      {"label": "Water Station", "icon": Icons.water_drop},
-    ];
+    final List<String>? additionalSupport = camp.additionalSupport;
+    final List<String>? languages = camp.languages;
 
     final List<Map<String, dynamic>> options = [
       {
@@ -423,7 +414,7 @@ class CampDetailsModal extends StatelessWidget {
       },
     ];
 
-    return Container(
+    return SizedBox(
       height: 500,
       child: SingleChildScrollView(
         child: Column(
@@ -437,6 +428,7 @@ class CampDetailsModal extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      addVerticalSpace(12),
                       Row(
                         children: [
                           Image.asset(
@@ -456,9 +448,12 @@ class CampDetailsModal extends StatelessWidget {
                       addVerticalSpace(8),
                       Row(
                         children: [
-                          Text(
-                            "camp.description",
-                            style: getTextStyle("small", color: Colors.black38),
+                          SizedBox(
+                            child: Text(
+                              wrapText(camp.description, 50),
+                              style:
+                                  getTextStyle("small", color: Colors.black38),
+                            ),
                           ),
                         ],
                       ),
@@ -487,40 +482,43 @@ class CampDetailsModal extends StatelessWidget {
             SizedBox(
               height: 50,
               child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: options.map((option) {
-                    final label = option["label"] as String;
-                    final icon = option["icon"] as IconData;
-                    final onPressed = option["onPressed"] as VoidCallback;
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: ElevatedButton.icon(
-                        onPressed: onPressed,
-                        icon: Icon(
-                          icon,
-                          size: 16,
-                          color: Colors.white,
-                        ),
-                        label: Text(
-                          label,
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          elevation: 0,
-                          backgroundColor: label == "Directions"
-                              ? AppColors.orange
-                              : AppColors.lightTeal,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: options.asMap().entries.map((entry) {
+                      int index = entry.key;
+                      final option = entry.value;
+                      final label = option["label"] as String;
+                      final icon = option["icon"] as IconData;
+                      final onPressed = option["onPressed"] as VoidCallback;
+                      return Padding(
+                        padding: index == 0
+                            ? const EdgeInsets.symmetric(horizontal: 8)
+                            : const EdgeInsets.only(right: 8),
+                        child: ElevatedButton.icon(
+                          onPressed: onPressed,
+                          icon: Icon(
+                            icon,
+                            size: 16,
+                            color: Colors.white,
                           ),
-                          minimumSize: const Size(140, 40),
+                          label: Text(
+                            label,
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            elevation: 0,
+                            backgroundColor: label == "Directions"
+                                ? AppColors.orange
+                                : AppColors.lightTeal,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            minimumSize: const Size(140, 40),
+                          ),
                         ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
+                      );
+                    }).toList(),
+                  )),
             ),
             addVerticalSpace(12),
             Padding(
@@ -555,7 +553,7 @@ class CampDetailsModal extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              "We need more resources to support ongoing projects.",
+                              camp.statusOfResources,
                               style: getTextStyle("small", color: Colors.white),
                             ),
                           ),
@@ -588,37 +586,131 @@ class CampDetailsModal extends StatelessWidget {
               child: SizedBox(
                 height: 50,
                 child: Wrap(
-                  children: additionalSupport
-                      .map(
-                        (item) => Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Chip(
-                            backgroundColor: AppColors.lightTeal,
-                            avatar: Icon(
-                              item["icon"],
-                              color: Colors.white,
-                            ),
-                            label: Text(
-                              item["label"],
-                              style: getTextStyle('small', color: Colors.white),
-                            ),
-                            shape: RoundedRectangleBorder(
-                              side: const BorderSide(
-                                color: Colors.transparent,
-                              ),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                          ),
+                  children: (additionalSupport ?? []).map((support) {
+                    return Padding(
+                      padding: additionalSupport?.indexOf(support) == 0
+                          ? EdgeInsets.symmetric(horizontal: 8)
+                          : EdgeInsets.only(right: 8),
+                      child: Chip(
+                        backgroundColor: AppColors.lightTeal,
+                        avatar: Icon(
+                          getIcon(support), // Use the String to map the icon
+                          color: Colors.white,
                         ),
-                      )
-                      .toList(),
+                        label: Text(
+                          support,
+                          style: getTextStyle('small', color: Colors.white),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          side: const BorderSide(
+                            color: Colors.transparent,
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                    );
+                  }).toList(),
                 ),
               ),
             ),
+            addVerticalSpace(12),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Column(
+                children: [
+                  Text(
+                    "Languages Spoken",
+                    style: getTextStyle(
+                      "mediumBold",
+                      color: AppColors.teal,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            addVerticalSpace(12),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: SizedBox(
+                height: 50,
+                child: Wrap(
+                  children: (languages ?? []).map((lang) {
+                    return Padding(
+                      padding: languages?.indexOf(lang) == 0
+                          ? EdgeInsets.symmetric(horizontal: 8)
+                          : EdgeInsets.only(right: 8),
+                      child: Chip(
+                        backgroundColor: AppColors.lightTeal,
+                        avatar: Icon(
+                          Icons.language_rounded,
+                          color: Colors.white,
+                        ),
+                        label: Text(
+                          lang,
+                          style: getTextStyle('small', color: Colors.white),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          side: const BorderSide(
+                            color: Colors.transparent,
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+            addVerticalSpace(12),
           ],
         ),
       ),
     );
+  }
+}
+
+IconData getIcon(String support) {
+  switch (support) {
+    case "Trauma Support":
+      return Icons.healing;
+    case "Medical Clinic":
+      return Icons.local_hospital;
+    case "WiFi Access":
+      return Icons.wifi;
+    case "Food Stall":
+      return Icons.fastfood;
+    case "Water Station":
+      return Icons.water_drop;
+    case "Security":
+      return Icons.security;
+    case "Psychological Support":
+      return Icons.psychology;
+    case "Library":
+      return Icons.library_books;
+    case "Sports Facilities":
+      return Icons.sports_soccer;
+    case "Transport":
+      return Icons.directions_bus;
+    case "Accessibility Support":
+      return Icons.accessible;
+    case "Child Care":
+      return Icons.child_care;
+    case "Health and Safety":
+      return Icons.health_and_safety;
+    case "Housing Support":
+      return Icons.house;
+    case "Educational Support":
+      return Icons.school;
+    case "Translation Services":
+      return Icons.translate;
+    case "Technical Support":
+      return Icons.computer;
+    case "Volunteer Programs":
+      return Icons.volunteer_activism;
+    case "Sanitation Facilities":
+      return Icons.soap;
+    default:
+      return Icons.help_outline;
   }
 }
 
