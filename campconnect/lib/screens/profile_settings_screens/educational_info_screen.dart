@@ -68,7 +68,7 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
       areasOfExpertise: [],
       availabilitySchedule: '',
       certifications: [],
-      highestEducationLevel: 'Graduate or professional Degree complete',
+      highestEducationLevel: 'High School or secondary school degree complete',
       preferredCampDuration: '',
       teachingExperience: 16,
       willingnessToTravel: '',
@@ -547,6 +547,7 @@ class TeacherEducationSection extends ConsumerWidget {
                               ref.watch(teachedEducationLevelProvider).when(
                                     data: (data) {
                                       return FilterDropdown(
+                                        height: 48,
                                         selectedFilter: selectedEducationLevel,
                                         options: data,
                                         onSelected: (String? newLevel) {

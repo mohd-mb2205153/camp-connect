@@ -5,18 +5,20 @@ class FilterDropdown extends StatelessWidget {
   final String selectedFilter;
   final List<String> options;
   final ValueChanged<String?> onSelected;
+  final double height;
 
   const FilterDropdown({
     super.key,
     required this.selectedFilter,
     required this.options,
     required this.onSelected,
+    this.height = 40,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 40,
+      height: height,
       width: 200,
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       decoration: BoxDecoration(
