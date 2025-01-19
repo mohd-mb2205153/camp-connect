@@ -26,8 +26,8 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
   String? selectedEducationLevel;
   List<String> selectedSubjects = [];
   final FocusNode certificationFocus = FocusNode();
-
-  List<String> certifications = [];
+  List<String> selectedCertifications = [];
+  List<String> selectedAreasOfExpertise = [];
   dynamic
       user; //Testing for now, later we will get user that is logged in thru provider.
 
@@ -71,7 +71,7 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
       mobileNumber: '30993067',
       phoneCode: '+974',
       email: 'mark@gmail.com',
-      areasOfExpertise: [],
+      areasOfExpertise: ['Biology', 'Art'],
       availabilitySchedule: '',
       certifications: [
         // 'CCNA',
@@ -99,7 +99,8 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
     if (user is Teacher) {
       teachingExpController.text = user.teachingExperience.toString();
       selectedEducationLevel = user.highestEducationLevel;
-      certifications = List<String>.from(user.certifications);
+      selectedCertifications = List<String>.from(user.certifications);
+      selectedAreasOfExpertise = List<String>.from(user.areasOfExpertise);
     } else if (user is Student) {
       learningGoalsController.text = user.learningGoals;
       selectedSubjects = List<String>.from(user.preferredSubjects);
@@ -310,9 +311,76 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
           boxWidth: double.infinity,
           isCurved: true,
           boxChild: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ref.watch(subjectsProvider).when(
+                    data: (subjects) {
+                      return AreaOfExpertiseSection(
+                        isEditing: isEditing,
+                        builder: (_) {
+                          return ListView.builder(
+                            itemCount: subjects.length,
+                            itemBuilder: (_, index) {
+                              return ListTile(
+                                title: Text(
+                                  subjects[index],
+                                  style: getTextStyle("small"),
+                                ),
+                                onTap: () {
+                                  setState(() {
+                                    if (!selectedAreasOfExpertise
+                                        .contains(subjects[index])) {
+                                      selectedAreasOfExpertise
+                                          .add(subjects[index]);
+                                    }
+                                  });
+                                  Navigator.pop(context);
+                                },
+                              );
+                            },
+                          );
+                        },
+                        user: user!,
+                        children: selectedAreasOfExpertise
+                            .map(
+                              (expertise) => Chip(
+                                backgroundColor: AppColors.lightTeal,
+                                label: Text(
+                                  expertise,
+                                  style: getTextStyle('small',
+                                      color: Colors.white),
+                                ),
+                                deleteIcon: const Icon(Icons.close,
+                                    color: Colors.white),
+                                onDeleted: () {
+                                  setState(() {
+                                    selectedAreasOfExpertise.remove(expertise);
+                                  });
+                                },
+                                shape: RoundedRectangleBorder(
+                                  side: const BorderSide(
+                                    color: Colors.transparent,
+                                  ),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                              ),
+                            )
+                            .toList(),
+                      );
+                    },
+                    loading: () => const CircularProgressIndicator(),
+                    error: (err, stack) => Text('Error: $err'),
+                  )),
+        ),
+        SizedBox(
+          height: 20,
+        ),
+        FrostedGlassBox(
+          boxWidth: double.infinity,
+          isCurved: true,
+          boxChild: Padding(
             padding: const EdgeInsets.all(16.0),
             child: CertificationSection(
-                isCertEmpty: certifications.isEmpty ? true : false,
+                isCertEmpty: selectedCertifications.isEmpty ? true : false,
                 isEditing: isEditing,
                 user: user,
                 textField: buildTextField(
@@ -326,7 +394,7 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
                       final value = txtCertificationsController.text.trim();
                       if (value.isNotEmpty) {
                         setState(() {
-                          certifications.add(value);
+                          selectedCertifications.add(value);
                           txtCertificationsController.clear();
                         });
                         certificationFocus.unfocus();
@@ -334,7 +402,7 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
                     },
                   ),
                 ),
-                children: certifications
+                children: selectedCertifications
                     .map(
                       (cert) => Chip(
                         backgroundColor: AppColors.lightTeal,
@@ -346,7 +414,7 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
                             const Icon(Icons.close, color: Colors.white),
                         onDeleted: () {
                           setState(() {
-                            certifications.remove(cert);
+                            selectedCertifications.remove(cert);
                           });
                         },
                         shape: RoundedRectangleBorder(
@@ -797,6 +865,130 @@ class CertificationSection extends StatelessWidget {
         ),
         addVerticalSpace(8),
         textField,
+        addVerticalSpace(8),
+        Wrap(
+          spacing: 8,
+          children: children,
+        ),
+      ],
+    );
+  }
+}
+
+class AreaOfExpertiseSection extends StatelessWidget {
+  final bool isEditing;
+  final Teacher user;
+  final List<Widget> children;
+  final Widget Function(BuildContext) builder;
+
+  const AreaOfExpertiseSection({
+    super.key,
+    required this.isEditing,
+    required this.children,
+    required this.user,
+    required this.builder,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return DetailsSection(
+      title: "Areas of Expertise",
+      icon: Icons.engineering,
+      children: [
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            "Skills and Area of Interest",
+            style: getTextStyle("small", color: AppColors.darkBlue),
+          ),
+        ),
+        if (isEditing) buildAreasOfExpertiseInput(context),
+        if (!isEditing)
+          const Divider(
+            color: AppColors.darkBlue,
+            thickness: 2,
+            height: 20,
+          ),
+        if (!isEditing)
+          Column(
+            children: [
+              for (var expertise in user.areasOfExpertise)
+                buildExpertiseContainer(expertise)
+            ],
+          ),
+      ],
+    );
+  }
+
+  Widget buildExpertiseContainer(String expertise) {
+    return Column(
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.lightTeal,
+            borderRadius: BorderRadius.circular(15),
+          ),
+          height: 35,
+          child: Center(
+            child: Text(
+              '   $expertise   ',
+              style: getTextStyle('small', color: AppColors.white),
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 5,
+        )
+      ],
+    );
+  }
+
+  Widget buildAreasOfExpertiseInput(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Divider(
+          color: AppColors.darkBlue,
+          thickness: 2,
+          height: 20,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              "Areas of Expertise",
+              textAlign: TextAlign.start,
+              style: getTextStyle("small", color: AppColors.lightTeal),
+            ),
+          ],
+        ),
+        addVerticalSpace(8),
+        Row(
+          children: [
+            Icon(Icons.book, color: Colors.grey),
+            addHorizontalSpace(10),
+            Text(
+              "Areas of Expertise",
+              style: getTextStyle('medium', color: Colors.grey),
+            ),
+            const Spacer(),
+            IconButton(
+              icon: const Icon(Icons.add, color: Colors.grey),
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(12),
+                    ),
+                  ),
+                  builder: builder,
+                );
+              },
+            ),
+          ],
+        ),
+        const Divider(color: AppColors.lightTeal, thickness: 2),
         addVerticalSpace(8),
         Wrap(
           spacing: 8,
