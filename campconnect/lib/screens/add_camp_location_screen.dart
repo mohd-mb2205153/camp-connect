@@ -1,13 +1,14 @@
 import 'dart:async';
-
+import 'package:campconnect/theme/styling_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:lottie/lottie.dart';
+import 'package:lottie/lottie.dart' as lottie;
 
+import '../providers/show_nav_bar_provider.dart';
 import '../routes/app_router.dart';
 
 class AddCampLocationScreen extends ConsumerStatefulWidget {
@@ -24,143 +25,212 @@ class _AddCamp extends ConsumerState<AddCampLocationScreen> {
   late String _transferString;
   CameraPosition? _initial;
   String addressStr = '';
+  Set<Marker> markers = {}; // Ensure this uses google_maps_flutter.Marker
+  BitmapDescriptor liveLocationIcon = BitmapDescriptor.defaultMarker;
+  bool _followUserLocation = true;
+  late StreamSubscription<Position> _positionStreamSubscription;
 
   @override
   void initState() {
+    super.initState();
     _default = LatLng(25.3, 51.487);
     _scrolledLocation = _default;
     _initial = CameraPosition(target: _default, zoom: 17);
-    _goToUserPostion();
+    _loadCustomIcons();
+    _startLiveLocationUpdates();
+    Future.microtask(() {
+      ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(false);
+    });
+  }
 
-    super.initState();
+  void _loadCustomIcons() {
+    BitmapDescriptor.asset(
+      const ImageConfiguration(size: Size(32, 32)),
+      "assets/images/current_location_icon.png",
+    ).then((icon) {
+      if (mounted) {
+        setState(() {
+          liveLocationIcon = icon;
+        });
+      }
+    });
+  }
+
+  void _startLiveLocationUpdates() {
+    _positionStreamSubscription = Geolocator.getPositionStream(
+      locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
+    ).listen((Position position) {
+      LatLng userLocation = LatLng(position.latitude, position.longitude);
+
+      setState(() {
+        markers
+            .removeWhere((marker) => marker.markerId.value == "live_location");
+        markers.add(
+          Marker(
+            markerId: const MarkerId("live_location"),
+            position: userLocation,
+            icon: liveLocationIcon,
+            infoWindow: const InfoWindow(title: "You are here"),
+          ),
+        );
+      });
+
+      if (_followUserLocation && _googleMapController.isCompleted) {
+        _googleMapController.future.then((controller) {
+          controller.animateCamera(CameraUpdate.newLatLng(userLocation));
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _positionStreamSubscription.cancel();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (!didPop) {
+          ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(true);
+          Navigator.of(context).pop(result);
+        }
+        return;
+      },
       child: Scaffold(
-        body: _body(),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            _goToUserPostion();
-          },
-          child: Icon(Icons.location_on),
+        appBar: AppBar(
+          scrolledUnderElevation: 0.0,
+          backgroundColor: AppColors.lightTeal,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () {
+              ref
+                  .read(showNavBarNotifierProvider.notifier)
+                  .showBottomNavBar(true);
+              context.pop();
+            },
+          ),
+          title: Text(
+            'Set the Camp Location',
+            style: getTextStyle("mediumBold", color: Colors.white),
+          ),
+        ),
+        body: Stack(
+          children: [
+            GoogleMap(
+              initialCameraPosition: _initial!,
+              markers: markers,
+              zoomControlsEnabled: false,
+              myLocationButtonEnabled: false,
+              onMapCreated: (controller) {
+                if (!_googleMapController.isCompleted) {
+                  _googleMapController.complete(controller);
+                }
+              },
+              onCameraMove: (CameraPosition position) {
+                _scrolledLocation = position.target;
+                _followUserLocation = false;
+              },
+            ),
+            Center(
+              child: SizedBox(
+                width: 70,
+                child: lottie.Lottie.asset('assets/icon/pin.json'),
+              ),
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 50),
+                child: SizedBox(
+                  width: 100,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      _transferString =
+                          '${_scrolledLocation.latitude}|${_scrolledLocation.longitude}|$addressStr';
+                      context.pushNamed(AppRouter.addCamp.name,
+                          pathParameters: {'location': _transferString});
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.lightTeal,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      "Set",
+                      style: getTextStyle("small", color: AppColors.white),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        floatingActionButton: Container(
+          decoration: BoxDecoration(
+            color: AppColors.lightTeal,
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            onPressed: () async {
+              setState(() {
+                _followUserLocation = true; // Re-enable location tracking
+              });
+              try {
+                // Fetch the current user location
+                Position position = await Geolocator.getCurrentPosition(
+                  locationSettings: const LocationSettings(
+                    accuracy: LocationAccuracy.high,
+                  ),
+                );
+
+                LatLng userLocation =
+                    LatLng(position.latitude, position.longitude);
+
+                final GoogleMapController controller =
+                    await _googleMapController.future;
+                controller.animateCamera(
+                  CameraUpdate.newLatLngZoom(userLocation, 17),
+                );
+
+                setState(() {
+                  markers.removeWhere(
+                      (marker) => marker.markerId.value == "live_location");
+                  markers.add(
+                    Marker(
+                      markerId: const MarkerId("live_location"),
+                      position: userLocation,
+                      icon: liveLocationIcon,
+                      infoWindow: const InfoWindow(title: "You are here"),
+                    ),
+                  );
+                });
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Error getting location: $e")),
+                );
+              }
+            },
+            icon: Container(
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+              ),
+              padding: const EdgeInsets.all(4.0),
+              child: Image.asset(
+                "assets/images/track_location_icon.png",
+                fit: BoxFit.contain,
+                height: 24,
+              ),
+            ),
+          ),
         ),
       ),
     );
-  }
-
-  Widget _body() {
-    return Stack(
-      children: [
-        _getMap(),
-        _customPin(),
-        showAddress(),
-        Positioned(
-            bottom: MediaQuery.of(context).size.height * 0.01,
-            right: MediaQuery.of(context).size.width * 0.4,
-            child: SizedBox(
-              width: 80,
-              child: ElevatedButton(
-                  onPressed: () {
-                    _transferString =
-                        '${_scrolledLocation.latitude}|${_scrolledLocation.longitude}|$addressStr';
-                    context.pushNamed(AppRouter.addCamp.name,
-                        pathParameters: {'location': _transferString});
-                  },
-                  child: Text("Set")),
-            ))
-      ],
-    );
-  }
-
-  Widget _getMap() {
-    return GoogleMap(
-      initialCameraPosition: _initial!,
-      mapType: MapType.normal,
-      zoomControlsEnabled: false,
-      onCameraIdle: () {
-        getAddress(_scrolledLocation);
-      },
-      onCameraMove: (position) {
-        _scrolledLocation = position.target;
-      },
-      onMapCreated: (GoogleMapController controller) {
-        if (!_googleMapController.isCompleted) {
-          _googleMapController.complete(controller);
-        }
-      },
-    );
-  }
-
-  Future _goToUserPostion() async {
-    Position currentPostion = await _userPosition();
-    _goToScrolledPosition(
-        LatLng(currentPostion.latitude, currentPostion.longitude));
-  }
-
-  Future _goToScrolledPosition(LatLng position) async {
-    GoogleMapController googleMapController = await _googleMapController.future;
-    googleMapController.animateCamera(CameraUpdate.newCameraPosition(
-        CameraPosition(target: position, zoom: 17)));
-    await getAddress(position);
-  }
-
-  Future _userPosition() async {
-    LocationPermission locationPermission;
-    bool isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
-
-    if (!isLocationServiceEnabled) {
-      print("Please enable Location Permission.");
-    }
-
-    locationPermission = await Geolocator.checkPermission();
-
-    if (locationPermission == LocationPermission.denied) {
-      locationPermission = await Geolocator.requestPermission();
-      if (locationPermission == LocationPermission.denied) {
-        Future.error("Permission denied");
-      }
-    }
-
-    if (locationPermission == LocationPermission.deniedForever) {
-      Future.error("Permission denied.");
-    }
-
-    // ignore: deprecated_member_use
-    return await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-  }
-
-  Widget _customPin() {
-    return Center(
-      child: SizedBox(
-        width: 70,
-        child: Lottie.asset('assets/icon/pin.json'),
-      ),
-    );
-  }
-
-  Widget showAddress() {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      height: 50,
-      decoration: BoxDecoration(color: const Color.fromARGB(255, 5, 174, 152)),
-      child: Center(
-        child: Text('Set Location to $addressStr',
-            style: TextStyle(fontStyle: FontStyle.italic)),
-      ),
-    );
-  }
-
-  Future getAddress(LatLng position) async {
-    List<Placemark> placemarks =
-        await placemarkFromCoordinates(position.latitude, position.longitude);
-    Placemark address = placemarks[0];
-    String fullAddress =
-        "${address.street},${address.locality},${address.administrativeArea},${address.country}";
-    setState(() {
-      addressStr = fullAddress;
-    });
   }
 }

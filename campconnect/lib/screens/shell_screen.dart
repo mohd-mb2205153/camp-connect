@@ -1,4 +1,5 @@
 import 'package:campconnect/providers/show_bot_nav_provider.dart';
+import 'package:campconnect/providers/show_nav_bar_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -35,7 +36,7 @@ class _ShellScreenState extends ConsumerState<ShellScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: widget.child,
-        bottomNavigationBar: ref.watch(showBotNavNotifierProvider)
+        bottomNavigationBar: ref.watch(showNavBarNotifierProvider)
             ? BottomNavigationBar(
                 currentIndex: _selectedIndex,
                 onTap: _onItemTapped,

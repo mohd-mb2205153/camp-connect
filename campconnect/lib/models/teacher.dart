@@ -10,7 +10,7 @@ class Teacher extends User {
   String willingnessToTravel; // e.g., "Within 10 km"
   String availabilitySchedule; // Days and times available
   String preferredCampDuration; // e.g., "Short-term"
-  List<String> enrolledCamps;
+  List<String> createdCamps;
 
   Teacher(
       {super.id,
@@ -30,7 +30,7 @@ class Teacher extends User {
       required this.willingnessToTravel,
       required this.availabilitySchedule,
       required this.preferredCampDuration,
-      required this.enrolledCamps})
+      required this.createdCamps})
       : super(
           role: 'teacher',
         );
@@ -54,7 +54,7 @@ class Teacher extends User {
         willingnessToTravel: json['willingnessToTravel'],
         availabilitySchedule: json['availabilitySchedule'],
         preferredCampDuration: json['preferredCampDuration'],
-        enrolledCamps: List<String>.from(json['enrolledCamps']));
+        createdCamps: List<String>.from(json['enrolledCamps']));
   }
 
   @override
@@ -68,7 +68,7 @@ class Teacher extends User {
         'willingnessToTravel': willingnessToTravel,
         'availabilitySchedule': availabilitySchedule,
         'preferredCampDuration': preferredCampDuration,
-        'enrolledCamps': enrolledCamps
+        'enrolledCamps': createdCamps
       });
   }
 }
