@@ -80,6 +80,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             buildMenuItem(
               Icons.person,
               'Personal Information',
+              true,
               () {
                 context.pushNamed(AppRouter.personal.name);
                 ref
@@ -87,16 +88,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     .showBottomNavBar(false);
               },
             ),
-            buildMenuItem(Icons.menu_book_rounded, 'Educational Information',
-                () {
+            buildMenuItem(
+                Icons.menu_book_rounded, 'Educational Information', true, () {
               context.pushNamed(AppRouter.educational.name);
               ref
                   .read(showNavBarNotifierProvider.notifier)
                   .showBottomNavBar(false);
             }),
-            buildMenuItem(Icons.tune, 'Preferences'),
-            buildMenuItem(Icons.language, 'Language'),
-            buildMenuItem(Icons.power_settings_new, 'Log out',
+            buildMenuItem(Icons.tune, 'Preferences', false),
+            buildMenuItem(Icons.language, 'Language', false),
+            buildMenuItem(Icons.power_settings_new, 'Log out', true,
                 () => context.go(AppRouter.onboarding.path)),
           ],
         ),
@@ -105,17 +106,21 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   //For now onPressed is optional.
-  Widget buildMenuItem(IconData icon, String title, [Function()? onPressed]) {
+  Widget buildMenuItem(IconData icon, String title, bool isAvailable,
+      [Function()? onPressed]) {
     return Column(
       children: [
         ListTile(
           leading: Icon(
             icon,
-            color: AppColors.darkTeal,
+            color: isAvailable ? AppColors.lightTeal : AppColors.grey,
           ),
           title: Text(
             title,
-            style: const TextStyle(fontSize: 16),
+            style: getTextStyle(
+              'medium',
+              color: isAvailable ? AppColors.darkTeal : AppColors.grey,
+            ),
           ),
           trailing: IconButton(
             icon: const Icon(Icons.chevron_right),
