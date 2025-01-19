@@ -38,10 +38,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   String selectedNationality = "Nationality";
   String selectedDateOfBirth = "Date of Birth";
+  String selectedCountryCode = "";
+  String selectedPhoneCode = "";
 
   late List<String> nationalityOptions = [];
   late List<String> languageOptions = [];
   List<String> selectedLanguages = [];
+
 
   @override
   void initState() {
@@ -102,21 +105,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     phoneFocus.dispose();
     super.dispose();
   }
-  // void clearAll() {
-  //   for (var controller in [
-  //     txtFirstNameController,
-  //     txtLastNameController,
-  //     txtEmailController,
-  //     txtPasswordController,
-  //     txtPhoneNumberController,
-  //     firstNameFocus,
-  //     emailFocus,
-  //     passwordFocus,
-  //     phoneFocus
-  //   ]) {
-  //     controller.clear();
-  //   }
-  // }
+  void clearAll() {
+    for (var controller in [
+      txtFirstNameController,
+      txtLastNameController,
+      txtEmailController,
+      txtPasswordController,
+      txtPhoneNumberController,
+    ]) {
+      controller.clear();
+    }
+  }
 
   void handleUser(BuildContext context) {
     if (!isAllFilled()) {
@@ -130,15 +129,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       dateOfBirth: DateTime.now(), 
       nationality: selectedNationality, 
       primaryLanguages: selectedLanguages, 
-      phoneCode: "", 
-      countryCode: "", 
+      phoneCode: selectedPhoneCode, 
+      countryCode: selectedCountryCode, 
       mobileNumber: txtPhoneNumberController.text, 
       email: txtEmailController.text, 
       role: "user"
       );
 
       ref.read(userNotifierProvider.notifier).addUser(user);
-      // clearAll();
+      clearAll();
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text('User Added.')));
     
@@ -325,7 +324,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           child: CountryCodePicker(
             textStyle: getTextStyle("small", color: Colors.white),
             hideSearch: true,
-            onChanged: (code) {},
+            onChanged: (code) {
+              setState(() {
+                selectedCountryCode = code.name!;
+                selectedPhoneCode = code.dialCode!;
+              });
+              print("This is the dial code: ${code.dialCode}");
+
+            },
             initialSelection: 'QA',
             showFlag: true,
             showFlagDialog: true,
@@ -564,8 +570,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           height: 44,
           child: ElevatedButton(
             onPressed: () {
-              context.pushNamed(AppRouter.role.name);
               handleUser(context);
+              context.pushNamed(AppRouter.role.name);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.lightTeal,
