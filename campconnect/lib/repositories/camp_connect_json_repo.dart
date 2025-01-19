@@ -18,7 +18,7 @@ class CampConnectJsonRepo {
     return data.map((item) => item["en_short_name"] as String).toList();
   }
 
-  Future<List<String>> fetchEducationLevel() async {
+  Future<List<String>> fetchStudentEducationLevel() async {
     final String response =
         await rootBundle.loadString('assets/data/education_level.json');
     final data = json.decode(response);
@@ -30,5 +30,14 @@ class CampConnectJsonRepo {
         await rootBundle.loadString('assets/data/subjects.json');
     final data = json.decode(response);
     return List<String>.from(data);
+  }
+
+  Future<List<String>> fetchTeacherEducationLevel() async {
+    final String response =
+        await rootBundle.loadString('assets/data/teacher_education_level.json');
+    final data = json.decode(response) as Map;
+    return (data['concept'] as List)
+        .map<String>((e) => e['display'] as String)
+        .toList();
   }
 }

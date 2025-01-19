@@ -76,10 +76,7 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
                   child: TextField(
                     controller: namecontroller,
                     decoration: InputDecoration(
-                      labelText: "Name",
-                      border: OutlineInputBorder()
-                      ),
-                      
+                        labelText: "Name", border: OutlineInputBorder()),
                   ),
                 )
               ],
@@ -88,10 +85,14 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: [
-                  Text("Location: ",
-                    style: getTextStyle("mediumBold", color: AppColors.lightTeal),),
+                  Text(
+                    "Location: ",
+                    style:
+                        getTextStyle("mediumBold", color: AppColors.lightTeal),
+                  ),
                   Expanded(
-                    child: Text(address ?? "", style: const TextStyle(fontSize: 16.0)),
+                    child: Text(address ?? "",
+                        style: const TextStyle(fontSize: 16.0)),
                   ),
                 ],
               ),
@@ -99,19 +100,26 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("Choose level", 
-                    style: getTextStyle("mediumBold", color: AppColors.lightTeal),), buildEduDropdown()
-                ]),
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Choose level",
+                      style: getTextStyle("mediumBold",
+                          color: AppColors.lightTeal),
+                    ),
+                    buildEduDropdown()
+                  ]),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Choose Subject",
-                    style: getTextStyle("mediumBold", color: AppColors.lightTeal),),
+                  Text(
+                    "Choose Subject",
+                    style:
+                        getTextStyle("mediumBold", color: AppColors.lightTeal),
+                  ),
                   buildSubjectsDropdown(),
                 ],
               ),
@@ -123,21 +131,26 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
                   controller: descriptionController,
                   maxLines: 3,
                   decoration: InputDecoration(
-                    labelText: "Enter Description",
-                    border: OutlineInputBorder()),
+                      labelText: "Enter Description",
+                      border: OutlineInputBorder()),
                 )
               ]),
             ),
-            Text("Special Needs",
-                    style: getTextStyle("mediumBold", color: AppColors.lightTeal),),
+            Text(
+              "Special Needs",
+              style: getTextStyle("mediumBold", color: AppColors.lightTeal),
+            ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: [
                   Expanded(
                     child: RadioListTile(
-                      title: Text('Yes',
-                      style: getTextStyle("medium", color: AppColors.lightTeal),),
+                      title: Text(
+                        'Yes',
+                        style:
+                            getTextStyle("medium", color: AppColors.lightTeal),
+                      ),
                       value: 'Yes',
                       groupValue: _selectedSpecNeeds,
                       onChanged: (value) {
@@ -149,8 +162,11 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
                   ),
                   Expanded(
                     child: RadioListTile(
-                      title: Text('No',
-                      style: getTextStyle("medium", color: AppColors.lightTeal),),
+                      title: Text(
+                        'No',
+                        style:
+                            getTextStyle("medium", color: AppColors.lightTeal),
+                      ),
                       value: 'No',
                       groupValue: _selectedSpecNeeds,
                       onChanged: (value) {
@@ -183,10 +199,13 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
                       context.go(AppRouter.home.path);
                     },
                     style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white, backgroundColor: AppColors.lightTeal, // Text color
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12), // Padding
+                      foregroundColor: Colors.white,
+                      backgroundColor: AppColors.lightTeal, // Text color
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 12), // Padding
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12), // Rounded corners
+                        borderRadius:
+                            BorderRadius.circular(12), // Rounded corners
                       ),
                       elevation: 4, // Shadow elevation
                     ),
@@ -246,7 +265,8 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
                             ),
                             onTap: () {
                               setState(() {
-                                if (!selectedSubjects.contains(subjects[index])) {
+                                if (!selectedSubjects
+                                    .contains(subjects[index])) {
                                   selectedSubjects.add(subjects[index]);
                                 }
                               });
@@ -318,7 +338,7 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
   }
 
   Widget buildEduDropdown() {
-    return ref.watch(educationLevelProvider).when(
+    return ref.watch(studentEducationLevelProvider).when(
         data: (data) {
           return FilterDropdown(
             selectedFilter: selectedEducationLevel ?? "Primary School",
