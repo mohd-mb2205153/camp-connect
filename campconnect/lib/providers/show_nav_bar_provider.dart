@@ -5,7 +5,7 @@ class ShowNavBarNotifier extends Notifier<Map<String, dynamic>> {
   Map<String, dynamic> build() {
     return {
       'showNavBar': true,
-      'selectedIndex': 0, // Default index
+      'selectedIndex': 0,
     };
   }
 

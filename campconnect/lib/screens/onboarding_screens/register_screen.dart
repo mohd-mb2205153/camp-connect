@@ -65,12 +65,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   }
 
   bool isAllFilled() => [
-    txtFirstNameController,
-    txtLastNameController,
-    txtEmailController,
-    txtPasswordController,
-    txtPhoneNumberController,
-  ].every((controller) => controller.text.isNotEmpty);
+        txtFirstNameController,
+        txtLastNameController,
+        txtEmailController,
+        txtPasswordController,
+        txtPhoneNumberController,
+      ].every((controller) => controller.text.isNotEmpty);
 
   Future<void> loadDropdownData() async {
     final countriesJson = await DefaultAssetBundle.of(context)
@@ -125,23 +125,21 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       return;
     }
     User user = User(
-      firstName: txtFirstNameController.text, 
-      lastName: txtLastNameController.text, 
-      dateOfBirth: DateTime.now(), 
-      nationality: selectedNationality, 
-      primaryLanguages: selectedLanguages, 
-      phoneCode: "", 
-      countryCode: "", 
-      mobileNumber: txtPhoneNumberController.text, 
-      email: txtEmailController.text, 
-      role: "user"
-      );
+        firstName: txtFirstNameController.text,
+        lastName: txtLastNameController.text,
+        dateOfBirth: DateTime.now(),
+        nationality: selectedNationality,
+        primaryLanguages: selectedLanguages,
+        phoneCode: "",
+        countryCode: "",
+        mobileNumber: txtPhoneNumberController.text,
+        email: txtEmailController.text,
+        role: "user");
 
-      ref.read(userNotifierProvider.notifier).addUser(user);
-      // clearAll();
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('User Added.')));
-    
+    ref.read(userNotifierProvider.notifier).addUser(user);
+    // clearAll();
+    ScaffoldMessenger.of(context)
+        .showSnackBar(const SnackBar(content: Text('User Added.')));
   }
 
   @override
@@ -156,7 +154,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         appBar: buildAppBar(context),
         body: Stack(
           children: [
-            buildBackground(),
+            buildBackground("bg9"),
             Column(
               children: [
                 buildHeader("Let's create your account",
@@ -584,5 +582,3 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     );
   }
 }
-
-

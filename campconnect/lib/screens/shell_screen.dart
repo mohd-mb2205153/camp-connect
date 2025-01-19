@@ -40,23 +40,50 @@ class _ShellScreenState extends ConsumerState<ShellScreen> {
           ? BottomNavigationBar(
               currentIndex: _selectedIndex,
               onTap: _onItemTapped,
-              selectedItemColor: AppColors.lightTeal,
-              unselectedItemColor: Colors.grey,
               backgroundColor: Colors.white,
               type: BottomNavigationBarType.fixed,
-              showSelectedLabels: false,
-              showUnselectedLabels: false,
-              items: const [
+              items: [
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.home),
+                  icon: AnimatedContainer(
+                    duration: const Duration(
+                        milliseconds: 300), //smoothen the animation lol
+                    curve: Curves.easeInOut,
+                    width: _selectedIndex == 0 ? 30 : 26,
+                    height: _selectedIndex == 0 ? 30 : 26,
+                    child: Image.asset(
+                      _selectedIndex == 0
+                          ? 'assets/images/home_icon_teal.png'
+                          : 'assets/images/home_icon_grey.png',
+                    ),
+                  ),
                   label: '',
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.map),
+                  icon: AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                    width: _selectedIndex == 1 ? 30 : 26,
+                    height: _selectedIndex == 1 ? 30 : 26,
+                    child: Image.asset(
+                      _selectedIndex == 1
+                          ? 'assets/images/maps_icon_teal.png'
+                          : 'assets/images/maps_icon_grey.png',
+                    ),
+                  ),
                   label: '',
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.person),
+                  icon: AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                    width: _selectedIndex == 2 ? 30 : 26,
+                    height: _selectedIndex == 2 ? 30 : 26,
+                    child: Image.asset(
+                      _selectedIndex == 2
+                          ? 'assets/images/profile_icon_teal.png'
+                          : 'assets/images/profile_icon_grey.png',
+                    ),
+                  ),
                   label: '',
                 ),
               ],

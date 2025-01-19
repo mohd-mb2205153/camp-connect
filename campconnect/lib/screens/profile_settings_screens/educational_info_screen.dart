@@ -2,7 +2,7 @@ import 'package:campconnect/models/student.dart';
 import 'package:campconnect/models/teacher.dart';
 import 'package:campconnect/models/user.dart';
 import 'package:campconnect/providers/json_provider.dart';
-import 'package:campconnect/providers/show_bot_nav_provider.dart';
+import 'package:campconnect/providers/show_nav_bar_provider.dart';
 import 'package:campconnect/theme/frosted_glass.dart';
 import 'package:campconnect/theme/styling_constants.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
@@ -100,7 +100,7 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
         if (!didPop) {
-          ref.read(showBotNavNotifierProvider.notifier).showBottomNavBar(true);
+          ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(true);
           Navigator.of(context).pop(result);
         }
         return;
@@ -121,7 +121,7 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
             icon: const Icon(Icons.arrow_back),
             onPressed: () {
               ref
-                  .read(showBotNavNotifierProvider.notifier)
+                  .read(showNavBarNotifierProvider.notifier)
                   .showBottomNavBar(true);
               Navigator.of(context).pop();
             },

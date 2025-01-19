@@ -177,10 +177,10 @@ Widget buildDecoratedInput(String text, IconData icon) {
   );
 }
 
-Widget buildBackground() {
+Widget buildBackground(String background) {
   return Positioned.fill(
     child: Image.asset(
-      'assets/images/bg9.png',
+      'assets/images/$background.png',
       fit: BoxFit.cover,
     ),
   );

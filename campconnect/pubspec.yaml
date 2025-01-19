@@ -51,6 +51,7 @@ dependencies:
   country_code_picker: ^3.1.0
   smooth_page_indicator: ^1.0.0+2
   group_button: ^5.3.4
+  url_launcher: ^6.1.10
 
 dev_dependencies:
   flutter_test:
