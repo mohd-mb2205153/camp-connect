@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:campconnect/models/user.dart';
+import 'package:campconnect/providers/user_provider.dart';
 import 'package:campconnect/routes/app_router.dart';
 import 'package:campconnect/theme/styling_constants.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
@@ -62,6 +64,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     txtPhoneNumberController = TextEditingController();
   }
 
+  bool isAllFilled() => [
+    txtFirstNameController,
+    txtLastNameController,
+    txtEmailController,
+    txtPasswordController,
+    txtPhoneNumberController,
+  ].every((controller) => controller.text.isNotEmpty);
+
   Future<void> loadDropdownData() async {
     final countriesJson = await DefaultAssetBundle.of(context)
         .loadString("assets/data/countries.json");
@@ -91,6 +101,47 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     passwordFocus.dispose();
     phoneFocus.dispose();
     super.dispose();
+  }
+  // void clearAll() {
+  //   for (var controller in [
+  //     txtFirstNameController,
+  //     txtLastNameController,
+  //     txtEmailController,
+  //     txtPasswordController,
+  //     txtPhoneNumberController,
+  //     firstNameFocus,
+  //     emailFocus,
+  //     passwordFocus,
+  //     phoneFocus
+  //   ]) {
+  //     controller.clear();
+  //   }
+  // }
+
+  void handleUser(BuildContext context) {
+    if (!isAllFilled()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('All fields are required.')));
+      return;
+    }
+    User user = User(
+      firstName: txtFirstNameController.text, 
+      lastName: txtLastNameController.text, 
+      dateOfBirth: DateTime.now(), 
+      nationality: selectedNationality, 
+      primaryLanguages: selectedLanguages, 
+      phoneCode: "", 
+      countryCode: "", 
+      mobileNumber: txtPhoneNumberController.text, 
+      email: txtEmailController.text, 
+      role: "user"
+      );
+
+      ref.read(userNotifierProvider.notifier).addUser(user);
+      // clearAll();
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('User Added.')));
+    
   }
 
   @override
@@ -514,6 +565,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           child: ElevatedButton(
             onPressed: () {
               context.pushNamed(AppRouter.role.name);
+              handleUser(context);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.lightTeal,
@@ -532,3 +584,5 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     );
   }
 }
+
+
