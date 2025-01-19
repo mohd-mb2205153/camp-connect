@@ -1,4 +1,4 @@
-import 'package:campconnect/theme/styling_constants.dart';
+import 'package:campconnect/theme/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';

@@ -1,5 +1,5 @@
 import 'package:campconnect/routes/app_router.dart';
-import 'package:campconnect/theme/styling_constants.dart';
+import 'package:campconnect/theme/constants.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

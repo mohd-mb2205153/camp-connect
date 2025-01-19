@@ -1,4 +1,4 @@
-import 'package:campconnect/theme/styling_constants.dart';
+import 'package:campconnect/theme/constants.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
 import 'package:campconnect/widgets/edit_screen_fields.dart';
 import 'package:campconnect/widgets/special_text.dart';

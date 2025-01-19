@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:campconnect/routes/app_router.dart';
-import 'package:campconnect/theme/styling_constants.dart';
+import 'package:campconnect/theme/constants.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/cupertino.dart';

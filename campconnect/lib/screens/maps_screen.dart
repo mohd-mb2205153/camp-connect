@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:campconnect/models/camp.dart';
 import 'package:campconnect/providers/camp_provider.dart';
-import 'package:campconnect/theme/styling_constants.dart';
+import 'package:campconnect/theme/constants.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

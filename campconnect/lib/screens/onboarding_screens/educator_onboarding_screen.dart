@@ -7,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-import '../../theme/styling_constants.dart';
+import '../../theme/constants.dart';
 
 class EducatorOnboardingScreen extends ConsumerStatefulWidget {
   const EducatorOnboardingScreen({super.key});

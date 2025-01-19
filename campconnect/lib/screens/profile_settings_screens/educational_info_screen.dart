@@ -4,9 +4,8 @@ import 'package:campconnect/models/user.dart';
 import 'package:campconnect/providers/json_provider.dart';
 import 'package:campconnect/providers/show_nav_bar_provider.dart';
 import 'package:campconnect/theme/frosted_glass.dart';
-import 'package:campconnect/theme/styling_constants.dart';
+import 'package:campconnect/theme/constants.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
-import 'package:campconnect/widgets/detail_section.dart';
 import 'package:campconnect/widgets/details_row.dart';
 import 'package:campconnect/widgets/edit_screen_fields.dart';
 import 'package:campconnect/widgets/filter_dropdown.dart';
@@ -25,16 +24,11 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
   bool isEditing = false;
   String? selectedEducationLevel;
   List<String> selectedSubjects = [];
-  final FocusNode certificationFocus = FocusNode();
-  List<String> selectedCertifications = [];
-  List<String> selectedAreasOfExpertise = [];
   dynamic
       user; //Testing for now, later we will get user that is logged in thru provider.
 
   final TextEditingController learningGoalsController = TextEditingController();
   final TextEditingController teachingExpController = TextEditingController();
-  final TextEditingController txtCertificationsController =
-      TextEditingController();
 
   @override
   void initState() {
@@ -71,13 +65,9 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
       mobileNumber: '30993067',
       phoneCode: '+974',
       email: 'mark@gmail.com',
-      areasOfExpertise: ['Biology', 'Art'],
+      areasOfExpertise: [],
       availabilitySchedule: '',
-      certifications: [
-        // 'CCNA',
-        // 'deepLearning.ai - Deep Learning',
-        // 'IBM Embedded Systems'
-      ],
+      certifications: [],
       highestEducationLevel: 'High School or secondary school degree complete',
       preferredCampDuration: '',
       teachingExperience: 16,
@@ -88,10 +78,8 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
 
   @override
   void dispose() {
-    txtCertificationsController.dispose();
     teachingExpController.dispose();
     learningGoalsController.dispose();
-    certificationFocus.dispose();
     super.dispose();
   }
 
@@ -99,8 +87,6 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
     if (user is Teacher) {
       teachingExpController.text = user.teachingExperience.toString();
       selectedEducationLevel = user.highestEducationLevel;
-      selectedCertifications = List<String>.from(user.certifications);
-      selectedAreasOfExpertise = List<String>.from(user.areasOfExpertise);
     } else if (user is Student) {
       learningGoalsController.text = user.learningGoals;
       selectedSubjects = List<String>.from(user.preferredSubjects);
@@ -283,152 +269,24 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
   }
 
   Widget buildTeacherInfo() {
-    return Column(
-      children: [
-        FrostedGlassBox(
-          boxWidth: double.infinity,
-          isCurved: true,
-          boxChild: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TeacherEducationSection(
-              isEditing: isEditing,
-              controller: teachingExpController,
-              selectedEducationLevel:
-                  selectedEducationLevel ?? user.highestEducationLevel,
-              onEducationLevelSelected: (newLevel) {
-                setState(() {
-                  selectedEducationLevel = newLevel;
-                });
-              },
-              user: user!,
-            ),
-          ),
+    return FrostedGlassBox(
+      boxWidth: double.infinity,
+      isCurved: true,
+      boxChild: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: TeacherEducationSection(
+          isEditing: isEditing,
+          controller: teachingExpController,
+          selectedEducationLevel:
+              selectedEducationLevel ?? user.highestEducationLevel,
+          onEducationLevelSelected: (newLevel) {
+            setState(() {
+              selectedEducationLevel = newLevel;
+            });
+          },
+          user: user!,
         ),
-        SizedBox(
-          height: 20,
-        ),
-        FrostedGlassBox(
-          boxWidth: double.infinity,
-          isCurved: true,
-          boxChild: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: ref.watch(subjectsProvider).when(
-                    data: (subjects) {
-                      return AreaOfExpertiseSection(
-                        isEditing: isEditing,
-                        builder: (_) {
-                          return ListView.builder(
-                            itemCount: subjects.length,
-                            itemBuilder: (_, index) {
-                              return ListTile(
-                                title: Text(
-                                  subjects[index],
-                                  style: getTextStyle("small"),
-                                ),
-                                onTap: () {
-                                  setState(() {
-                                    if (!selectedAreasOfExpertise
-                                        .contains(subjects[index])) {
-                                      selectedAreasOfExpertise
-                                          .add(subjects[index]);
-                                    }
-                                  });
-                                  Navigator.pop(context);
-                                },
-                              );
-                            },
-                          );
-                        },
-                        user: user!,
-                        children: selectedAreasOfExpertise
-                            .map(
-                              (expertise) => Chip(
-                                backgroundColor: AppColors.lightTeal,
-                                label: Text(
-                                  expertise,
-                                  style: getTextStyle('small',
-                                      color: Colors.white),
-                                ),
-                                deleteIcon: const Icon(Icons.close,
-                                    color: Colors.white),
-                                onDeleted: () {
-                                  setState(() {
-                                    selectedAreasOfExpertise.remove(expertise);
-                                  });
-                                },
-                                shape: RoundedRectangleBorder(
-                                  side: const BorderSide(
-                                    color: Colors.transparent,
-                                  ),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                              ),
-                            )
-                            .toList(),
-                      );
-                    },
-                    loading: () => const CircularProgressIndicator(),
-                    error: (err, stack) => Text('Error: $err'),
-                  )),
-        ),
-        SizedBox(
-          height: 20,
-        ),
-        FrostedGlassBox(
-          boxWidth: double.infinity,
-          isCurved: true,
-          boxChild: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: CertificationSection(
-                isCertEmpty: selectedCertifications.isEmpty ? true : false,
-                isEditing: isEditing,
-                user: user,
-                textField: buildTextField(
-                  controller: txtCertificationsController,
-                  hintText: "Add Certification",
-                  keyboardType: TextInputType.text,
-                  focusNode: certificationFocus,
-                  suffixIcon: IconButton(
-                    icon: Icon(Icons.add, color: Colors.grey),
-                    onPressed: () {
-                      final value = txtCertificationsController.text.trim();
-                      if (value.isNotEmpty) {
-                        setState(() {
-                          selectedCertifications.add(value);
-                          txtCertificationsController.clear();
-                        });
-                        certificationFocus.unfocus();
-                      }
-                    },
-                  ),
-                ),
-                children: selectedCertifications
-                    .map(
-                      (cert) => Chip(
-                        backgroundColor: AppColors.lightTeal,
-                        label: Text(
-                          cert,
-                          style: getTextStyle('small', color: Colors.white),
-                        ),
-                        deleteIcon:
-                            const Icon(Icons.close, color: Colors.white),
-                        onDeleted: () {
-                          setState(() {
-                            selectedCertifications.remove(cert);
-                          });
-                        },
-                        shape: RoundedRectangleBorder(
-                          side: const BorderSide(
-                            color: Colors.transparent,
-                          ),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-                    )
-                    .toList()),
-          ),
-        ),
-      ],
+      ),
     );
   }
 
@@ -762,239 +620,29 @@ class LearningGoalsSection extends StatelessWidget {
   }
 }
 
-class CertificationSection extends StatelessWidget {
-  final bool isEditing;
-  final Teacher user;
+class DetailsSection extends StatelessWidget {
+  final String title;
+  final IconData icon;
   final List<Widget> children;
-  final Widget textField;
-  final bool isCertEmpty;
 
-  const CertificationSection({
+  const DetailsSection({
     super.key,
-    required this.isEditing,
+    required this.title,
+    required this.icon,
     required this.children,
-    required this.user,
-    required this.textField,
-    required this.isCertEmpty,
   });
 
   @override
   Widget build(BuildContext context) {
-    return DetailsSection(
-      title: "Certifications",
-      icon: Icons.fact_check_rounded,
-      children: [
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Text(
-            "Relevant Certifications",
-            style: getTextStyle("small", color: AppColors.darkBlue),
-          ),
-        ),
-        if (isEditing) buildCertificationsInput(),
-        if (!isEditing)
-          const Divider(
-            color: AppColors.darkBlue,
-            thickness: 2,
-            height: 20,
-          ),
-        if (!isEditing && isCertEmpty == true)
-          ListTile(
-            tileColor: Colors.transparent,
-            leading: Icon(
-              Icons.error_outline_sharp,
-              color: AppColors.grey,
-            ),
-            title: Text(
-              'No Certifications',
-              style: getTextStyle('medium', color: AppColors.grey),
-            ),
-          ),
-        if (!isEditing && isCertEmpty == false)
-          Column(
-            children: [
-              for (var certificate in user.certifications)
-                buildCertificateContainer(certificate)
-            ],
-          ),
-      ],
-    );
-  }
-
-  Widget buildCertificateContainer(String certificate) {
-    return Column(
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            color: AppColors.lightTeal,
-            borderRadius: BorderRadius.circular(15),
-          ),
-          height: 35,
-          child: Center(
-            child: Text(
-              '   $certificate   ',
-              style: getTextStyle('small', color: AppColors.white),
-            ),
-          ),
-        ),
-        SizedBox(
-          height: 5,
-        )
-      ],
-    );
-  }
-
-  Widget buildCertificationsInput() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Divider(
-          color: AppColors.darkBlue,
-          thickness: 2,
-          height: 20,
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text(
-              "Enter Relevant Certifications",
-              textAlign: TextAlign.start,
-              style: getTextStyle("small", color: AppColors.lightTeal),
-            ),
-          ],
-        ),
-        addVerticalSpace(8),
-        textField,
-        addVerticalSpace(8),
-        Wrap(
-          spacing: 8,
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: SectionTitleWithIcon(
+        icon: icon,
+        title: title,
+        child: Column(
           children: children,
         ),
-      ],
-    );
-  }
-}
-
-class AreaOfExpertiseSection extends StatelessWidget {
-  final bool isEditing;
-  final Teacher user;
-  final List<Widget> children;
-  final Widget Function(BuildContext) builder;
-
-  const AreaOfExpertiseSection({
-    super.key,
-    required this.isEditing,
-    required this.children,
-    required this.user,
-    required this.builder,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return DetailsSection(
-      title: "Areas of Expertise",
-      icon: Icons.engineering,
-      children: [
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Text(
-            "Skills and Area of Interest",
-            style: getTextStyle("small", color: AppColors.darkBlue),
-          ),
-        ),
-        if (isEditing) buildAreasOfExpertiseInput(context),
-        if (!isEditing)
-          const Divider(
-            color: AppColors.darkBlue,
-            thickness: 2,
-            height: 20,
-          ),
-        if (!isEditing)
-          Column(
-            children: [
-              for (var expertise in user.areasOfExpertise)
-                buildExpertiseContainer(expertise)
-            ],
-          ),
-      ],
-    );
-  }
-
-  Widget buildExpertiseContainer(String expertise) {
-    return Column(
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            color: AppColors.lightTeal,
-            borderRadius: BorderRadius.circular(15),
-          ),
-          height: 35,
-          child: Center(
-            child: Text(
-              '   $expertise   ',
-              style: getTextStyle('small', color: AppColors.white),
-            ),
-          ),
-        ),
-        SizedBox(
-          height: 5,
-        )
-      ],
-    );
-  }
-
-  Widget buildAreasOfExpertiseInput(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Divider(
-          color: AppColors.darkBlue,
-          thickness: 2,
-          height: 20,
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text(
-              "Areas of Expertise",
-              textAlign: TextAlign.start,
-              style: getTextStyle("small", color: AppColors.lightTeal),
-            ),
-          ],
-        ),
-        addVerticalSpace(8),
-        Row(
-          children: [
-            Icon(Icons.book, color: Colors.grey),
-            addHorizontalSpace(10),
-            Text(
-              "Areas of Expertise",
-              style: getTextStyle('medium', color: Colors.grey),
-            ),
-            const Spacer(),
-            IconButton(
-              icon: const Icon(Icons.add, color: Colors.grey),
-              onPressed: () {
-                showModalBottomSheet(
-                  context: context,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(12),
-                    ),
-                  ),
-                  builder: builder,
-                );
-              },
-            ),
-          ],
-        ),
-        const Divider(color: AppColors.lightTeal, thickness: 2),
-        addVerticalSpace(8),
-        Wrap(
-          spacing: 8,
-          children: children,
-        ),
-      ],
+      ),
     );
   }
 }

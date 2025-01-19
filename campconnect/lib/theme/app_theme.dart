@@ -1,6 +1,6 @@
+import 'package:campconnect/theme/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'styling_constants.dart';
 
 class AppTheme {
   static ThemeData lightTheme = ThemeData(
