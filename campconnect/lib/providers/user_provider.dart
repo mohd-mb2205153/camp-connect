@@ -10,12 +10,30 @@ class UserNotifier extends AsyncNotifier<List<User>> {
   @override
   Future<List<User>> build() async{
     _repo = await ref.watch(repoProvider.future);
-    //initalizeUsers();
+    initializeUsers();
     return [];
   }
 
-  Future<void> initiazeUsers() async {
-    
+  Future<void> initializeUsers() async {
+    _repo.observeUsers().listen((user){
+      state = AsyncData(user);
+    }).onError((error){
+      print(error);
+    });
+  }
+  void removeUser(User user) {
+    _repo.deleteUser(user);
   }
 
+  void addUser(User user) {
+    _repo.addUser(user);
+  }
+
+  void updateUser(User user){
+    _repo.updateUser(user);
+  }
 }
+
+final userNotifierProvider =
+    AsyncNotifierProvider<UserNotifier, List<User>>(
+        () => UserNotifier());
