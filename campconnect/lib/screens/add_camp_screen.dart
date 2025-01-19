@@ -258,11 +258,13 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
                               descriptionController.text.isNotEmpty &&
                               selectedEducationalLevels.isNotEmpty) {
                             addCamp();
-
                             context.goNamed(AppRouter.map.name);
                             ref
                                 .read(showNavBarNotifierProvider.notifier)
                                 .showBottomNavBar(true);
+                            ref
+                                .read(showNavBarNotifierProvider.notifier)
+                                .setActiveBottomNavBar(1);
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(

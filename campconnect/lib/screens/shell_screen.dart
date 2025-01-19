@@ -1,5 +1,5 @@
-import 'package:campconnect/providers/show_bot_nav_provider.dart';
 import 'package:campconnect/providers/show_nav_bar_provider.dart';
+import 'package:campconnect/theme/styling_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -14,55 +14,54 @@ class ShellScreen extends ConsumerStatefulWidget {
 }
 
 class _ShellScreenState extends ConsumerState<ShellScreen> {
-  int _selectedIndex = 0;
-
   final List<String> _routes = [
     '/home',
     '/maps',
-    '/notifications',
     '/profile',
   ];
 
   void _onItemTapped(int index) {
-    if (index != _selectedIndex) {
+    if (index != ref.read(showNavBarNotifierProvider)['selectedIndex']) {
       context.go(_routes[index]);
-      setState(() {
-        _selectedIndex = index;
-      });
+      ref
+          .read(showNavBarNotifierProvider.notifier)
+          .setActiveBottomNavBar(index);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final navBarState = ref.watch(showNavBarNotifierProvider);
+    final _selectedIndex = navBarState['selectedIndex'];
+
     return Scaffold(
-        body: widget.child,
-        bottomNavigationBar: ref.watch(showNavBarNotifierProvider)
-            ? BottomNavigationBar(
-                currentIndex: _selectedIndex,
-                onTap: _onItemTapped,
-                selectedItemColor: Colors.blue,
-                unselectedItemColor: Colors.grey,
-                backgroundColor: Colors.white,
-                type: BottomNavigationBarType.fixed,
-                items: const [
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.home),
-                    label: 'Home',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.map),
-                    label: 'Maps',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.notifications),
-                    label: 'Notifications',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.person),
-                    label: 'Profile',
-                  ),
-                ],
-              )
-            : null);
+      body: widget.child,
+      bottomNavigationBar: navBarState['showNavBar']
+          ? BottomNavigationBar(
+              currentIndex: _selectedIndex,
+              onTap: _onItemTapped,
+              selectedItemColor: AppColors.lightTeal,
+              unselectedItemColor: Colors.grey,
+              backgroundColor: Colors.white,
+              type: BottomNavigationBarType.fixed,
+              showSelectedLabels: false,
+              showUnselectedLabels: false,
+              items: const [
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.home),
+                  label: '',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.map),
+                  label: '',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.person),
+                  label: '',
+                ),
+              ],
+            )
+          : null,
+    );
   }
 }

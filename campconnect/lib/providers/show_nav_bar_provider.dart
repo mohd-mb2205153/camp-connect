@@ -1,13 +1,34 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ShowNavBarNotifier extends Notifier<bool> {
+class ShowNavBarNotifier extends Notifier<Map<String, dynamic>> {
   @override
-  bool build() {
-    return false;
+  Map<String, dynamic> build() {
+    return {
+      'showNavBar': true,
+      'selectedIndex': 0, // Default index
+    };
   }
 
-  void showBottomNavBar(bool show) => state = show;
+  void showBottomNavBar(bool show) {
+    state = {
+      ...state,
+      'showNavBar': show,
+    };
+  }
+
+  void setActiveBottomNavBar(int index) {
+    state = {
+      ...state,
+      'selectedIndex': index,
+    };
+  }
+
+  int getActiveBottomNavBar() {
+    return state['selectedIndex'];
+  }
 }
 
 final showNavBarNotifierProvider =
-    NotifierProvider<ShowNavBarNotifier, bool>(() => ShowNavBarNotifier());
+    NotifierProvider<ShowNavBarNotifier, Map<String, dynamic>>(
+  () => ShowNavBarNotifier(),
+);
