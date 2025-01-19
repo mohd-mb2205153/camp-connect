@@ -115,7 +115,7 @@ class _AddCamp extends ConsumerState<AddCampLocationScreen> {
             },
           ),
           title: Text(
-            'Set the Camp Location',
+            'Set Camp Location',
             style: getTextStyle("mediumBold", color: Colors.white),
           ),
         ),
