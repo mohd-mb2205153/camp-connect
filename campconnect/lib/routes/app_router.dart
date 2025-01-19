@@ -5,7 +5,6 @@ import 'package:campconnect/screens/home_screen.dart';
 import 'package:campconnect/screens/onboarding_screens/educator_onboarding_screen.dart';
 import 'package:campconnect/screens/onboarding_screens/login_screen.dart';
 import 'package:campconnect/screens/maps_screen.dart';
-import 'package:campconnect/screens/notifications_screen.dart';
 import 'package:campconnect/screens/onboarding_screens/onboarding_screen.dart';
 import 'package:campconnect/screens/profile_settings_screens/educational_info_screen.dart';
 import 'package:campconnect/screens/profile_settings_screens/personal_info_screen.dart';
@@ -134,12 +133,7 @@ class AppRouter {
                 builder: (context, state) => const EducationalInfoScreen(),
               ),
             ],
-          ),
-          GoRoute(
-            name: notifications.name,
-            path: notifications.path,
-            builder: (context, state) => const NotificationsScreen(),
-          ),
+          )
         ],
       ),
     ],
