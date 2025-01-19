@@ -52,6 +52,9 @@ dependencies:
   smooth_page_indicator: ^1.0.0+2
   group_button: ^5.3.4
   url_launcher: ^6.1.10
+  flutter_svg: ^2.0.17
+  location: ^7.0.1
+  flutter_polyline_points: ^2.1.0
 
 dev_dependencies:
   flutter_test:
