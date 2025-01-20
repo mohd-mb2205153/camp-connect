@@ -674,7 +674,7 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
                 child: IconButton(
                   onPressed: toggleSaveCamp,
                   icon: Icon(
-                    isSaved ? Icons.bookmark : Icons.bookmark_outlined,
+                    isSaved ? Icons.bookmark : Icons.bookmark_outline_outlined,
                     color: AppColors.lightTeal,
                     size: 20,
                   ),
