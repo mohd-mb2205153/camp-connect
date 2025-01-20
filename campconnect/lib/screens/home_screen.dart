@@ -7,6 +7,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../providers/loggedinuser_provider.dart';
+
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
@@ -15,6 +17,10 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
+  bool isStudent = false;
+  bool isTeacher = false;
+  dynamic loggedUser; // Initialize as null
+
   Future<void> _launchURL() async {
     final Uri uri = Uri.parse(
       "https://www.unicef.org/drcongo/en/stories/temporary-learning-spaces-give-displaced-children-chance-learn",
@@ -28,7 +34,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void initState() {
     super.initState();
     Future.microtask(() {
+      final userNotifier = ref.read(loggedInUserNotifierProvider.notifier);
+
+      // Determine user type
+      isStudent = userNotifier.isStudent;
+      isTeacher = userNotifier.isTeacher;
+
+      // Assign logged user
+      if (isStudent) {
+        loggedUser = userNotifier.student;
+      } else if (isTeacher) {
+        loggedUser = userNotifier.teacher;
+      }
+
+      // Show the bottom navigation bar
       ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(true);
+
+      // Trigger rebuild after initialization
+      setState(() {});
     });
   }
 
@@ -53,7 +76,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       body: SizedBox.expand(
         child: Stack(
           children: [
-            // Background as the parent of Stack
             buildBackground("bg12"),
             SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
@@ -67,12 +89,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Hello there, Abdullah",
+                          "Hello there, ${loggedUser?.firstName ?? "Guest"}",
                           style: getTextStyle("largeBold", color: Colors.white),
                         ),
                         addVerticalSpace(8),
                         Text(
-                          "Ready to connect and teach today?",
+                          "Ready to connect and ${isStudent ? "learn" : "teach"} today?",
                           style: getTextStyle("small", color: Colors.white),
                         ),
                       ],
@@ -85,10 +107,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           buildHomeCard(),
                           addVerticalSpace(12),
                           Row(
-                            mainAxisAlignment: MainAxisAlignment
-                                .spaceEvenly, // Space buttons evenly
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              // View Camps Button
                               Expanded(
                                 child: ElevatedButton.icon(
                                   onPressed: () {
@@ -96,18 +116,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   },
                                   style: ElevatedButton.styleFrom(
                                     elevation: 0,
-                                    backgroundColor:
-                                        AppColors.orange, // Button color
+                                    backgroundColor: AppColors.orange,
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(
-                                          8), // Rounded corners
+                                      borderRadius: BorderRadius.circular(8),
                                     ),
                                   ),
                                   icon: Image.asset(
                                     'assets/images/tent_icon_white.png',
                                     width: 20,
                                     height: 20,
-                                    color: Colors.white, // Ensure icon is white
+                                    color: Colors.white,
                                   ),
                                   label: Text(
                                     'View Camps',
@@ -129,17 +147,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   },
                                   style: ElevatedButton.styleFrom(
                                     elevation: 0,
-                                    backgroundColor:
-                                        AppColors.orange, // Button color
+                                    backgroundColor: AppColors.orange,
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(
-                                          8), // Rounded corners
+                                      borderRadius: BorderRadius.circular(8),
                                     ),
                                   ),
                                   icon: Icon(
-                                    Icons.bookmark, // Save icon
+                                    Icons.bookmark,
                                     size: 20,
-                                    color: Colors.white, // Icon color
+                                    color: Colors.white,
                                   ),
                                   label: Text(
                                     'Create Camp',

@@ -32,7 +32,6 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
 
   late LatLng currentLocation;
   late LatLng destinationCampLocation;
-  // List<LatLng> polyLineCordinates = [LatLng(25.250960, 51.513295), LatLng(25.251625, 51.516506), LatLng(25.25162, 51.52117)];
   List<LatLng> polyLineCordinates = [];
 
   @override
@@ -76,7 +75,6 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
         );
   }
 
-  // Method to load custom marker icons
   void _loadCustomIcons() {
     _loadCustomIcon("assets/images/tent_icon.png", (icon) {
       customIcon = icon;
@@ -99,7 +97,6 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
     });
   }
 
-  // Method to start live location updates
   void _startLiveLocationUpdates() {
     _positionStreamSubscription = Geolocator.getPositionStream(
       locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
@@ -132,7 +129,6 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
     }
   }
 
-  // Method to build the main map screen
   Widget _buildMapScreen(BuildContext context, List<Camp> data) {
     markers.addAll(createMarkers(data));
 
@@ -177,7 +173,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
             polylineId: const PolylineId("route"),
             points: polyLineCordinates,
             color: AppColors.blue,
-            width: 5, // Adjust width if needed
+            width: 5,
           ),
       },
       onMapCreated: (controller) {
@@ -425,17 +421,14 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
     }
   }
 
-  // Error screen builder
   Widget _buildErrorScreen(Object error) {
     return Center(child: Text('Error: $error'));
   }
 
-  // Loading screen builder
   Widget _buildLoadingScreen() {
     return const Center(child: CircularProgressIndicator());
   }
 
-  // Marker creation
   List<Marker> createMarkers(List<Camp> camps) {
     return camps.map((camp) {
       return Marker(
@@ -713,7 +706,7 @@ class CampDetailsModal extends StatelessWidget {
                       child: Chip(
                         backgroundColor: AppColors.lightTeal,
                         avatar: Icon(
-                          getIcon(support), // Use the String to map the icon
+                          getIcon(support),
                           color: Colors.white,
                         ),
                         label: Text(

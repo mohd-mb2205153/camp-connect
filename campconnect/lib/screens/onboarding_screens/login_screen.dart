@@ -1,7 +1,11 @@
+import 'package:campconnect/models/student.dart';
+import 'package:campconnect/models/teacher.dart';
+import 'package:campconnect/providers/loggedinuser_provider.dart';
 import 'package:campconnect/providers/show_nav_bar_provider.dart';
 import 'package:campconnect/routes/app_router.dart';
 import 'package:campconnect/theme/constants.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -73,11 +77,39 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
 
     try {
-      final userCredential =
-          await _authService.signin(email: email, password: password);
+      // Authenticate user with Firebase Auth
+      await _authService.signin(email: email, password: password);
 
-      ref.read(showNavBarNotifierProvider.notifier).setActiveBottomNavBar(0);
-      context.pushReplacementNamed(AppRouter.home.name);
+      // Check the students collection
+      final studentDoc = await FirebaseFirestore.instance
+          .collection('students')
+          .where('email', isEqualTo: email)
+          .get();
+
+      if (studentDoc.docs.isNotEmpty) {
+        final student = Student.fromJson(studentDoc.docs.first.data());
+        ref.read(loggedInUserNotifierProvider.notifier).setStudent(student);
+
+        ref.read(showNavBarNotifierProvider.notifier).setActiveBottomNavBar(0);
+        context.replaceNamed(AppRouter.home.name);
+        return;
+      }
+
+      final teacherDoc = await FirebaseFirestore.instance
+          .collection('teachers')
+          .where('email', isEqualTo: email)
+          .get();
+
+      if (teacherDoc.docs.isNotEmpty) {
+        final teacher = Teacher.fromJson(teacherDoc.docs.first.data());
+        ref.read(loggedInUserNotifierProvider.notifier).setTeacher(teacher);
+
+        ref.read(showNavBarNotifierProvider.notifier).setActiveBottomNavBar(0);
+        context.replaceNamed(AppRouter.home.name);
+        return;
+      }
+
+      throw Exception("User not found in students or teachers collections");
     } catch (e) {
       showCustomSnackBar(e.toString(), icon: Icons.error);
     }

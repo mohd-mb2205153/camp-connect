@@ -1,3 +1,4 @@
+import 'package:campconnect/providers/loggedinuser_provider.dart';
 import 'package:campconnect/routes/app_router.dart';
 import 'package:campconnect/theme/constants.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
@@ -6,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../providers/show_nav_bar_provider.dart';
+import '../../services/auth_services.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -120,8 +122,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             }),
             buildMenuItem(Icons.tune, 'Preferences'),
             buildMenuItem(Icons.language, 'Language'),
-            buildMenuItem(Icons.power_settings_new, 'Log out',
-                () => context.go(AppRouter.onboarding.path)),
+            buildMenuItem(Icons.power_settings_new, 'Logout', () async {
+              ref.read(loggedInUserNotifierProvider.notifier).clearUser();
+              await AuthService().signout(context: context);
+              context.go(AppRouter.onboarding.path);
+            }),
           ],
         ),
       ),

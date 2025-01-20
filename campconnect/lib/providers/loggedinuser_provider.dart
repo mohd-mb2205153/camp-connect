@@ -14,6 +14,7 @@ class LoggedInUserNotifier extends StateNotifier<User?> {
     state = teacher;
   }
 
+  /// Clear the state and logout the user
   void clearUser() {
     state = null;
   }
@@ -25,9 +26,17 @@ class LoggedInUserNotifier extends StateNotifier<User?> {
   Student? get student => state is Student ? state as Student : null;
 
   Teacher? get teacher => state is Teacher ? state as Teacher : null;
+
+  bool get isLoggedIn => state != null;
+
+  String? get userRole {
+    if (state is Student) return 'student';
+    if (state is Teacher) return 'teacher';
+    return null;
+  }
 }
 
-final loggedInUserProvider =
+final loggedInUserNotifierProvider =
     StateNotifierProvider<LoggedInUserNotifier, User?>((ref) {
   return LoggedInUserNotifier();
 });
