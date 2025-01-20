@@ -9,6 +9,7 @@ import 'package:campconnect/providers/teacher_provider.dart';
 import 'package:campconnect/theme/frosted_glass.dart';
 import 'package:campconnect/theme/constants.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
+import 'package:campconnect/widgets/detail_section.dart';
 import 'package:campconnect/widgets/details_row.dart';
 import 'package:campconnect/widgets/edit_screen_fields.dart';
 import 'package:campconnect/widgets/filter_dropdown.dart';
@@ -46,7 +47,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
   void initState() {
     super.initState();
     user = ref.read(loggedInUserNotifierProvider);
-    selectedLanguages = user.primaryLanguages;
+    initializeControllers(user);
   }
 
   @override
@@ -805,33 +806,6 @@ class ContactSection extends StatelessWidget {
               ],
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class DetailsSection extends StatelessWidget {
-  final String title;
-  final IconData icon;
-  final List<Widget> children;
-
-  const DetailsSection({
-    super.key,
-    required this.title,
-    required this.icon,
-    required this.children,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(15.0),
-      child: SectionTitleWithIcon(
-        icon: icon,
-        title: title,
-        child: Column(
-          children: children,
         ),
       ),
     );

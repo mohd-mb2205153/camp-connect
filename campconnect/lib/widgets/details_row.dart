@@ -63,7 +63,7 @@ class DetailsRow extends StatelessWidget {
                     child: special
                         ? specialText(value)
                         : Text(
-                            wrapText(value, 30),
+                            wrapText(value, 20),
                             style: getTextStyle('small',
                                 color: AppColors.darkBlue),
                           ),
