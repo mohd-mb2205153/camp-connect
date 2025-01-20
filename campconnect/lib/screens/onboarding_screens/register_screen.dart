@@ -377,7 +377,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               showPhoneCode: true,
               onSelect: (Country country) {
                 setState(() {
-                  userPhoneCode = country.phoneCode;
+                  userPhoneCode = '+${country.phoneCode}';
                 });
               },
               countryListTheme: CountryListThemeData(
