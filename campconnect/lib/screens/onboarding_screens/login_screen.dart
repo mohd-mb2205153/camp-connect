@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../services/auth_services.dart';
+
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
@@ -21,6 +23,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   late FocusNode emailFocusNode;
   late FocusNode passwordFocusNode;
+
+  final AuthService _authService = AuthService();
 
   @override
   void initState() {
@@ -57,6 +61,37 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     emailFocusNode.dispose();
     passwordFocusNode.dispose();
     super.dispose();
+  }
+
+  void handleLogin(BuildContext context) async {
+    final email = txtEmailController.text.trim();
+    final password = txtPasswordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      showCustomSnackBar("Please fill in all fields", icon: Icons.error);
+      return;
+    }
+
+    try {
+      final userCredential =
+          await _authService.signin(email: email, password: password);
+
+      ref.read(showNavBarNotifierProvider.notifier).setActiveBottomNavBar(0);
+      context.pushReplacementNamed(AppRouter.home.name);
+    } catch (e) {
+      showCustomSnackBar(e.toString(), icon: Icons.error);
+    }
+  }
+
+  void showCustomSnackBar(String message,
+      {Color? backgroundColor, IconData? icon}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      CustomSnackBar.create(
+        message: message,
+        backgroundColor: backgroundColor,
+        icon: icon,
+      ),
+    );
   }
 
   @override
@@ -110,10 +145,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         inputFields(context),
                         addVerticalSpace(60),
                         LoginButton(onLoginPressed: () {
-                          ref
-                              .read(showNavBarNotifierProvider.notifier)
-                              .setActiveBottomNavBar(0);
-                          context.pushReplacementNamed(AppRouter.home.name);
+                          handleLogin(context);
                         }),
                       ],
                     ),

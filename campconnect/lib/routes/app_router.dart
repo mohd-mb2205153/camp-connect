@@ -76,15 +76,15 @@ class AppRouter {
                       path: studentOnboarding.path,
                       name: studentOnboarding.name,
                       builder: (context, state) {
-                        final student = state.extra as Student;
-                        return StudentOnboardingScreen(student: student);
+                        final user = state.extra as User;
+                        return StudentOnboardingScreen(user: user);
                       }),
                   GoRoute(
                       path: educatorOnboarding.path,
                       name: educatorOnboarding.name,
                       builder: (context, state) {
-                        final teacher = state.extra as Teacher;
-                        return EducatorOnboardingScreen(teacher: teacher);
+                        final user = state.extra as User;
+                        return EducatorOnboardingScreen(user: user);
                       }),
                 ],
               ),

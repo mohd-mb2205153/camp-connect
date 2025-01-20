@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:campconnect/models/user.dart';
 import 'package:campconnect/routes/app_router.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -11,11 +12,12 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import '../../models/teacher.dart';
 import '../../providers/show_nav_bar_provider.dart';
 import '../../repositories/camp_connect_repo.dart';
+import '../../services/auth_services.dart';
 import '../../theme/constants.dart';
 
 class EducatorOnboardingScreen extends ConsumerStatefulWidget {
-  final Teacher teacher;
-  const EducatorOnboardingScreen({super.key, required this.teacher});
+  final User user;
+  const EducatorOnboardingScreen({super.key, required this.user});
 
   @override
   ConsumerState<EducatorOnboardingScreen> createState() =>
@@ -24,6 +26,8 @@ class EducatorOnboardingScreen extends ConsumerStatefulWidget {
 
 class _EducatorOnboardingScreenState
     extends ConsumerState<EducatorOnboardingScreen> {
+  late Teacher teacher;
+
   TimeOfDay fromTime = TimeOfDay.now();
   TimeOfDay toTime = TimeOfDay.fromDateTime(
     DateTime.now().add(const Duration(hours: 1)),
@@ -53,7 +57,29 @@ class _EducatorOnboardingScreenState
   void initState() {
     super.initState();
     ref.read(showNavBarNotifierProvider.notifier);
+    teacher = initializeTeacher(widget.user);
     loadDropdownData();
+  }
+
+  Teacher initializeTeacher(User user) {
+    return Teacher(
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      phoneCode: user.phoneCode,
+      mobileNumber: user.mobileNumber,
+      dateOfBirth: user.dateOfBirth,
+      nationality: user.nationality,
+      highestEducationLevel: '',
+      certifications: [],
+      teachingExperience: 0,
+      areasOfExpertise: [],
+      willingnessToTravel: '',
+      availabilitySchedule: '',
+      preferredCampDuration: '',
+      primaryLanguages: [],
+    );
   }
 
   Future<void> loadDropdownData() async {
@@ -118,7 +144,15 @@ class _EducatorOnboardingScreenState
     }
 
     try {
-      final updatedTeacher = widget.teacher.copyWith(
+      final authService = AuthService();
+      final firebaseUser = await authService.signup(
+        email: widget.user.email,
+        password: widget.user.password,
+        firstName: widget.user.firstName,
+        lastName: widget.user.lastName,
+      );
+
+      final updatedTeacher = teacher.copyWith(
         highestEducationLevel: highestEducationLevel,
         certifications: certifications,
         teachingExperience: teachingExperience,
@@ -140,12 +174,15 @@ class _EducatorOnboardingScreenState
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            "Teacher registered successfully!",
+            "You have registered successfully",
             style: getTextStyle("small", color: Colors.white),
           ),
-          backgroundColor: AppColors.lightTeal,
+          backgroundColor: AppColors.orange,
         ),
       );
+
+      ref.read(showNavBarNotifierProvider.notifier).setActiveBottomNavBar(0);
+      context.goNamed(AppRouter.home.name);
     } catch (error) {
       debugPrint("Error saving teacher: $error");
       ScaffoldMessenger.of(context).showSnackBar(
@@ -241,10 +278,6 @@ class _EducatorOnboardingScreenState
                           );
                         } else {
                           handleRegisterTeacher();
-                          ref
-                              .read(showNavBarNotifierProvider.notifier)
-                              .setActiveBottomNavBar(0);
-                          // context.goNamed(AppRouter.home.name);
                         }
                       },
                       style: ElevatedButton.styleFrom(

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:campconnect/models/student.dart';
 import 'package:campconnect/repositories/camp_connect_repo.dart';
 import 'package:campconnect/routes/app_router.dart';
+import 'package:campconnect/services/auth_services.dart';
 import 'package:campconnect/theme/constants.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -14,12 +15,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
+import '../../models/user.dart';
 import '../../providers/show_nav_bar_provider.dart';
 
 class StudentOnboardingScreen extends ConsumerStatefulWidget {
-  final Student student;
+  final User user;
 
-  const StudentOnboardingScreen({super.key, required this.student});
+  const StudentOnboardingScreen({super.key, required this.user});
 
   @override
   ConsumerState<StudentOnboardingScreen> createState() =>
@@ -28,6 +30,28 @@ class StudentOnboardingScreen extends ConsumerStatefulWidget {
 
 class _StudentOnboardingScreenState
     extends ConsumerState<StudentOnboardingScreen> {
+  late Student student;
+
+  Student initializeStudent(User user) {
+    final student = Student(
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      dateOfBirth: user.dateOfBirth,
+      nationality: user.nationality,
+      primaryLanguages: user.primaryLanguages,
+      phoneCode: user.phoneCode,
+      mobileNumber: user.mobileNumber,
+      email: user.email,
+      currentEducationLevel: '',
+      guardianContact: '',
+      guardianPhoneCode: '',
+      preferredDistanceForCamps: '',
+      preferredSubjects: [],
+    );
+    return student;
+  }
+
   final TextEditingController txtEmergencyPhoneNumberController =
       TextEditingController();
   final TextEditingController txtSpecialNeedsController =
@@ -54,6 +78,7 @@ class _StudentOnboardingScreenState
   void initState() {
     super.initState();
     ref.read(showNavBarNotifierProvider.notifier);
+    student = initializeStudent(widget.user);
     loadDetailsData();
   }
 
@@ -116,7 +141,15 @@ class _StudentOnboardingScreenState
     }
 
     try {
-      final student = widget.student.copyWith(
+      final authService = AuthService();
+      final firebaseUser = await authService.signup(
+        email: widget.user.email,
+        password: widget.user.password,
+        firstName: widget.user.firstName,
+        lastName: widget.user.lastName,
+      );
+
+      final updatedStudent = student.copyWith(
         guardianContact: txtEmergencyPhoneNumberController.text.trim(),
         guardianPhoneCode: emergencyUserPhoneCode,
         specialNeeds: txtSpecialNeedsController.text.trim(),
@@ -133,17 +166,19 @@ class _StudentOnboardingScreenState
         usersRef: FirebaseFirestore.instance.collection('users'),
       );
 
-      await repo.addStudent(student);
+      await repo.addStudent(updatedStudent);
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            "Student registered successfully!",
+            "You have registered successfully",
             style: getTextStyle("small", color: Colors.white),
           ),
-          backgroundColor: AppColors.lightTeal,
+          backgroundColor: AppColors.orange,
         ),
       );
+      context.goNamed(AppRouter.home.name);
+      ref.read(showNavBarNotifierProvider.notifier).setActiveBottomNavBar(0);
     } catch (error) {
       debugPrint("Error saving student: $error");
       ScaffoldMessenger.of(context).showSnackBar(
@@ -270,10 +305,6 @@ class _StudentOnboardingScreenState
                           );
                         } else {
                           handleRegisterStudent();
-                          ref
-                              .read(showNavBarNotifierProvider.notifier)
-                              .setActiveBottomNavBar(0);
-                          // context.goNamed(AppRouter.home.name);
                         }
                       },
                       style: ElevatedButton.styleFrom(

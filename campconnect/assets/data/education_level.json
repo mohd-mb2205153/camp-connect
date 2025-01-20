@@ -1,1 +1,8 @@
-["Primary School", "Middle School", "High School"]
+[
+  "No Schooling",
+  "Early Childhood Education",
+  "Kindergarten",
+  "Primary School (1st Grade - 5th Grade)",
+  "Middle School (6th Grade - 8th Grade)",
+  "High School (9th Grade - 12th Grade)"
+]

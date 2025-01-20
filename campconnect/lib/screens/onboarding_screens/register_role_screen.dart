@@ -102,28 +102,10 @@ class StudentButton extends StatelessWidget {
         height: 44,
         child: ElevatedButton(
           onPressed: () {
-            final student = Student(
-              id: user.id,
-              firstName: user.firstName,
-              lastName: user.lastName,
-              dateOfBirth: user.dateOfBirth,
-              nationality: user.nationality,
-              primaryLanguages: user.primaryLanguages,
-              phoneCode: user.phoneCode,
-              mobileNumber: user.mobileNumber,
-              email: user.email,
-              currentEducationLevel: '',
-              guardianContact: '',
-              guardianPhoneCode: '',
-              preferredDistanceForCamps: '',
-              preferredSubjects: [],
-            );
-
-            debugPrint(student.toString());
-
+            user.role = 'student';
             context.pushNamed(
               AppRouter.studentOnboarding.name,
-              extra: student,
+              extra: user,
             );
           },
           style: ElevatedButton.styleFrom(
@@ -168,29 +150,10 @@ class EducatorButton extends StatelessWidget {
         height: 44,
         child: ElevatedButton(
           onPressed: () {
-            final teacher = Teacher(
-              id: user.id,
-              firstName: user.firstName,
-              lastName: user.lastName,
-              dateOfBirth: user.dateOfBirth,
-              nationality: user.nationality,
-              primaryLanguages: user.primaryLanguages,
-              phoneCode: user.phoneCode,
-              mobileNumber: user.mobileNumber,
-              email: user.email,
-              highestEducationLevel: '',
-              teachingExperience: 0,
-              areasOfExpertise: [],
-              willingnessToTravel: '',
-              availabilitySchedule: '',
-              preferredCampDuration: '',
-            );
-
-            debugPrint(teacher.toString());
-
+            user.role = 'teacher';
             context.pushNamed(
               AppRouter.educatorOnboarding.name,
-              extra: teacher,
+              extra: user,
             );
           },
           style: ElevatedButton.styleFrom(

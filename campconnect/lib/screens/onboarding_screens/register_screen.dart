@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:campconnect/models/user.dart';
 import 'package:campconnect/providers/user_provider.dart';
 import 'package:campconnect/routes/app_router.dart';
+import 'package:campconnect/services/auth_services.dart';
 import 'package:campconnect/theme/constants.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
 import 'package:country_code_picker/country_code_picker.dart';
@@ -87,6 +88,62 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         hasSelectedLanguages &&
         hasValidDateOfBirth &&
         hasValidNationality;
+  }
+
+  bool validateFields(BuildContext context) {
+    void showCustomSnackBar(String message,
+        {Color? backgroundColor, IconData? icon}) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        CustomSnackBar.create(
+          message: message,
+          backgroundColor: backgroundColor,
+          icon: icon,
+        ),
+      );
+    }
+
+    if (!isAllFilled()) {
+      showCustomSnackBar("All fields are required.", icon: Icons.error);
+      return false;
+    }
+
+    final email = txtEmailController.text.trim();
+    final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+    if (!emailRegex.hasMatch(email)) {
+      showCustomSnackBar("Please enter a valid email address.");
+      return false;
+    }
+
+    final password = txtPasswordController.text.trim();
+    if (password.length < 6) {
+      showCustomSnackBar("Password must be at least 6 characters long.");
+      return false;
+    }
+
+    final firstName = txtFirstNameController.text.trim();
+    if (firstName.isEmpty || firstName.length < 2) {
+      showCustomSnackBar("First name must be at least 2 characters long.");
+      return false;
+    }
+
+    final lastName = txtLastNameController.text.trim();
+    if (lastName.isEmpty || lastName.length < 2) {
+      showCustomSnackBar("Last name must be at least 2 characters long.");
+      return false;
+    }
+
+    final phoneNumber = txtPhoneNumberController.text.trim();
+    if (phoneNumber.isEmpty || !RegExp(r'^\d+$').hasMatch(phoneNumber)) {
+      showCustomSnackBar("Please enter a valid phone number.");
+      return false;
+    }
+
+    if (!agreeToTerms) {
+      showCustomSnackBar("You must agree to the Terms of Use.");
+      return false;
+    }
+
+    return true;
   }
 
   Future<void> loadDropdownData() async {
@@ -588,23 +645,24 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           height: 44,
           child: ElevatedButton(
             onPressed: () {
-              if (handleUser(context)) {
+              if (validateFields(context)) {
                 final user = User(
-                  firstName: txtFirstNameController.text,
-                  lastName: txtLastNameController.text,
+                  firstName: txtFirstNameController.text.trim(),
+                  lastName: txtLastNameController.text.trim(),
                   dateOfBirth: parseCustomDate(selectedDateOfBirth),
                   nationality: selectedNationality,
                   primaryLanguages: selectedLanguages,
                   phoneCode: userPhoneCode,
-                  mobileNumber: txtPhoneNumberController.text,
-                  email: txtEmailController.text,
-                  role: '',
+                  mobileNumber: txtPhoneNumberController.text.trim(),
+                  email: txtEmailController.text.trim(),
+                  password: txtPasswordController.text.trim(),
+                  role: '', // This will be updated later
                 );
-                debugPrint(user.toString());
 
+                // Navigate to Role Selection screen
                 context.pushNamed(
                   AppRouter.role.name,
-                  extra: user, // Pass the user object
+                  extra: user,
                 );
               }
             },
@@ -616,7 +674,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               elevation: 0,
             ),
             child: Text(
-              "Sign up",
+              "Next",
               style: getTextStyle('mediumBold', color: Colors.white),
             ),
           ),

@@ -8,6 +8,7 @@ class User {
   String phoneCode;
   String mobileNumber;
   String email;
+  String password;
   String role; // 'student' or 'teacher'
 
   User({
@@ -20,6 +21,7 @@ class User {
     required this.phoneCode,
     required this.mobileNumber,
     required this.email,
+    this.password = '',
     required this.role,
   });
 
@@ -34,6 +36,7 @@ class User {
       'phoneCode': phoneCode,
       'mobileNumber': mobileNumber,
       'email': email,
+      'password': password,
       'role': role,
     }.toString();
   }
@@ -49,6 +52,7 @@ class User {
       phoneCode: json['phoneCode'],
       mobileNumber: json['mobileNumber'],
       email: json['email'] ?? '',
+      password: json['password'] ?? '', // Add password here
       role: json['role'],
     );
   }
@@ -64,6 +68,7 @@ class User {
       'phoneCode': phoneCode,
       'mobileNumber': mobileNumber,
       'email': email,
+      'password': password, // Include password in toJson
       'role': role,
     };
   }
