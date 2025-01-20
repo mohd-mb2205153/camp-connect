@@ -30,8 +30,8 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
   late StreamSubscription<Position> _positionStreamSubscription;
   bool _followUserLocation = true;
 
-  LatLng currentLocation = LatLng(25.250960, 51.513295);
-  LatLng destinationCampLocation = LatLng(25.25162, 51.52117);
+  late LatLng currentLocation;
+  late LatLng destinationCampLocation;
   // List<LatLng> polyLineCordinates = [LatLng(25.250960, 51.513295), LatLng(25.251625, 51.516506), LatLng(25.25162, 51.52117)];
   List<LatLng> polyLineCordinates = [];
 
@@ -112,6 +112,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
 
     if (mounted) {
       setState(() {
+        currentLocation = userLocation;
         markers
             .removeWhere((marker) => marker.markerId.value == "live_location");
         markers.add(
@@ -267,6 +268,8 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
       children: [
         _buildFloatingRowActions(),
         _buildTrackUserLocationButton(context),
+        // Display the cancel button only when a route is shown.
+        polyLineCordinates.isNotEmpty ? _routeCancelButton(context): Container()
       ],
     );
   }
@@ -294,9 +297,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
                 ),
               ),
               IconButton(
-                onPressed: () {
-                  getPolyPoints();
-                },
+                onPressed: () {},
                 icon: const Icon(Icons.directions, color: Colors.white),
               ),
               IconButton(
@@ -332,6 +333,48 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
         ),
       ),
     );
+  }
+
+  Positioned _routeCancelButton(BuildContext context){
+    return Positioned(
+      bottom: 70,
+      right: 90,
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.lightTeal,
+          shape: BoxShape.circle,
+        ),
+        child: 
+        ElevatedButton(
+          onPressed: () {   //When a route is cancelled
+            setState(() {
+              polyLineCordinates.clear();  //Remove the cordinates
+            }); 
+          },
+          style: ElevatedButton.styleFrom(
+              elevation: 2,
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.cancel,
+                ),
+                const SizedBox(width: 5,),
+                Text(
+                  "Cancel Route",
+                  style: getTextStyle("small", color: AppColors.teal),
+                ),
+              ],
+            ),
+      )
+      ),
+      
+      );
   }
 
   Future<void> _trackUserLocation(BuildContext context) async {
@@ -414,15 +457,28 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
       ),
-      builder: (context) => CampDetailsModal(camp: camp),
+      builder: (context) => CampDetailsModal(
+        camp: camp,
+        onDirectionsPressed: (){
+          setState(() {
+            destinationCampLocation = LatLng(camp.latitude, camp.longitude);
+          });
+          Navigator.pop(context);
+          getPolyPoints();
+        },),
     );
   }
 }
 
 class CampDetailsModal extends StatelessWidget {
   final Camp camp;
+  final VoidCallback onDirectionsPressed;
 
-  const CampDetailsModal({Key? key, required this.camp}) : super(key: key);
+  const CampDetailsModal({
+    Key? key,
+    required this.camp,
+    required this.onDirectionsPressed,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -433,9 +489,7 @@ class CampDetailsModal extends StatelessWidget {
       {
         "label": "Directions",
         "icon": Icons.directions,
-        "onPressed": () {
-          print("opening directions");
-        },
+        "onPressed": onDirectionsPressed
       },
       {
         "label": "Teachers",
