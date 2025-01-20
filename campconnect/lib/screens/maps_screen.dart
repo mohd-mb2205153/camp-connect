@@ -114,17 +114,20 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
   }
 
   void _loadCustomIcons() {
-    _loadCustomIcon("assets/images/tent_icon.png", (icon) {
+    _loadCustomIcon("assets/images/tent_icon.png", const Size(48, 48), (icon) {
       customIcon = icon;
     });
-    _loadCustomIcon("assets/images/current_location_icon.png", (icon) {
+
+    _loadCustomIcon(
+        "assets/images/current_location_icon.png", const Size(32, 32), (icon) {
       liveLocationIcon = icon;
     });
   }
 
-  void _loadCustomIcon(String assetPath, Function(BitmapDescriptor) callback) {
+  void _loadCustomIcon(
+      String assetPath, Size size, Function(BitmapDescriptor) callback) {
     BitmapDescriptor.asset(
-      const ImageConfiguration(size: Size(48, 48)),
+      ImageConfiguration(size: size), // Set the size here
       assetPath,
     ).then((icon) {
       if (mounted) {
@@ -563,8 +566,6 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
   @override
   void initState() {
     super.initState();
-    final loggedInUser = ref.read(loggedInUserNotifierProvider) as Student?;
-    isSaved = loggedInUser?.savedCamps.contains(widget.camp.id) ?? false;
   }
 
   void toggleSaveCamp() async {

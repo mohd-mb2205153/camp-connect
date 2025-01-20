@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:campconnect/models/camp.dart';
 import 'package:campconnect/providers/camp_provider.dart';
 import 'package:campconnect/providers/json_provider.dart';
+import 'package:campconnect/providers/teacher_provider.dart';
 import 'package:campconnect/routes/app_router.dart';
 import 'package:campconnect/widgets/filter_dropdown.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:campconnect/theme/constants.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
 
+import '../providers/loggedinuser_provider.dart';
 import '../providers/show_nav_bar_provider.dart';
 
 class AddCampScreen extends ConsumerStatefulWidget {
@@ -24,6 +26,10 @@ class AddCampScreen extends ConsumerStatefulWidget {
 }
 
 class _AddCampScreenState extends ConsumerState<AddCampScreen> {
+  bool isStudent = false;
+  bool isTeacher = false;
+  dynamic loggedUser;
+
   final nameController = TextEditingController();
   final descriptionController = TextEditingController();
   final statusOfResourcesController = TextEditingController();
@@ -59,9 +65,23 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
     loadAdditionalSupports();
     loadEducationalLevels();
     loadLanguages();
+    initializeUserDetails();
     ref.read(campProviderNotifier.notifier);
+    ref.read(teacherProviderNotifier.notifier);
     Future.microtask(() {
       ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(false);
+    });
+  }
+
+  void initializeUserDetails() {
+    Future.microtask(() {
+      final userNotifier = ref.read(loggedInUserNotifierProvider.notifier);
+
+      loggedUser = userNotifier.teacher;
+
+      ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(true);
+
+      setState(() {});
     });
   }
 
@@ -103,7 +123,7 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
     }
   }
 
-  void addCamp() {
+  void addCamp() async {
     final newCamp = Camp(
       name: nameController.text,
       educationLevel: selectedEducationalLevels,
@@ -114,9 +134,30 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
       additionalSupport: selectedAdditionalSupports,
       languages: selectedLanguages,
     );
-    ref.read(campProviderNotifier.notifier).addCamp(newCamp);
-    ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(true);
-    context.pop();
+
+    try {
+      final teacherId = loggedUser.id;
+
+      final campId = await ref
+          .read(campProviderNotifier.notifier)
+          .addCamp(newCamp, teacherId);
+
+      if (loggedUser != null) {
+        final teacherId = loggedUser.id;
+        await ref
+            .read(teacherProviderNotifier.notifier)
+            .addCreatedCamp(teacherId, campId);
+        await ref
+            .read(teacherProviderNotifier.notifier)
+            .addTeachingCamp(teacherId, campId);
+      }
+
+      ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(true);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to add camp: $e")),
+      );
+    }
   }
 
   @override

@@ -10,8 +10,8 @@ class Camp {
   String description; // Description of the camp
   double latitude; // Latitude of the camp location
   double longitude; // Longitude of the camp location
-  List<String>? teachers; // Store teacher IDs (Firestore references)
-  List<Class>? classes; // List of class objects
+  List<String>? teacherId; // Store teacher IDs (Firestore references)
+  List<String>? classId; // List of class IDs
   String statusOfResources; // Current status of camp resources
   List<String>?
       additionalSupport; // Additional support offered (e.g., trauma support, wifi, etc.)
@@ -24,8 +24,8 @@ class Camp {
     required this.description,
     required this.latitude,
     required this.longitude,
-    this.teachers,
-    this.classes,
+    this.teacherId,
+    this.classId,
     required this.statusOfResources,
     this.additionalSupport,
     this.languages,
@@ -41,13 +41,10 @@ class Camp {
       description: json['description'] ?? '',
       latitude: (json['latitude'] as num).toDouble(),
       longitude: (json['longitude'] as num).toDouble(),
-      teachers:
-          json['teachers'] != null ? List<String>.from(json['teachers']) : [],
-      classes: json['classes'] != null
-          ? (json['classes'] as List)
-              .map((classJson) => Class.fromJson(classJson))
-              .toList()
-          : [],
+      teacherId:
+          json['teacherId'] != null ? List<String>.from(json['teacherId']) : [],
+      classId:
+          json['classesIds'] != null ? List<String>.from(json['classId']) : [],
       statusOfResources: json['statusOfResources'] ?? '',
       additionalSupport: json['additionalSupport'] != null
           ? List<String>.from(json['additionalSupport'])
@@ -65,8 +62,8 @@ class Camp {
       "description": description,
       "latitude": latitude,
       "longitude": longitude,
-      "teachers": teachers ?? [],
-      "classes": classes?.map((classObj) => classObj.toJson()).toList() ?? [],
+      "teacherId": teacherId,
+      "classId": classId,
       "statusOfResources": statusOfResources,
       "additionalSupport": additionalSupport ?? [],
       "languages": languages,

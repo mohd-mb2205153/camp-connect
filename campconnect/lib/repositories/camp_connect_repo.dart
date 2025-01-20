@@ -32,10 +32,11 @@ class CampConnectRepo {
         (snapshot) => Camp.fromJson(snapshot.data() as Map<String, dynamic>),
       );
 
-  Future<void> addCamp(Camp camp) async {
+  Future<String> addCamp(Camp camp) async {
     final docId = campsRef.doc().id;
     camp.id = docId;
-    await campsRef.doc(camp.id).set(camp.toJson());
+    await campsRef.doc(docId).set(camp.toJson());
+    return docId;
   }
 
   Future<void> updateCamp(Camp camp) =>
@@ -80,6 +81,21 @@ class CampConnectRepo {
             (snapshot) =>
                 Teacher.fromJson(snapshot.data() as Map<String, dynamic>),
           );
+
+  Future<void> addCampToTeacher({
+    required String teacherId,
+    required String campId,
+    required String field, // "createdCamps" or "teachingCamps"
+  }) async {
+    try {
+      final teacherRef = teachersRef.doc(teacherId);
+      await teacherRef.update({
+        field: FieldValue.arrayUnion([campId]),
+      });
+    } catch (e) {
+      throw Exception("Failed to update $field for teacher: $e");
+    }
+  }
 
   Future<void> addTeacher(Teacher teacher) async {
     final docId = teachersRef.doc().id;

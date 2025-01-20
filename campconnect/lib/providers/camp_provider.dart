@@ -24,8 +24,22 @@ class CampProvider extends AsyncNotifier<List<Camp>> {
 
   Future<Camp?> getCampById(String id) => _repo.getCampById(id);
 
-  void addCamp(Camp camp) {
-    _repo.addCamp(camp);
+  Future<String> addCamp(Camp camp, String teacherId) async {
+    try {
+      state = AsyncValue.loading();
+
+      camp.teacherId = (camp.teacherId ?? [])..add(teacherId);
+
+      final campId = await _repo.addCamp(camp);
+
+      final currentState = state.asData?.value ?? [];
+      state = AsyncValue.data([...currentState, camp]);
+
+      return campId;
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
+    }
   }
 
   void deleteCamp(Camp camp) {

@@ -32,6 +32,30 @@ class TeacherProvider extends AsyncNotifier<List<Teacher>> {
   void updateTeacher(Teacher teacher) {
     _repo.updateTeacher(teacher);
   }
+
+  Future<void> addCreatedCamp(String teacherId, String campId) async {
+    try {
+      await _repo.addCampToTeacher(
+        teacherId: teacherId,
+        campId: campId,
+        field: 'createdCamps',
+      );
+    } catch (e) {
+      state = AsyncError(e, StackTrace.current);
+    }
+  }
+
+  Future<void> addTeachingCamp(String teacherId, String campId) async {
+    try {
+      await _repo.addCampToTeacher(
+        teacherId: teacherId,
+        campId: campId,
+        field: 'teachingCamps',
+      );
+    } catch (e) {
+      state = AsyncError(e, StackTrace.current);
+    }
+  }
 }
 
 final teacherProviderNotifier =
