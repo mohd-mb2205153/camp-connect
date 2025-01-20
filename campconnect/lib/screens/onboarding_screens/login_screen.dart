@@ -77,10 +77,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
 
     try {
-      // Authenticate user with Firebase Auth
       await _authService.signin(email: email, password: password);
 
-      // Check the students collection
       final studentDoc = await FirebaseFirestore.instance
           .collection('students')
           .where('email', isEqualTo: email)

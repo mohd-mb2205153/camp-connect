@@ -18,6 +18,8 @@ import 'package:go_router/go_router.dart';
 import '../models/teacher.dart';
 import '../screens/onboarding_screens/register_screen.dart';
 import '../screens/onboarding_screens/student_onboarding_screen.dart';
+import '../screens/view_saved_camps_screen.dart';
+import '../screens/view_created_camps_screen.dart';
 
 class AppRouter {
   // Onboarding Routes
@@ -35,6 +37,12 @@ class AppRouter {
   static const map = (name: 'maps', path: '/maps');
   static const profile = (name: 'profile', path: '/profile');
   static const notifications = (name: 'notifications', path: '/notifications');
+
+  // View Camp Routes
+  static const viewSavedCamps =
+      (name: 'viewSavedCamps', path: '/viewSavedCamps');
+  static const viewTeachingCamps =
+      (name: 'viewTeachingCamps', path: '/viewTeachingCamps');
 
   // Add Camp Routes
   static const addCampLocation =
@@ -103,6 +111,16 @@ class AppRouter {
             path: home.path,
             builder: (context, state) => const HomeScreen(),
             routes: [
+              GoRoute(
+                name: viewSavedCamps.name,
+                path: viewSavedCamps.path,
+                builder: (context, state) => const ViewSavedCampsScreen(),
+              ),
+              GoRoute(
+                name: viewTeachingCamps.name,
+                path: viewTeachingCamps.path,
+                builder: (context, state) => const ViewCreatedCampsScreen(),
+              ),
               GoRoute(
                 name: addCampLocation.name,
                 path: addCampLocation.path,
