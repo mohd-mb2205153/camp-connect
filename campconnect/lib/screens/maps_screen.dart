@@ -5,6 +5,7 @@ import 'package:campconnect/providers/camp_provider.dart';
 import 'package:campconnect/theme/constants.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -29,6 +30,11 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
   late StreamSubscription<Position> _positionStreamSubscription;
   bool _followUserLocation = true;
 
+  LatLng currentLocation = LatLng(25.250960, 51.513295);
+  LatLng destinationCampLocation = LatLng(25.25162, 51.52117);
+  // List<LatLng> polyLineCordinates = [LatLng(25.250960, 51.513295), LatLng(25.251625, 51.516506), LatLng(25.25162, 51.52117)];
+  List<LatLng> polyLineCordinates = [];
+
   @override
   void initState() {
     super.initState();
@@ -41,6 +47,25 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
     _positionStreamSubscription.cancel();
     _googleMapController?.dispose();
     super.dispose();
+  }
+
+
+  void getPolyPoints() async {
+    PolylinePoints polylinePoints = PolylinePoints();
+    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+      request: 
+        PolylineRequest(
+          origin: PointLatLng(currentLocation.latitude, currentLocation.longitude), 
+          destination: PointLatLng(destinationCampLocation.latitude, destinationCampLocation.longitude), 
+          mode: TravelMode.driving),
+      googleApiKey: googleApiKey
+      );
+
+      if (result.points.isNotEmpty){
+        result.points.forEach((PointLatLng point) => 
+          polyLineCordinates.add(LatLng(point.latitude, point.longitude)));
+      setState(() {});
+      }
   }
 
   @override
@@ -138,6 +163,11 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
       zoomControlsEnabled: false,
       mapType: MapType.terrain,
       myLocationButtonEnabled: false,
+      polylines: {
+        Polyline(polylineId: PolylineId("route"),
+          points: polyLineCordinates,
+          color: AppColors.blue)
+      },
       onMapCreated: (controller) {
         _googleMapController = controller;
       },
@@ -264,7 +294,9 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
                 ),
               ),
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  getPolyPoints();
+                },
                 icon: const Icon(Icons.directions, color: Colors.white),
               ),
               IconButton(
