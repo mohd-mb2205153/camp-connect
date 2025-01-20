@@ -2,6 +2,9 @@ import 'dart:async';
 
 import 'package:campconnect/models/camp.dart';
 import 'package:campconnect/providers/camp_provider.dart';
+import 'package:campconnect/providers/class_provider.dart';
+import 'package:campconnect/providers/student_provider.dart';
+import 'package:campconnect/providers/teacher_provider.dart';
 import 'package:campconnect/routes/app_router.dart';
 import 'package:campconnect/theme/constants.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
@@ -97,6 +100,11 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(loggedInUserNotifierProvider);
+    final student = ref.watch(studentProviderNotifier);
+    final teacher = ref.watch(teacherProviderNotifier);
+    final classSchedule = ref.watch(classProviderNotifier);
+
     return ref.watch(campProviderNotifier).when(
           data: (data) => _buildMapScreen(context, data),
           error: (err, stack) => _buildErrorScreen(err),
@@ -235,16 +243,18 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
     );
   }
 
-  Row _buildHeaderButtons(BuildContext context) {
-    return Row(
-      children: [
-        _buildCircleIconButton(Icons.search, () {}),
-        const Spacer(),
-        _buildFilterButton(),
-        const Spacer(),
-        _buildCircleIconButton(Icons.settings, () {}),
-      ],
-    );
+  Widget _buildHeaderButtons(BuildContext context) {
+    return polyLineCordinates.isEmpty
+        ? Row(
+            children: [
+              _buildCircleIconButton(Icons.search, () {}),
+              const Spacer(),
+              _buildFilterButton(),
+              const Spacer(),
+              _buildCircleIconButton(Icons.settings, () {}),
+            ],
+          )
+        : Row();
   }
 
   Widget _buildCircleIconButton(IconData icon, VoidCallback onPressed) {
@@ -284,18 +294,20 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
   }
 
   Widget _buildLastUpdatedText() {
-    return Text(
-      "Last Updated: Now",
-      style: getTextStyle("small", color: AppColors.white).copyWith(
-        shadows: [
-          Shadow(
-            offset: Offset(1.0, 1.0),
-            blurRadius: 2.0,
-            color: Colors.black.withOpacity(0.6),
-          ),
-        ],
-      ),
-    );
+    return polyLineCordinates.isEmpty
+        ? Text(
+            "Last Updated: Now",
+            style: getTextStyle("small", color: AppColors.white).copyWith(
+              shadows: [
+                Shadow(
+                  offset: Offset(1.0, 1.0),
+                  blurRadius: 2.0,
+                  color: Colors.black.withOpacity(0.6),
+                ),
+              ],
+            ),
+          )
+        : Text("");
   }
 
   Widget _buildFloatingActionButtons(BuildContext context) {
@@ -347,12 +359,21 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
                 icon: const Icon(Icons.directions, color: Colors.white),
               ),
               IconButton(
-                onPressed: () {},
-                icon: Image.asset(
-                  "assets/images/add_icon.png",
-                  fit: BoxFit.contain,
-                  height: 24,
-                ),
+                onPressed: () {
+                  isStudent
+                      ? null
+                      : context.pushNamed(AppRouter.addCampLocation.name);
+                },
+                icon: isStudent
+                    ? Icon(
+                        Icons.bookmark,
+                        color: Colors.white,
+                      )
+                    : Image.asset(
+                        "assets/images/add_icon.png",
+                        fit: BoxFit.contain,
+                        height: 24,
+                      ),
               ),
             ],
           ),
@@ -508,11 +529,11 @@ class CampDetailsModal extends StatelessWidget {
   final bool isStudent;
 
   const CampDetailsModal({
-    Key? key,
+    super.key,
     required this.camp,
     required this.onDirectionsPressed,
     required this.isStudent,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -529,14 +550,14 @@ class CampDetailsModal extends StatelessWidget {
         "label": "Teachers",
         "icon": Icons.person,
         "onPressed": () {
-          print("opening teachers");
+          context.goNamed(AppRouter.viewTeachers.name);
         },
       },
       {
         "label": "Classes",
         "icon": Icons.class_,
         "onPressed": () {
-          print("opening classes");
+          context.goNamed(AppRouter.viewClasses.name);
         },
       },
       {

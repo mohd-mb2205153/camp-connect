@@ -194,7 +194,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           color: Colors.white,
         ),
         label: Text(
-          isStudent ? "Save a Camp" : "Create a Camp",
+          isStudent ? "Save a Camp" : "Create Camp",
           style: getTextStyle("small", color: Colors.white),
         ),
       ),
