@@ -52,13 +52,11 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
       dateOfBirth: DateTime(2004, 11, 9),
       nationality: 'Iraq',
       primaryLanguages: ['Arabic', 'English'],
-      countryCode: 'QA',
       mobileNumber: '3033067',
       email: 'enter@gmail.com',
       currentEducationLevel: 'High School',
       savedCamps: [],
       guardianContact: '44450699',
-      guardianCountryCode: 'IN',
       preferredDistanceForCamps: '',
       preferredSubjects: [],
       learningGoals:
@@ -151,24 +149,8 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
           topLeft: Radius.circular(40.0),
           topRight: Radius.circular(40.0),
         ),
-        inputDecoration: InputDecoration(
-          labelText: 'Search Phone Code',
-          labelStyle: getTextStyle('medium', color: AppColors.darkBeige),
-          prefixIcon: const Icon(
-            Icons.search,
-            color: AppColors.darkBlue,
-          ),
-          border: OutlineInputBorder(
-            borderSide: BorderSide(
-              color: AppColors.darkBlue,
-            ),
-          ),
-        ),
-        searchTextStyle: TextStyle(
-          color: AppColors.darkBlue,
-          fontSize: 18,
-        ),
       ),
+      showSearch: false,
     );
   }
 

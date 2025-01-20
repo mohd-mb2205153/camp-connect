@@ -5,7 +5,6 @@ class User {
   DateTime dateOfBirth;
   String nationality;
   List<String> primaryLanguages;
-  String countryCode;
   String phoneCode;
   String mobileNumber;
   String email;
@@ -19,11 +18,25 @@ class User {
     required this.nationality,
     required this.primaryLanguages,
     required this.phoneCode,
-    required this.countryCode,
     required this.mobileNumber,
     required this.email,
     required this.role,
   });
+
+  @override
+  String toString() {
+    return {
+      'firstName': firstName,
+      'lastName': lastName,
+      'dateOfBirth': dateOfBirth.toIso8601String(),
+      'nationality': nationality,
+      'primaryLanguages': primaryLanguages,
+      'phoneCode': phoneCode,
+      'mobileNumber': mobileNumber,
+      'email': email,
+      'role': role,
+    }.toString();
+  }
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
@@ -34,7 +47,6 @@ class User {
       nationality: json['nationality'],
       primaryLanguages: List<String>.from(json['primaryLanguages']),
       phoneCode: json['phoneCode'],
-      countryCode: json['countryCode'],
       mobileNumber: json['mobileNumber'],
       email: json['email'] ?? '',
       role: json['role'],
@@ -50,7 +62,6 @@ class User {
       'nationality': nationality,
       'primaryLanguages': primaryLanguages,
       'phoneCode': phoneCode,
-      'countryCode': countryCode,
       'mobileNumber': mobileNumber,
       'email': email,
       'role': role,

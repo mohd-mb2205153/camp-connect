@@ -6,6 +6,7 @@ import 'package:campconnect/routes/app_router.dart';
 import 'package:campconnect/theme/constants.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
 import 'package:country_code_picker/country_code_picker.dart';
+import 'package:country_picker/country_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -36,6 +37,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final FocusNode passwordFocus = FocusNode();
   final FocusNode phoneFocus = FocusNode();
 
+  String userPhoneCode = '';
   String selectedNationality = "Nationality";
   String selectedDateOfBirth = "Date of Birth";
 
@@ -64,13 +66,28 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     txtPhoneNumberController = TextEditingController();
   }
 
-  bool isAllFilled() => [
-        txtFirstNameController,
-        txtLastNameController,
-        txtEmailController,
-        txtPasswordController,
-        txtPhoneNumberController,
-      ].every((controller) => controller.text.isNotEmpty);
+  bool isAllFilled() {
+    bool areTextFieldsFilled = [
+      txtFirstNameController,
+      txtLastNameController,
+      txtEmailController,
+      txtPasswordController,
+      txtPhoneNumberController,
+    ].every((controller) => controller.text.isNotEmpty);
+
+    bool hasSelectedLanguages = selectedLanguages.isNotEmpty;
+
+    bool hasValidDateOfBirth = selectedDateOfBirth != "Date of Birth" &&
+        selectedDateOfBirth.isNotEmpty;
+
+    bool hasValidNationality =
+        selectedNationality != "Nationality" && selectedNationality.isNotEmpty;
+
+    return areTextFieldsFilled &&
+        hasSelectedLanguages &&
+        hasValidDateOfBirth &&
+        hasValidNationality;
+  }
 
   Future<void> loadDropdownData() async {
     final countriesJson = await DefaultAssetBundle.of(context)
@@ -102,44 +119,24 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     phoneFocus.dispose();
     super.dispose();
   }
-  // void clearAll() {
-  //   for (var controller in [
-  //     txtFirstNameController,
-  //     txtLastNameController,
-  //     txtEmailController,
-  //     txtPasswordController,
-  //     txtPhoneNumberController,
-  //     firstNameFocus,
-  //     emailFocus,
-  //     passwordFocus,
-  //     phoneFocus
-  //   ]) {
-  //     controller.clear();
-  //   }
-  // }
 
-  void handleUser(BuildContext context) {
-    if (!isAllFilled()) {
+  bool handleUser(BuildContext context) {
+    void showCustomSnackBar(String message,
+        {Color? backgroundColor, IconData? icon}) {
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('All fields are required.')));
-      return;
+        CustomSnackBar.create(
+          message: message,
+          backgroundColor: backgroundColor,
+          icon: icon,
+        ),
+      );
     }
-    User user = User(
-        firstName: txtFirstNameController.text,
-        lastName: txtLastNameController.text,
-        dateOfBirth: DateTime.now(),
-        nationality: selectedNationality,
-        primaryLanguages: selectedLanguages,
-        phoneCode: "",
-        countryCode: "",
-        mobileNumber: txtPhoneNumberController.text,
-        email: txtEmailController.text,
-        role: "user");
 
-    ref.read(userNotifierProvider.notifier).addUser(user);
-    // clearAll();
-    ScaffoldMessenger.of(context)
-        .showSnackBar(const SnackBar(content: Text('User Added.')));
+    if (!isAllFilled()) {
+      showCustomSnackBar('All fields are required.');
+      return false;
+    }
+    return true;
   }
 
   @override
@@ -315,28 +312,57 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   Widget buildPhoneField() {
     return Row(
       children: [
-        Container(
-          decoration: BoxDecoration(
-            color: AppColors.lightTeal,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: CountryCodePicker(
-            textStyle: getTextStyle("small", color: Colors.white),
-            hideSearch: true,
-            onChanged: (code) {},
-            initialSelection: 'QA',
-            showFlag: true,
-            showFlagDialog: true,
+        GestureDetector(
+          onTap: () {
+            showCountryPicker(
+              context: context,
+              useSafeArea: true,
+              showPhoneCode: true,
+              onSelect: (Country country) {
+                setState(() {
+                  userPhoneCode = country.phoneCode;
+                });
+              },
+              countryListTheme: CountryListThemeData(
+                bottomSheetHeight: screenHeight(context) * .7,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(40.0),
+                  topRight: Radius.circular(40.0),
+                ),
+              ),
+              showSearch: false,
+            );
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              color: AppColors.lightTeal,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  userPhoneCode.isNotEmpty ? "+$userPhoneCode" : "Phone Code",
+                  style: getTextStyle("smallBold", color: Colors.white),
+                ),
+                addHorizontalSpace(8),
+                Icon(
+                  Icons.arrow_drop_down,
+                  color: Colors.white,
+                )
+              ],
+            ),
           ),
         ),
-        addHorizontalSpace(12),
-        addHorizontalSpace(8),
+        const SizedBox(width: 12),
         Expanded(
           child: buildTextField(
             controller: txtPhoneNumberController,
-            hintText: "Phone Number",
-            prefixIcon: const Icon(Icons.phone, color: Colors.grey),
             focusNode: phoneFocus,
+            keyboardType: TextInputType.phone,
+            hintText: 'Phone Number',
+            prefixIcon: const Icon(Icons.phone, color: Colors.grey),
           ),
         ),
       ],
@@ -562,8 +588,25 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           height: 44,
           child: ElevatedButton(
             onPressed: () {
-              context.pushNamed(AppRouter.role.name);
-              handleUser(context);
+              if (handleUser(context)) {
+                final user = User(
+                  firstName: txtFirstNameController.text,
+                  lastName: txtLastNameController.text,
+                  dateOfBirth: parseCustomDate(selectedDateOfBirth),
+                  nationality: selectedNationality,
+                  primaryLanguages: selectedLanguages,
+                  phoneCode: userPhoneCode,
+                  mobileNumber: txtPhoneNumberController.text,
+                  email: txtEmailController.text,
+                  role: '',
+                );
+                debugPrint(user.toString());
+
+                context.pushNamed(
+                  AppRouter.role.name,
+                  extra: user, // Pass the user object
+                );
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.lightTeal,
@@ -580,5 +623,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         ),
       ),
     );
+  }
+
+  DateTime parseCustomDate(String dateString) {
+    final parts = dateString.split('/');
+    if (parts.length == 3) {
+      final day = int.parse(parts[0]);
+      final month = int.parse(parts[1]);
+      final year = int.parse(parts[2]);
+      return DateTime(year, month, day);
+    } else {
+      throw FormatException('Invalid date format: $dateString');
+    }
   }
 }

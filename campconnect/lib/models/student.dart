@@ -3,7 +3,6 @@ import 'user.dart';
 
 class Student extends User {
   String guardianContact; // For students under 15
-  String guardianCountryCode;
   String guardianPhoneCode;
   String currentEducationLevel; // e.g., Primary, Secondary, High School
   List<String> preferredSubjects; // e.g., Math, Science
@@ -19,12 +18,10 @@ class Student extends User {
     required super.dateOfBirth,
     required super.nationality,
     required super.primaryLanguages,
-    required super.countryCode,
     required super.phoneCode,
     required super.mobileNumber,
     required super.email,
     required this.guardianContact,
-    required this.guardianCountryCode,
     required this.guardianPhoneCode,
     required this.currentEducationLevel,
     required this.preferredSubjects,
@@ -37,6 +34,32 @@ class Student extends User {
           role: 'student',
         );
 
+  @override
+  String toString() {
+    return '''
+Student(
+  id: $id,
+  firstName: $firstName,
+  lastName: $lastName,
+  dateOfBirth: $dateOfBirth,
+  nationality: $nationality,
+  primaryLanguages: $primaryLanguages,
+  phoneCode: $phoneCode,
+  mobileNumber: $mobileNumber,
+  email: $email,
+  guardianContact: $guardianContact,
+  guardianPhoneCode: $guardianPhoneCode,
+  currentEducationLevel: $currentEducationLevel,
+  preferredSubjects: $preferredSubjects,
+  learningGoals: $learningGoals,
+  specialNeeds: $specialNeeds,
+  preferredDistanceForCamps: $preferredDistanceForCamps,
+  savedCamps: $savedCamps,
+  role: $role
+)
+''';
+  }
+
   factory Student.fromJson(Map<String, dynamic> json) {
     return Student(
       id: json['id'],
@@ -46,12 +69,10 @@ class Student extends User {
       nationality: json['nationality'],
       primaryLanguages: List<String>.from(json['primaryLanguages']),
       phoneCode: json['phoneCode'],
-      countryCode: json['countryCode'],
       mobileNumber: json['mobileNumber'],
       email: json['email'] ?? '',
       guardianContact: json['guardianContact'],
       guardianPhoneCode: json['guardianPhoneCode'],
-      guardianCountryCode: json['guardianCountryCode'],
       currentEducationLevel: json['currentEducationLevel'],
       preferredSubjects: List<String>.from(json['preferredSubjects']),
       learningGoals: json['learningGoals'] ?? '',
@@ -68,7 +89,6 @@ class Student extends User {
     return super.toJson()
       ..addAll({
         'guardianContact': guardianContact,
-        'guardianCountryCode': guardianCountryCode,
         'guardianPhoneCode': guardianPhoneCode,
         'currentEducationLevel': currentEducationLevel,
         'preferredSubjects': preferredSubjects,
@@ -77,5 +97,38 @@ class Student extends User {
         'preferredDistanceForCamps': preferredDistanceForCamps,
         'savedCamps': savedCamps,
       });
+  }
+
+  Student copyWith({
+    String? guardianContact,
+    String? guardianPhoneCode,
+    String? currentEducationLevel,
+    List<String>? preferredSubjects,
+    String? learningGoals,
+    String? specialNeeds,
+    String? preferredDistanceForCamps,
+    List<String>? savedCamps,
+  }) {
+    return Student(
+      id: id,
+      firstName: firstName,
+      lastName: lastName,
+      dateOfBirth: dateOfBirth,
+      nationality: nationality,
+      primaryLanguages: primaryLanguages,
+      phoneCode: phoneCode,
+      mobileNumber: mobileNumber,
+      email: email,
+      guardianContact: guardianContact ?? this.guardianContact,
+      guardianPhoneCode: guardianPhoneCode ?? this.guardianPhoneCode,
+      currentEducationLevel:
+          currentEducationLevel ?? this.currentEducationLevel,
+      preferredSubjects: preferredSubjects ?? this.preferredSubjects,
+      learningGoals: learningGoals ?? this.learningGoals,
+      specialNeeds: specialNeeds ?? this.specialNeeds,
+      preferredDistanceForCamps:
+          preferredDistanceForCamps ?? this.preferredDistanceForCamps,
+      savedCamps: savedCamps ?? this.savedCamps,
+    );
   }
 }

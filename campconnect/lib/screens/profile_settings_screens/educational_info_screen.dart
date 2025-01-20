@@ -61,7 +61,6 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
       dateOfBirth: DateTime(1987, 11, 9),
       nationality: 'USA',
       primaryLanguages: ['English'],
-      countryCode: 'QA',
       mobileNumber: '30993067',
       phoneCode: '+974',
       email: 'mark@gmail.com',

@@ -1,9 +1,13 @@
 import 'dart:convert';
 
+import 'package:campconnect/models/student.dart';
+import 'package:campconnect/repositories/camp_connect_repo.dart';
 import 'package:campconnect/routes/app_router.dart';
 import 'package:campconnect/theme/constants.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:country_code_picker/country_code_picker.dart';
+import 'package:country_picker/country_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,7 +17,9 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import '../../providers/show_nav_bar_provider.dart';
 
 class StudentOnboardingScreen extends ConsumerStatefulWidget {
-  const StudentOnboardingScreen({super.key});
+  final Student student;
+
+  const StudentOnboardingScreen({super.key, required this.student});
 
   @override
   ConsumerState<StudentOnboardingScreen> createState() =>
@@ -28,6 +34,8 @@ class _StudentOnboardingScreenState
       TextEditingController();
   final TextEditingController txtLearningGoalsController =
       TextEditingController();
+
+  String emergencyUserPhoneCode = '';
 
   final FocusNode emergencyPhoneFocus = FocusNode();
   final FocusNode specialNeedsFocus = FocusNode();
@@ -76,6 +84,78 @@ class _StudentOnboardingScreenState
     learningGoalsFocus.dispose();
     pageController.dispose();
     super.dispose();
+  }
+
+  bool isAllFilled() {
+    return txtEmergencyPhoneNumberController.text.trim().isNotEmpty &&
+        emergencyUserPhoneCode.isNotEmpty &&
+        selectedEducationLevel != "Select Level" &&
+        selectedSubjects.isNotEmpty &&
+        selectedDistance != "Select Distance";
+  }
+
+  void handleRegisterStudent() async {
+    void showCustomSnackBar(String message,
+        {Color? backgroundColor, IconData? icon}) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        CustomSnackBar.create(
+          message: message,
+          backgroundColor: backgroundColor,
+          icon: icon,
+        ),
+      );
+    }
+
+    if (!isAllFilled()) {
+      showCustomSnackBar(
+        'All fields are required. Please complete the form.',
+        backgroundColor: AppColors.orange,
+        icon: Icons.error,
+      );
+      return;
+    }
+
+    try {
+      final student = widget.student.copyWith(
+        guardianContact: txtEmergencyPhoneNumberController.text.trim(),
+        guardianPhoneCode: emergencyUserPhoneCode,
+        specialNeeds: txtSpecialNeedsController.text.trim(),
+        learningGoals: txtLearningGoalsController.text.trim(),
+        currentEducationLevel: selectedEducationLevel,
+        preferredSubjects: selectedSubjects,
+        preferredDistanceForCamps: selectedDistance,
+      );
+
+      final repo = CampConnectRepo(
+        studentsRef: FirebaseFirestore.instance.collection('students'),
+        teachersRef: FirebaseFirestore.instance.collection('teachers'),
+        campsRef: FirebaseFirestore.instance.collection('camps'),
+        usersRef: FirebaseFirestore.instance.collection('users'),
+      );
+
+      await repo.addStudent(student);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Student registered successfully!",
+            style: getTextStyle("small", color: Colors.white),
+          ),
+          backgroundColor: AppColors.lightTeal,
+        ),
+      );
+    } catch (error) {
+      debugPrint("Error saving student: $error");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Failed to register student: $error",
+            style: getTextStyle("small", color: Colors.white),
+          ),
+          backgroundColor: AppColors.orange,
+        ),
+      );
+    }
   }
 
   @override
@@ -189,6 +269,7 @@ class _StudentOnboardingScreenState
                             curve: Curves.ease,
                           );
                         } else {
+                          handleRegisterStudent();
                           ref
                               .read(showNavBarNotifierProvider.notifier)
                               .setActiveBottomNavBar(0);
@@ -233,28 +314,60 @@ class _StudentOnboardingScreenState
         addVerticalSpace(8),
         Row(
           children: [
-            Container(
-              decoration: BoxDecoration(
-                color: AppColors.lightTeal,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: CountryCodePicker(
-                textStyle: getTextStyle("small", color: Colors.white),
-                hideSearch: true,
-                onChanged: (code) {},
-                initialSelection: 'QA',
-                showFlag: true,
-                showFlagDialog: true,
+            GestureDetector(
+              onTap: () {
+                showCountryPicker(
+                  context: context,
+                  useSafeArea: true,
+                  showPhoneCode: true,
+                  onSelect: (Country country) {
+                    setState(() {
+                      emergencyUserPhoneCode = country.phoneCode;
+                    });
+                  },
+                  countryListTheme: CountryListThemeData(
+                    bottomSheetHeight: screenHeight(context) * .7,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(40.0),
+                      topRight: Radius.circular(40.0),
+                    ),
+                  ),
+                  showSearch: false,
+                );
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: AppColors.lightTeal,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      emergencyUserPhoneCode.isNotEmpty
+                          ? "+$emergencyUserPhoneCode"
+                          : "Phone Code",
+                      style: getTextStyle("smallBold", color: Colors.white),
+                    ),
+                    addHorizontalSpace(8),
+                    Icon(
+                      Icons.arrow_drop_down,
+                      color: Colors.white,
+                    )
+                  ],
+                ),
               ),
             ),
-            addHorizontalSpace(12),
+            const SizedBox(width: 12),
             Expanded(
               child: buildTextField(
                 controller: txtEmergencyPhoneNumberController,
-                hintText: "Emergency Phone",
-                prefixIcon: const Icon(Icons.emergency, color: Colors.grey),
                 focusNode: emergencyPhoneFocus,
-                keyboardType: TextInputType.number,
+                keyboardType: TextInputType.phone,
+                hintText: 'Phone Number',
+                prefixIcon: const Icon(Icons.emergency, color: Colors.grey),
               ),
             ),
           ],
@@ -292,7 +405,7 @@ class _StudentOnboardingScreenState
         addVerticalSpace(8),
         buildTextArea(
           controller: txtSpecialNeedsController,
-          hintText: "Special Needs",
+          hintText: "Enter Special Needs",
           prefixIcon: const Icon(Icons.accessibility_new, color: Colors.grey),
           focusNode: specialNeedsFocus,
           keyboardType: TextInputType.text,
@@ -330,7 +443,7 @@ class _StudentOnboardingScreenState
         addVerticalSpace(8),
         buildTextArea(
           controller: txtLearningGoalsController,
-          hintText: "Learning Goals",
+          hintText: "Enter Goals",
           prefixIcon: const Icon(Icons.star, color: Colors.grey),
           focusNode: learningGoalsFocus,
           keyboardType: TextInputType.text,
@@ -417,7 +530,7 @@ class SecondPageContent extends StatelessWidget {
         ),
         addVerticalSpace(64),
         SizedBox(
-          height: 300,
+          height: 420,
           child: SingleChildScrollView(
             child: Column(
               children: [
@@ -459,7 +572,7 @@ class SecondPageContent extends StatelessWidget {
               Icon(Icons.book, color: Colors.grey),
               addHorizontalSpace(10),
               Text(
-                "Preferred Subjects",
+                "Select Subjects",
                 style: getTextStyle('medium', color: Colors.grey),
               ),
               const Spacer(),

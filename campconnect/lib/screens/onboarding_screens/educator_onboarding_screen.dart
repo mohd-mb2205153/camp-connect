@@ -1,17 +1,21 @@
 import 'dart:convert';
 import 'package:campconnect/routes/app_router.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
+import '../../models/teacher.dart';
 import '../../providers/show_nav_bar_provider.dart';
+import '../../repositories/camp_connect_repo.dart';
 import '../../theme/constants.dart';
 
 class EducatorOnboardingScreen extends ConsumerStatefulWidget {
-  const EducatorOnboardingScreen({super.key});
+  final Teacher teacher;
+  const EducatorOnboardingScreen({super.key, required this.teacher});
 
   @override
   ConsumerState<EducatorOnboardingScreen> createState() =>
@@ -81,6 +85,80 @@ class _EducatorOnboardingScreenState
     certificationFocus.dispose();
     pageController.dispose();
     super.dispose();
+  }
+
+  bool isAllFilled() {
+    return highestEducationLevel != "Select Education Level" &&
+        certifications.isNotEmpty &&
+        teachingExperience > 0 &&
+        areasOfExpertise.isNotEmpty &&
+        willingnessToTravel != "Select Distance" &&
+        availabilitySchedule != "Select Time" &&
+        preferredCampDuration != "Select Duration";
+  }
+
+  void handleRegisterTeacher() async {
+    void showCustomSnackBar(String message,
+        {Color? backgroundColor, IconData? icon}) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        CustomSnackBar.create(
+          message: message,
+          backgroundColor: backgroundColor,
+          icon: icon,
+        ),
+      );
+    }
+
+    if (!isAllFilled()) {
+      showCustomSnackBar(
+        'All fields are required. Please complete the form.',
+        backgroundColor: AppColors.orange,
+        icon: Icons.error,
+      );
+      return;
+    }
+
+    try {
+      final updatedTeacher = widget.teacher.copyWith(
+        highestEducationLevel: highestEducationLevel,
+        certifications: certifications,
+        teachingExperience: teachingExperience,
+        areasOfExpertise: areasOfExpertise,
+        willingnessToTravel: willingnessToTravel,
+        availabilitySchedule: "${fromTime.hour}:00 - ${toTime.hour}:00",
+        preferredCampDuration: preferredCampDuration,
+      );
+
+      final repo = CampConnectRepo(
+        studentsRef: FirebaseFirestore.instance.collection('students'),
+        teachersRef: FirebaseFirestore.instance.collection('teachers'),
+        campsRef: FirebaseFirestore.instance.collection('camps'),
+        usersRef: FirebaseFirestore.instance.collection('users'),
+      );
+
+      await repo.addTeacher(updatedTeacher);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Teacher registered successfully!",
+            style: getTextStyle("small", color: Colors.white),
+          ),
+          backgroundColor: AppColors.lightTeal,
+        ),
+      );
+    } catch (error) {
+      debugPrint("Error saving teacher: $error");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Failed to register teacher: $error",
+            style: getTextStyle("small", color: Colors.white),
+          ),
+          backgroundColor: AppColors.orange,
+        ),
+      );
+    }
   }
 
   @override
@@ -163,6 +241,7 @@ class _EducatorOnboardingScreenState
                             curve: Curves.ease,
                           );
                         } else {
+                          handleRegisterTeacher();
                           ref
                               .read(showNavBarNotifierProvider.notifier)
                               .setActiveBottomNavBar(0);

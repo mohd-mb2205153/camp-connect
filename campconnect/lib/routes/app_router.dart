@@ -1,4 +1,6 @@
 import 'package:campconnect/google_map.dart';
+import 'package:campconnect/models/student.dart';
+import 'package:campconnect/models/user.dart';
 import 'package:campconnect/screens/add_camp_location_screen.dart';
 import 'package:campconnect/screens/add_camp_screen.dart';
 import 'package:campconnect/screens/home_screen.dart';
@@ -13,6 +15,7 @@ import 'package:campconnect/screens/onboarding_screens/register_role_screen.dart
 import 'package:campconnect/screens/shell_screen.dart';
 import 'package:go_router/go_router.dart';
 
+import '../models/teacher.dart';
 import '../screens/onboarding_screens/register_screen.dart';
 import '../screens/onboarding_screens/student_onboarding_screen.dart';
 
@@ -64,20 +67,25 @@ class AppRouter {
               GoRoute(
                 path: role.path,
                 name: role.name,
-                builder: (context, state) => const RoleScreen(),
+                builder: (context, state) {
+                  final user = state.extra as User;
+                  return RoleScreen(user: user);
+                },
                 routes: [
                   GoRoute(
-                    path: studentOnboarding.path,
-                    name: studentOnboarding.name,
-                    builder: (context, state) =>
-                        const StudentOnboardingScreen(),
-                  ),
+                      path: studentOnboarding.path,
+                      name: studentOnboarding.name,
+                      builder: (context, state) {
+                        final student = state.extra as Student;
+                        return StudentOnboardingScreen(student: student);
+                      }),
                   GoRoute(
-                    path: educatorOnboarding.path,
-                    name: educatorOnboarding.name,
-                    builder: (context, state) =>
-                        const EducatorOnboardingScreen(),
-                  ),
+                      path: educatorOnboarding.path,
+                      name: educatorOnboarding.name,
+                      builder: (context, state) {
+                        final teacher = state.extra as Teacher;
+                        return EducatorOnboardingScreen(teacher: teacher);
+                      }),
                 ],
               ),
             ],

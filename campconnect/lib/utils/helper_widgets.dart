@@ -186,6 +186,35 @@ Widget buildBackground(String background) {
   );
 }
 
+class CustomSnackBar {
+  static SnackBar create({
+    required String message,
+    Color? backgroundColor,
+    IconData? icon,
+  }) {
+    return SnackBar(
+      content: Row(
+        children: [
+          if (icon != null) ...[
+            Icon(icon, color: Colors.white),
+            const SizedBox(width: 12),
+          ],
+          Expanded(
+            child: Text(
+              message,
+              style: getTextStyle(
+                "small",
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
+      backgroundColor: backgroundColor ?? Colors.orange,
+    );
+  }
+}
+
 class Assets {
   static const _imagesBasePath = "assets/images/";
   static String image(String fileName) => '$_imagesBasePath$fileName';

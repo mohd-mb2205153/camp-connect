@@ -19,7 +19,6 @@ class Teacher extends User {
     required super.dateOfBirth,
     required super.nationality,
     required super.primaryLanguages,
-    required super.countryCode,
     required super.phoneCode,
     required super.mobileNumber,
     super.email = '',
@@ -37,6 +36,33 @@ class Teacher extends User {
         teachingCamps = teachingCamps ?? [],
         super(role: 'teacher');
 
+  @override
+  String toString() {
+    return '''
+Teacher(
+  id: $id,
+  firstName: $firstName,
+  lastName: $lastName,
+  dateOfBirth: $dateOfBirth,
+  nationality: $nationality,
+  primaryLanguages: $primaryLanguages,
+  phoneCode: $phoneCode,
+  mobileNumber: $mobileNumber,
+  email: $email,
+  highestEducationLevel: $highestEducationLevel,
+  certifications: $certifications,
+  teachingExperience: $teachingExperience,
+  areasOfExpertise: $areasOfExpertise,
+  willingnessToTravel: $willingnessToTravel,
+  availabilitySchedule: $availabilitySchedule,
+  preferredCampDuration: $preferredCampDuration,
+  createdCamps: $createdCamps,
+  teachingCamps: $teachingCamps,
+  role: $role
+)
+''';
+  }
+
   factory Teacher.fromJson(Map<String, dynamic> json) {
     return Teacher(
       id: json['id'],
@@ -46,7 +72,6 @@ class Teacher extends User {
       nationality: json['nationality'],
       primaryLanguages: List<String>.from(json['primaryLanguages']),
       phoneCode: json['phoneCode'],
-      countryCode: json['countryCode'],
       mobileNumber: json['mobileNumber'],
       email: json['email'] ?? '',
       highestEducationLevel: json['highestEducationLevel'],
@@ -81,5 +106,49 @@ class Teacher extends User {
         'createdCamps': createdCamps,
         'teachingCamps': teachingCamps,
       });
+  }
+
+  Teacher copyWith({
+    String? id,
+    String? firstName,
+    String? lastName,
+    DateTime? dateOfBirth,
+    String? nationality,
+    List<String>? primaryLanguages,
+    String? phoneCode,
+    String? mobileNumber,
+    String? email,
+    String? highestEducationLevel,
+    List<String>? certifications,
+    int? teachingExperience,
+    List<String>? areasOfExpertise,
+    String? willingnessToTravel,
+    String? availabilitySchedule,
+    String? preferredCampDuration,
+    List<String>? createdCamps,
+    List<String>? teachingCamps,
+  }) {
+    return Teacher(
+      id: id ?? this.id,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
+      dateOfBirth: dateOfBirth ?? this.dateOfBirth,
+      nationality: nationality ?? this.nationality,
+      primaryLanguages: primaryLanguages ?? this.primaryLanguages,
+      phoneCode: phoneCode ?? this.phoneCode,
+      mobileNumber: mobileNumber ?? this.mobileNumber,
+      email: email ?? this.email,
+      highestEducationLevel:
+          highestEducationLevel ?? this.highestEducationLevel,
+      certifications: certifications ?? this.certifications,
+      teachingExperience: teachingExperience ?? this.teachingExperience,
+      areasOfExpertise: areasOfExpertise ?? this.areasOfExpertise,
+      willingnessToTravel: willingnessToTravel ?? this.willingnessToTravel,
+      availabilitySchedule: availabilitySchedule ?? this.availabilitySchedule,
+      preferredCampDuration:
+          preferredCampDuration ?? this.preferredCampDuration,
+      createdCamps: createdCamps ?? this.createdCamps,
+      teachingCamps: teachingCamps ?? this.teachingCamps,
+    );
   }
 }
