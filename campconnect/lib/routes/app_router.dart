@@ -121,12 +121,18 @@ class AppRouter {
               GoRoute(
                 name: viewSavedCamps.name,
                 path: viewSavedCamps.path,
-                builder: (context, state) => const ViewSavedCampsScreen(),
+                builder: (context, state) {
+                  final userId = state.extra as String;
+                  return ViewSavedCampsScreen(userId: userId);
+                },
               ),
               GoRoute(
                 name: viewTeachingCamps.name,
                 path: viewTeachingCamps.path,
-                builder: (context, state) => const ViewTeachingCampsScreen(),
+                builder: (context, state) {
+                  final userId = state.extra as String;
+                  return ViewTeachingCampsScreen(userId: userId);
+                },
               ),
               GoRoute(
                 name: addCampLocation.name,
@@ -153,7 +159,10 @@ class AppRouter {
               GoRoute(
                 path: viewCreatedCamps.path,
                 name: viewCreatedCamps.name,
-                builder: (context, state) => const ViewCreatedCampsScreen(),
+                builder: (context, state) {
+                  final userId = state.extra as String;
+                  return ViewCreatedCampsScreen(userId: userId);
+                },
               ),
               GoRoute(
                 path: viewClasses.path,

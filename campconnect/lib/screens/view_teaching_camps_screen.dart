@@ -5,7 +5,8 @@ import '../theme/constants.dart';
 import '../utils/helper_widgets.dart';
 
 class ViewTeachingCampsScreen extends ConsumerStatefulWidget {
-  const ViewTeachingCampsScreen({super.key});
+  final String userId;
+  const ViewTeachingCampsScreen({super.key, required this.userId});
 
   @override
   ConsumerState<ViewTeachingCampsScreen> createState() =>

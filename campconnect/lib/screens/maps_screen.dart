@@ -367,9 +367,12 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
             children: [
               IconButton(
                 onPressed: () {
+                  print(loggedUser.id);
                   isStudent
-                      ? context.pushNamed(AppRouter.viewSavedCamps.name)
-                      : context.pushNamed(AppRouter.viewCreatedCamps.name);
+                      ? context.pushNamed(AppRouter.viewSavedCamps.name,
+                          extra: loggedUser.id)
+                      : context.pushNamed(AppRouter.viewCreatedCamps.name,
+                          extra: loggedUser.id);
                 },
                 icon: Image.asset(
                   "assets/images/tent_icon_white.png",

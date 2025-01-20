@@ -1,3 +1,4 @@
+import 'package:campconnect/models/camp.dart';
 import 'package:campconnect/models/teacher.dart';
 import 'package:campconnect/providers/repo_provider.dart';
 import 'package:campconnect/repositories/camp_connect_repo.dart';
@@ -9,17 +10,17 @@ class TeacherProvider extends AsyncNotifier<List<Teacher>> {
   @override
   Future<List<Teacher>> build() async {
     _repo = await ref.watch(repoProvider.future);
-    initializeTeachers();
-    return [];
+    final initialData = await _repo.observeTeachers().first;
+    observeTeachers();
+
+    return initialData;
   }
 
-  Future<void> initializeTeachers() async {
+  void observeTeachers() {
     _repo.observeTeachers().listen((teachers) {
       state = AsyncData(teachers);
-    }).onError((error) => print(error));
+    }).onError((error) => state = AsyncError(error, StackTrace.current));
   }
-
-  Future<Teacher?> getTeacherById(String id) => _repo.getTeacherById(id);
 
   Future<List<Teacher>> getTeachersByCampId(String campId) async {
     try {
@@ -65,6 +66,15 @@ class TeacherProvider extends AsyncNotifier<List<Teacher>> {
       state = AsyncError(e, StackTrace.current);
     }
   }
+
+  Future<List<Camp>> getCreatedCamps(String teacherId) async {
+    try {
+      return await _repo.getCreatedCampsByTeacherId(teacherId);
+    } catch (e) {
+      state = AsyncError(e, StackTrace.current);
+      rethrow;
+    }
+  }
 }
 
 final teacherProviderNotifier =
@@ -73,6 +83,18 @@ final teacherProviderNotifier =
 
 final teachersByCampIdProvider =
     FutureProvider.family<List<Teacher>, String>((ref, campId) async {
-  final repo = ref.read(teacherProviderNotifier.notifier);
+  final repo = await ref.watch(repoProvider.future);
   return repo.getTeachersByCampId(campId);
+});
+
+final createdCampsProvider =
+    FutureProvider.family<List<Camp>, String>((ref, teacherId) async {
+  final repo = await ref.watch(repoProvider.future);
+  return repo.getCreatedCampsByTeacherId(teacherId);
+});
+
+final teachingCampsProvider =
+    FutureProvider.family<List<Camp>, String>((ref, teacherId) async {
+  final repo = await ref.watch(repoProvider.future);
+  return repo.getTeachingCampsByTeacherId(teacherId);
 });

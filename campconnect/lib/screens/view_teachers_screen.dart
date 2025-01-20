@@ -6,7 +6,6 @@ import 'package:campconnect/providers/teacher_provider.dart';
 import 'package:campconnect/theme/constants.dart';
 import '../providers/show_nav_bar_provider.dart';
 import '../widgets/empty_screen.dart';
-import '../widgets/icon_container.dart';
 
 class ViewTeachersScreen extends ConsumerStatefulWidget {
   final String campId;
@@ -49,13 +48,12 @@ class _ViewTeachersScreenState extends ConsumerState<ViewTeachersScreen> {
       body: SizedBox.expand(
         child: Stack(
           children: [
-            buildBackground("bg12"), // Add your background here
+            buildBackground("bg12"),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8),
               child: Column(
                 children: [
                   Expanded(child: TeacherList(campId: widget.campId)),
-                  const SizedBox(height: 10),
                 ],
               ),
             ),
@@ -73,6 +71,7 @@ class TeacherList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final teachers = ref.watch(teachersByCampIdProvider(campId));
+    print(teachers);
     return teachers.when(
       data: (teacherList) {
         return teacherList.isEmpty
