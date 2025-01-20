@@ -21,6 +21,15 @@ class TeacherProvider extends AsyncNotifier<List<Teacher>> {
 
   Future<Teacher?> getTeacherById(String id) => _repo.getTeacherById(id);
 
+  Future<List<Teacher>> getTeachersByCampId(String campId) async {
+    try {
+      return await _repo.getTeachersByCampId(campId);
+    } catch (e) {
+      state = AsyncError(e, StackTrace.current);
+      rethrow;
+    }
+  }
+
   void addTeacher(Teacher teacher) {
     _repo.addTeacher(teacher);
   }
@@ -61,3 +70,9 @@ class TeacherProvider extends AsyncNotifier<List<Teacher>> {
 final teacherProviderNotifier =
     AsyncNotifierProvider<TeacherProvider, List<Teacher>>(
         () => TeacherProvider());
+
+final teachersByCampIdProvider =
+    FutureProvider.family<List<Teacher>, String>((ref, campId) async {
+  final repo = ref.read(teacherProviderNotifier.notifier);
+  return repo.getTeachersByCampId(campId);
+});

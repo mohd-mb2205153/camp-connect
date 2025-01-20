@@ -607,7 +607,7 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
           children: [
             _buildHeader(context),
             addVerticalSpace(12),
-            _buildOptions(context),
+            _buildOptions(context, widget.camp.id),
             addVerticalSpace(12),
             _buildStatusOfResources(),
             addVerticalSpace(12),
@@ -684,7 +684,7 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
     );
   }
 
-  Widget _buildOptions(BuildContext context) {
+  Widget _buildOptions(BuildContext context, String? campId) {
     final options = [
       {
         "label": "Directions",
@@ -694,12 +694,16 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
       {
         "label": "Teachers",
         "icon": Icons.person,
-        "onPressed": () => context.goNamed(AppRouter.viewTeachers.name),
+        "onPressed": () {
+          print(campId);
+          context.goNamed(AppRouter.viewTeachers.name, extra: campId);
+        },
       },
       {
         "label": "Classes",
         "icon": Icons.class_,
-        "onPressed": () => context.goNamed(AppRouter.viewClasses.name),
+        "onPressed": () =>
+            context.goNamed(AppRouter.viewClasses.name, extra: campId),
       },
       {
         "label": "Images",
