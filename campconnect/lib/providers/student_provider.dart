@@ -1,3 +1,8 @@
+import 'package:campconnect/models/student.dart';
+import 'package:campconnect/providers/repo_provider.dart';
+import 'package:campconnect/repositories/camp_connect_repo.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 class StudentProvider extends AsyncNotifier<List<Student>> {
   late final CampConnectRepo _repo;
 

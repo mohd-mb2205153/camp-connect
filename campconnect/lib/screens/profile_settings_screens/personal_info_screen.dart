@@ -2,7 +2,10 @@ import 'package:campconnect/models/student.dart';
 import 'package:campconnect/models/teacher.dart';
 import 'package:campconnect/models/user.dart';
 import 'package:campconnect/providers/json_provider.dart';
+import 'package:campconnect/providers/loggedinuser_provider.dart';
 import 'package:campconnect/providers/show_nav_bar_provider.dart';
+import 'package:campconnect/providers/student_provider.dart';
+import 'package:campconnect/providers/teacher_provider.dart';
 import 'package:campconnect/theme/frosted_glass.dart';
 import 'package:campconnect/theme/constants.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
@@ -29,8 +32,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
   String? guardianPhoneCode;
   List<String> selectedLanguages = [];
 
-  dynamic
-      user; //Testing for now, later we will get user that is logged in thru provider.
+  dynamic user;
 
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
@@ -43,46 +45,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
   @override
   void initState() {
     super.initState();
-    //Dummy value
-    user = Student(
-      phoneCode: '+974',
-      guardianPhoneCode: '+974',
-      firstName: 'Ahmad',
-      lastName: 'John',
-      dateOfBirth: DateTime(2004, 11, 9),
-      nationality: 'Iraq',
-      primaryLanguages: ['Arabic', 'English'],
-      mobileNumber: '3033067',
-      email: 'enter@gmail.com',
-      currentEducationLevel: 'High School',
-      savedCamps: [],
-      guardianContact: '44450699',
-      preferredDistanceForCamps: '',
-      preferredSubjects: [],
-      learningGoals:
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-      specialNeeds: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
-    );
-
-    // user = Teacher(
-    //   firstName: 'Mark',
-    //   lastName: 'Johnny',
-    //   dateOfBirth: DateTime(1987, 11, 9),
-    //   nationality: 'Qatar',
-    //   primaryLanguages: ['English', 'Arabic'],
-    //   countryCode: 'QA',
-    //   mobileNumber: '30993067',
-    //   phoneCode: '+974',
-    //   email: 'mark@gmail.com',
-    //   enrolledCamps: [],
-    //   areasOfExpertise: [],
-    //   availabilitySchedule: '',
-    //   certifications: [],
-    //   highestEducationLevel: 'Master Degree',
-    //   preferredCampDuration: '',
-    //   teachingExperience: 16,
-    //   willingnessToTravel: '',
-    // );
+    user = ref.read(loggedInUserNotifierProvider);
     selectedLanguages = user.primaryLanguages;
   }
 
@@ -154,6 +117,25 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
     );
   }
 
+  void handleUpdate(User user) {
+    user.firstName = firstNameController.text;
+    user.lastName = lastNameController.text;
+    user.nationality = selectedCountry!;
+    user.dateOfBirth = DateTime.parse(dateOfBirth!);
+    user.email = emailController.text;
+    user.mobileNumber = mobileController.text;
+    user.phoneCode = userPhoneCode!;
+    user.primaryLanguages = List<String>.from(selectedLanguages);
+    if (user is Student) {
+      user.guardianPhoneCode = guardianPhoneCode!;
+      user.guardianContact = guardianMobileController.text;
+      user.specialNeeds = specialNeedsController.text;
+      ref.read(studentProviderNotifier.notifier).updateStudent(user);
+    } else if (user is Teacher) {
+      ref.read(teacherProviderNotifier.notifier).updateTeacher(user);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -192,7 +174,14 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
               onPressed: () {
                 setState(() {
                   if (isEditing) {
-                    // UPDATE USER
+                    handleUpdate(user);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      CustomSnackBar.create(
+                        message: 'Personal Details Updated',
+                        backgroundColor: AppColors.lightTeal,
+                        icon: Icons.task_alt,
+                      ),
+                    );
                   }
                   isEditing = !isEditing;
                   if (isEditing) {
@@ -549,7 +538,17 @@ class SpecialNeedsSection extends StatelessWidget {
             type: TextInputType.multiline,
             maxLines: 2,
           ),
-        if (!isEditing) Text(user.specialNeeds),
+        if (!isEditing)
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              user.specialNeeds,
+              style: getTextStyle(
+                'small',
+                color: AppColors.darkBlue,
+              ),
+            ),
+          ),
       ],
     );
   }
