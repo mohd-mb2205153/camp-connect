@@ -56,7 +56,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
       mobileNumber: '3033067',
       email: 'enter@gmail.com',
       currentEducationLevel: 'High School',
-      enrolledCamps: [],
+      savedCamps: [],
       guardianContact: '44450699',
       guardianCountryCode: 'IN',
       preferredDistanceForCamps: '',

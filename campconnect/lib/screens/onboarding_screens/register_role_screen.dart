@@ -90,7 +90,9 @@ class StudentButton extends StatelessWidget {
         width: double.infinity,
         height: 44,
         child: ElevatedButton(
-          onPressed: () => context.pushNamed(AppRouter.studentOnboarding.name),
+          onPressed: () {
+            context.pushNamed(AppRouter.studentOnboarding.name);
+          },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.white,
             shape: RoundedRectangleBorder(
