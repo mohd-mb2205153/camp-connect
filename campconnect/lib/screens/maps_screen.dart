@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:campconnect/models/camp.dart';
+import 'package:campconnect/models/teacher.dart';
+import 'package:campconnect/models/user.dart';
 import 'package:campconnect/providers/camp_provider.dart';
 import 'package:campconnect/providers/class_provider.dart';
 import 'package:campconnect/providers/student_provider.dart';
@@ -566,8 +568,11 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
   @override
   void initState() {
     super.initState();
-    isSaved = ref.read(studentProviderNotifier.notifier).isSavedCamp(
-        ref.read(loggedInUserNotifierProvider) as Student, widget.camp.id!);
+    User? user = ref.read(loggedInUserNotifierProvider);
+    if (user is Student) {
+      isSaved = ref.read(studentProviderNotifier.notifier).isSavedCamp(
+          ref.read(loggedInUserNotifierProvider) as Student, widget.camp.id!);
+    }
   }
 
   void toggleSaveCamp() async {
