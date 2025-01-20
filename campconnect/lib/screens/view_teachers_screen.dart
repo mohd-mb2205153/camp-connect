@@ -47,7 +47,7 @@ class _ViewTeachersScreenState extends ConsumerState<ViewTeachersScreen> {
             },
           ),
           title: Text(
-            'View Teaching Camps',
+            'View Teachers',
             style: getTextStyle("mediumBold", color: Colors.white),
           ),
         ),

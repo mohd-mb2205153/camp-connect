@@ -13,6 +13,8 @@ import 'package:campconnect/screens/profile_settings_screens/personal_info_scree
 import 'package:campconnect/screens/profile_settings_screens/profile_screen.dart';
 import 'package:campconnect/screens/onboarding_screens/register_role_screen.dart';
 import 'package:campconnect/screens/shell_screen.dart';
+import 'package:campconnect/screens/view_classes_screen.dart';
+import 'package:campconnect/screens/view_teachers_screen.dart';
 import 'package:go_router/go_router.dart';
 
 import '../models/teacher.dart';
@@ -38,11 +40,15 @@ class AppRouter {
   static const profile = (name: 'profile', path: '/profile');
   static const notifications = (name: 'notifications', path: '/notifications');
 
-  // View Camp Routes
+  // Viewing Routes
   static const viewSavedCamps =
       (name: 'viewSavedCamps', path: '/viewSavedCamps');
   static const viewTeachingCamps =
       (name: 'viewTeachingCamps', path: '/viewTeachingCamps');
+  static const viewCreatedCamps =
+      (name: 'viewCreatedCamps', path: '/viewCreatedCamps');
+  static const viewTeachers = (name: 'viewTeachers', path: '/viewTeachers');
+  static const viewClasses = (name: 'viewClasses', path: '/viewClasses');
 
   // Add Camp Routes
   static const addCampLocation =
@@ -142,6 +148,23 @@ class AppRouter {
             name: map.name,
             path: map.path,
             builder: (context, state) => const MapsScreen(),
+            routes: [
+              GoRoute(
+                path: viewCreatedCamps.path,
+                name: viewCreatedCamps.name,
+                builder: (context, state) => const ViewCreatedCampsScreen(),
+              ),
+              GoRoute(
+                path: viewClasses.path,
+                name: viewClasses.name,
+                builder: (context, state) => const ViewClassesScreen(),
+              ),
+              GoRoute(
+                path: viewTeachers.path,
+                name: viewTeachers.name,
+                builder: (context, state) => const ViewTeachersScreen(),
+              ),
+            ],
           ),
           GoRoute(
             name: profile.name,

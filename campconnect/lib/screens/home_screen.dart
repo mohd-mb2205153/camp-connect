@@ -24,6 +24,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    initializeUserDetails();
+  }
+
+  void initializeUserDetails() {
     Future.microtask(() {
       final userNotifier = ref.read(loggedInUserNotifierProvider.notifier);
 

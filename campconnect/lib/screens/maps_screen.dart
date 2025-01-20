@@ -11,6 +11,9 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:group_button/group_button.dart';
 
+import '../providers/loggedinuser_provider.dart';
+import '../providers/show_nav_bar_provider.dart';
+
 class MapsScreen extends ConsumerStatefulWidget {
   const MapsScreen({super.key});
 
@@ -19,6 +22,10 @@ class MapsScreen extends ConsumerStatefulWidget {
 }
 
 class _MapsScreenState extends ConsumerState<MapsScreen> {
+  bool isStudent = false;
+  bool isTeacher = false;
+  dynamic loggedUser;
+
   GoogleMapController? _googleMapController;
   static const CameraPosition initialCameraPosition =
       CameraPosition(target: LatLng(25.3, 51.487), zoom: 10);
@@ -39,6 +46,26 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
     super.initState();
     _loadCustomIcons();
     _startLiveLocationUpdates();
+    initializeUserDetails();
+  }
+
+  void initializeUserDetails() {
+    Future.microtask(() {
+      final userNotifier = ref.read(loggedInUserNotifierProvider.notifier);
+
+      isStudent = userNotifier.isStudent;
+      isTeacher = userNotifier.isTeacher;
+
+      if (isStudent) {
+        loggedUser = userNotifier.student;
+      } else if (isTeacher) {
+        loggedUser = userNotifier.teacher;
+      }
+
+      ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(true);
+
+      setState(() {});
+    });
   }
 
   @override
