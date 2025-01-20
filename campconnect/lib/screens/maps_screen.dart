@@ -16,6 +16,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:group_button/group_button.dart';
 
+import '../models/student.dart';
 import '../providers/loggedinuser_provider.dart';
 import '../providers/show_nav_bar_provider.dart';
 
@@ -101,9 +102,9 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
   @override
   Widget build(BuildContext context) {
     ref.watch(loggedInUserNotifierProvider);
-    final student = ref.watch(studentProviderNotifier);
-    final teacher = ref.watch(teacherProviderNotifier);
-    final classSchedule = ref.watch(classProviderNotifier);
+    // final student = ref.watch(studentProviderNotifier);
+    // final teacher = ref.watch(teacherProviderNotifier);
+    // final classSchedule = ref.watch(classProviderNotifier);
 
     return ref.watch(campProviderNotifier).when(
           data: (data) => _buildMapScreen(context, data),
@@ -169,9 +170,18 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
   Widget _buildMapScreen(BuildContext context, List<Camp> data) {
     markers.addAll(createMarkers(data));
 
+    Camp? selectedCamp;
+    if (polyLineCordinates.isNotEmpty) {
+      selectedCamp = data.firstWhere(
+        (camp) =>
+            camp.latitude == destinationCampLocation.latitude &&
+            camp.longitude == destinationCampLocation.longitude,
+      );
+    }
+
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: _buildTransparentAppBar(),
+      appBar: _buildAppBar(camp: selectedCamp),
       body: Stack(
         children: [
           _buildGoogleMap(),
@@ -190,11 +200,19 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
     );
   }
 
-  AppBar _buildTransparentAppBar() {
-    return AppBar(
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-    );
+  AppBar _buildAppBar({Camp? camp}) {
+    return polyLineCordinates.isEmpty
+        ? AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+          )
+        : AppBar(
+            backgroundColor: AppColors.teal,
+            title: Text(
+              "Directions to ${camp?.name ?? ''}",
+              style: getTextStyle("mediumBold", color: Colors.white),
+            ),
+          );
   }
 
   GoogleMap _buildGoogleMap() {
@@ -235,7 +253,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _buildHeaderButtons(context),
+          _buildHeaderContent(context),
           addVerticalSpace(12),
           _buildLastUpdatedText(),
         ],
@@ -243,7 +261,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
     );
   }
 
-  Widget _buildHeaderButtons(BuildContext context) {
+  Widget _buildHeaderContent(BuildContext context) {
     return polyLineCordinates.isEmpty
         ? Row(
             children: [
@@ -404,7 +422,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
 
   Positioned _routeCancelButton(BuildContext context) {
     return Positioned(
-      bottom: 80,
+      bottom: 60,
       left: 0,
       right: 0,
       child: Center(
@@ -523,7 +541,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
   }
 }
 
-class CampDetailsModal extends StatelessWidget {
+class CampDetailsModal extends ConsumerStatefulWidget {
   final Camp camp;
   final VoidCallback onDirectionsPressed;
   final bool isStudent;
@@ -536,306 +554,279 @@ class CampDetailsModal extends StatelessWidget {
   });
 
   @override
+  ConsumerState<CampDetailsModal> createState() => _CampDetailsModalState();
+}
+
+class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
+  late bool isSaved;
+
+  @override
+  void initState() {
+    super.initState();
+    final loggedInUser = ref.read(loggedInUserNotifierProvider) as Student?;
+    isSaved = loggedInUser?.savedCamps.contains(widget.camp.id) ?? false;
+  }
+
+  void toggleSaveCamp() async {
+    final loggedInUser = ref.read(loggedInUserNotifierProvider);
+
+    if (loggedInUser is! Student) return;
+
+    final studentNotifier = ref.read(loggedInUserNotifierProvider.notifier);
+
+    setState(() {
+      isSaved = !isSaved;
+    });
+
+    try {
+      if (isSaved) {
+        loggedInUser.savedCamps.add(widget.camp.id!);
+      } else {
+        loggedInUser.savedCamps.remove(widget.camp.id!);
+      }
+
+      await studentNotifier.updateStudent(loggedInUser);
+    } catch (e) {
+      setState(() {
+        isSaved = !isSaved;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error updating saved camps: $e")),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final List<String>? additionalSupport = camp.additionalSupport;
-    final List<String>? languages = camp.languages;
-
-    final List<Map<String, dynamic>> options = [
-      {
-        "label": "Directions",
-        "icon": Icons.directions,
-        "onPressed": onDirectionsPressed
-      },
-      {
-        "label": "Teachers",
-        "icon": Icons.person,
-        "onPressed": () {
-          context.goNamed(AppRouter.viewTeachers.name);
-        },
-      },
-      {
-        "label": "Classes",
-        "icon": Icons.class_,
-        "onPressed": () {
-          context.goNamed(AppRouter.viewClasses.name);
-        },
-      },
-      {
-        "label": "Images",
-        "icon": Icons.image,
-        "onPressed": () {
-          print("opening images");
-        },
-      },
-      {
-        "label": "Facilities",
-        "icon": Icons.build,
-        "onPressed": () {
-          print("opening facilities");
-        },
-      },
-      {
-        "label": "Contact Information",
-        "icon": Icons.contact_mail,
-        "onPressed": () {
-          print("opening contact information");
-        },
-      },
-    ];
-
     return SizedBox(
       height: 500,
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      addVerticalSpace(12),
-                      Row(
-                        children: [
-                          Image.asset(
-                            'assets/images/tent_icon_teal.png',
-                            height: 24,
-                            width: 24,
-                            fit: BoxFit.contain,
-                          ),
-                          addHorizontalSpace(12),
-                          Text(
-                            camp.name,
-                            style: getTextStyle("largeBold",
-                                color: AppColors.teal),
-                          ),
-                        ],
-                      ),
-                      addVerticalSpace(8),
-                      Row(
-                        children: [
-                          SizedBox(
-                            child: Text(
-                              wrapText(camp.description, 50),
-                              style:
-                                  getTextStyle("small", color: Colors.black38),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  const Spacer(),
-                  Material(
-                    elevation: 2,
-                    shape: const CircleBorder(),
-                    color: const Color.fromARGB(255, 247, 247, 247),
-                    child: SizedBox(
-                      height: 36,
-                      child: IconButton(
-                        onPressed: () {
-                          // isStudent? firebase add camp to the list of student.savedCamps
-                        },
-                        icon: SizedBox(
-                          child: Icon(
-                            isStudent ? Icons.bookmark : Icons.share,
-                            color: AppColors.lightTeal,
-                            size: 20,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 50,
-              child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: options.asMap().entries.map((entry) {
-                      int index = entry.key;
-                      final option = entry.value;
-                      final label = option["label"] as String;
-                      final icon = option["icon"] as IconData;
-                      final onPressed = option["onPressed"] as VoidCallback;
-                      return Padding(
-                        padding: index == 0
-                            ? const EdgeInsets.symmetric(horizontal: 8)
-                            : const EdgeInsets.only(right: 8),
-                        child: ElevatedButton.icon(
-                          onPressed: onPressed,
-                          icon: Icon(
-                            icon,
-                            size: 16,
-                            color: Colors.white,
-                          ),
-                          label: Text(
-                            label,
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            elevation: 0,
-                            backgroundColor: label == "Directions"
-                                ? AppColors.orange
-                                : AppColors.lightTeal,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            minimumSize: const Size(140, 40),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  )),
-            ),
+            _buildHeader(context),
             addVerticalSpace(12),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: AppColors.teal,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.info,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            "Status of Resources",
-                            style:
-                                getTextStyle("mediumBold", color: Colors.white),
-                          ),
-                        ],
-                      ),
-                      addVerticalSpace(8),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              camp.statusOfResources,
-                              style: getTextStyle("small", color: Colors.white),
-                            ),
-                          ),
-                        ],
-                      ),
-                      addVerticalSpace(4),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+            _buildOptions(context),
             addVerticalSpace(12),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Column(
-                children: [
-                  Text(
-                    "Additional Support",
-                    style: getTextStyle(
-                      "mediumBold",
-                      color: AppColors.teal,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            _buildStatusOfResources(),
             addVerticalSpace(12),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: SizedBox(
-                height: 50,
-                child: Wrap(
-                  children: (additionalSupport ?? []).map((support) {
-                    return Padding(
-                      padding: additionalSupport?.indexOf(support) == 0
-                          ? EdgeInsets.symmetric(horizontal: 8)
-                          : EdgeInsets.only(right: 8),
-                      child: Chip(
-                        backgroundColor: AppColors.lightTeal,
-                        avatar: Icon(
-                          getIcon(support),
-                          color: Colors.white,
-                        ),
-                        label: Text(
-                          support,
-                          style: getTextStyle('small', color: Colors.white),
-                        ),
-                        shape: RoundedRectangleBorder(
-                          side: const BorderSide(
-                            color: Colors.transparent,
-                          ),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
-            ),
+            _buildSectionTitle("Additional Support"),
+            _buildChips(widget.camp.additionalSupport, getIcon),
             addVerticalSpace(12),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Column(
-                children: [
-                  Text(
-                    "Languages Spoken",
-                    style: getTextStyle(
-                      "mediumBold",
-                      color: AppColors.teal,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            addVerticalSpace(12),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: SizedBox(
-                height: 50,
-                child: Wrap(
-                  children: (languages ?? []).map((lang) {
-                    return Padding(
-                      padding: languages?.indexOf(lang) == 0
-                          ? EdgeInsets.symmetric(horizontal: 8)
-                          : EdgeInsets.only(right: 8),
-                      child: Chip(
-                        backgroundColor: AppColors.lightTeal,
-                        avatar: Icon(
-                          Icons.language_rounded,
-                          color: Colors.white,
-                        ),
-                        label: Text(
-                          lang,
-                          style: getTextStyle('small', color: Colors.white),
-                        ),
-                        shape: RoundedRectangleBorder(
-                          side: const BorderSide(
-                            color: Colors.transparent,
-                          ),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
-            ),
+            _buildSectionTitle("Languages Spoken"),
+            _buildChips(widget.camp.languages, (_) => Icons.language_rounded),
             addVerticalSpace(12),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(12.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              addVerticalSpace(12),
+              Row(
+                children: [
+                  Image.asset(
+                    'assets/images/tent_icon_teal.png',
+                    height: 24,
+                    width: 24,
+                    fit: BoxFit.contain,
+                  ),
+                  addHorizontalSpace(12),
+                  Text(
+                    widget.camp.name,
+                    style: getTextStyle("largeBold", color: AppColors.teal),
+                  ),
+                ],
+              ),
+              addVerticalSpace(8),
+              Row(
+                children: [
+                  SizedBox(
+                    child: Text(
+                      wrapText(widget.camp.description, 50),
+                      style: getTextStyle("small", color: Colors.black38),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const Spacer(),
+          if (widget.isStudent)
+            Material(
+              elevation: 2,
+              shape: const CircleBorder(),
+              color: const Color.fromARGB(255, 247, 247, 247),
+              child: SizedBox(
+                height: 36,
+                child: IconButton(
+                  onPressed: toggleSaveCamp,
+                  icon: Icon(
+                    isSaved ? Icons.bookmark : Icons.bookmark_outlined,
+                    color: AppColors.lightTeal,
+                    size: 20,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOptions(BuildContext context) {
+    final options = [
+      {
+        "label": "Directions",
+        "icon": Icons.directions,
+        "onPressed": widget.onDirectionsPressed,
+      },
+      {
+        "label": "Teachers",
+        "icon": Icons.person,
+        "onPressed": () => context.goNamed(AppRouter.viewTeachers.name),
+      },
+      {
+        "label": "Classes",
+        "icon": Icons.class_,
+        "onPressed": () => context.goNamed(AppRouter.viewClasses.name),
+      },
+      {
+        "label": "Images",
+        "icon": Icons.image,
+        "onPressed": () => print("Opening images"),
+      },
+      {
+        "label": "Facilities",
+        "icon": Icons.build,
+        "onPressed": () => print("Opening facilities"),
+      },
+      {
+        "label": "Contact Information",
+        "icon": Icons.contact_mail,
+        "onPressed": () => print("Opening contact information"),
+      },
+    ];
+
+    return SizedBox(
+      height: 50,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: options.map((option) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: ElevatedButton.icon(
+                onPressed: option["onPressed"] as VoidCallback,
+                icon: Icon(option["icon"] as IconData,
+                    size: 16, color: Colors.white),
+                label: Text(
+                  option["label"] as String,
+                  style: const TextStyle(color: Colors.white),
+                ),
+                style: ElevatedButton.styleFrom(
+                  elevation: 0,
+                  backgroundColor: option["label"] == "Directions"
+                      ? AppColors.orange
+                      : AppColors.lightTeal,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  minimumSize: const Size(140, 40),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatusOfResources() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: AppColors.teal,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.info, color: Colors.white, size: 20),
+                  const SizedBox(width: 8),
+                  Text(
+                    "Status of Resources",
+                    style: getTextStyle("mediumBold", color: Colors.white),
+                  ),
+                ],
+              ),
+              addVerticalSpace(8),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      widget.camp.statusOfResources,
+                      style: getTextStyle("small", color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+              addVerticalSpace(4),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: Text(
+        title,
+        style: getTextStyle("mediumBold", color: AppColors.teal),
+      ),
+    );
+  }
+
+  Widget _buildChips(
+      List<String>? items, IconData Function(String) iconResolver) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: SizedBox(
+        height: 50,
+        child: Wrap(
+          children: (items ?? []).map((item) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Chip(
+                backgroundColor: AppColors.lightTeal,
+                avatar: Icon(iconResolver(item), color: Colors.white),
+                label: Text(
+                  item,
+                  style: getTextStyle('small', color: Colors.white),
+                ),
+                shape: RoundedRectangleBorder(
+                  side: const BorderSide(color: Colors.transparent),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+            );
+          }).toList(),
         ),
       ),
     );

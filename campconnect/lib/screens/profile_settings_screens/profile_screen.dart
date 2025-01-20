@@ -18,8 +18,29 @@ class ProfileScreen extends ConsumerStatefulWidget {
 
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   @override
+  @override
   Widget build(BuildContext context) {
     final loggedInUser = ref.watch(loggedInUserNotifierProvider);
+
+    // If user is null, show a placeholder or redirect
+    if (loggedInUser == null) {
+      return Scaffold(
+        appBar: AppBar(
+          scrolledUnderElevation: 0.0,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          centerTitle: true,
+          title: Text(
+            "Profile",
+            style: getTextStyle("largeBold", color: AppColors.teal),
+          ),
+        ),
+        body: const Center(
+          child: Text("User is not logged in."),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         scrolledUnderElevation: 0.0,
@@ -46,7 +67,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         Icons.person,
                         size: 40,
                         color: Colors.white,
-                      ), //Will change to images later..
+                      ), // Will change to images later..
                     ),
                     Positioned(
                       bottom: 0,
@@ -63,21 +84,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(
-                  width: 30,
-                ),
+                const SizedBox(width: 30),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       wrapText(
-                          '${loggedInUser?.firstName} ${loggedInUser?.lastName}',
+                          '${loggedInUser.firstName} ${loggedInUser.lastName}',
                           24),
                       style: getTextStyle("mediumBold",
                           color: AppColors.lightTeal),
                     ),
                     Text(
-                      loggedInUser!.email,
+                      loggedInUser.email,
                       style: getTextStyle("smallBold", color: Colors.grey),
                     ),
                     addVerticalSpace(12),
@@ -126,8 +145,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             buildMenuItem(Icons.tune, 'Preferences'),
             buildMenuItem(Icons.language, 'Language'),
             buildMenuItem(Icons.power_settings_new, 'Logout', () async {
-              ref.read(loggedInUserNotifierProvider.notifier).clearUser();
               await AuthService().signout(context: context);
+              ref.read(loggedInUserNotifierProvider.notifier).clearUser();
               context.go(AppRouter.onboarding.path);
             }),
           ],

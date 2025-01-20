@@ -2,9 +2,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/student.dart';
 import '../models/teacher.dart';
 import '../models/user.dart';
+import '../repositories/camp_connect_repo.dart';
+import 'repo_provider.dart';
 
 class LoggedInUserNotifier extends StateNotifier<User?> {
-  LoggedInUserNotifier() : super(null);
+  final CampConnectRepo _repo;
+
+  LoggedInUserNotifier(this._repo) : super(null);
 
   void setStudent(Student student) {
     state = student;
@@ -14,7 +18,6 @@ class LoggedInUserNotifier extends StateNotifier<User?> {
     state = teacher;
   }
 
-  /// Clear the state and logout the user
   void clearUser() {
     state = null;
   }
@@ -29,14 +32,28 @@ class LoggedInUserNotifier extends StateNotifier<User?> {
 
   bool get isLoggedIn => state != null;
 
-  String? get userRole {
-    if (state is Student) return 'student';
-    if (state is Teacher) return 'teacher';
-    return null;
+  Future<void> updateStudent(Student student) async {
+    if (student.id == null) {
+      throw Exception("Student ID is required to update.");
+    }
+    await _repo.updateStudent(student);
+    state = student; // Update the local state
   }
 }
 
 final loggedInUserNotifierProvider =
     StateNotifierProvider<LoggedInUserNotifier, User?>((ref) {
-  return LoggedInUserNotifier();
+  final asyncRepo = ref.watch(repoProvider);
+
+  return asyncRepo.when(
+    data: (repo) => LoggedInUserNotifier(repo),
+    loading: () {
+      // Provide a default state or null while loading
+      throw Exception('Repo is still loading. Ensure this is handled.');
+    },
+    error: (error, stackTrace) {
+      // Handle errors gracefully
+      throw Exception('Error resolving CampConnectRepo: $error');
+    },
+  );
 });

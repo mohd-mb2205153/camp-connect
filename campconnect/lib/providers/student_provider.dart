@@ -29,8 +29,11 @@ class StudentProvider extends AsyncNotifier<List<Student>> {
     _repo.deleteStudent(student);
   }
 
-  void updateStudent(Student student) {
-    _repo.updateStudent(student);
+  void updateStudent(Student student) async {
+    await _repo.updateStudent(student);
+    state = AsyncData(List<Student>.from(state.value ?? [])
+      ..removeWhere((s) => s.id == student.id)
+      ..add(student));
   }
 }
 

@@ -109,7 +109,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
       throw Exception("User not found in students or teachers collections");
     } catch (e) {
-      showCustomSnackBar(e.toString(), icon: Icons.error);
+      showCustomSnackBar(
+          "You have entered the wrong credentials. Please try again.",
+          icon: Icons.error);
     }
   }
 
