@@ -80,6 +80,18 @@ class CampConnectRepo {
                 Teacher.fromJson(snapshot.data() as Map<String, dynamic>),
           );
 
+  Future<List<Teacher>> getTeachersByCampId(String campId) async {
+    try {
+      final teachersSnapshot =
+          await teachersRef.where('teachingCamps', arrayContains: campId).get();
+      return teachersSnapshot.docs
+          .map((doc) => Teacher.fromJson(doc.data() as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      throw Exception('Error fetching teachers for campId $campId: $e');
+    }
+  }
+
   Future<void> addCampToTeacher({
     required String teacherId,
     required String campId,

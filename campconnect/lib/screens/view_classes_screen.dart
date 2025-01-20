@@ -6,7 +6,9 @@ import '../providers/show_nav_bar_provider.dart';
 import '../theme/constants.dart';
 
 class ViewClassesScreen extends ConsumerStatefulWidget {
-  const ViewClassesScreen({super.key});
+  final String campId;
+
+  const ViewClassesScreen({super.key, required this.campId});
 
   @override
   ConsumerState<ViewClassesScreen> createState() => _ViewClassesScreenState();

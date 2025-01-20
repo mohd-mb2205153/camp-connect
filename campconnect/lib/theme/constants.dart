@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+
 const String googleApiKey = "AIzaSyAKD7wbSgtOXJDdxM8NXcv1Icg6ON0WHtM";
+
 class AppColors {
   static const lightTeal = Color(0xFF36B6B6);
   static const teal = Color(0xFF009999);
@@ -25,6 +27,8 @@ class AppTextStyles {
   static const xxlargeLight = TextStyle(
       fontFamily: 'DMSans', fontSize: 36, fontWeight: FontWeight.w100);
 
+  static const xsmall = TextStyle(
+      fontFamily: 'DMSans', fontSize: 8, fontWeight: FontWeight.normal);
   static const small = TextStyle(
       fontFamily: 'DMSans', fontSize: 14, fontWeight: FontWeight.normal);
   static const medium = TextStyle(
