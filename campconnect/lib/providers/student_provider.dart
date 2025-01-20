@@ -35,6 +35,10 @@ class StudentProvider extends AsyncNotifier<List<Student>> {
       ..removeWhere((s) => s.id == student.id)
       ..add(student));
   }
+
+  bool isSavedCamp(Student student, String campId) {
+    return student.savedCamps.contains(campId);
+  }
 }
 
 final studentProviderNotifier =

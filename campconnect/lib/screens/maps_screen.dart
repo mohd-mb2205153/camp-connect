@@ -566,6 +566,8 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
   @override
   void initState() {
     super.initState();
+    isSaved = ref.read(studentProviderNotifier.notifier).isSavedCamp(
+        ref.read(loggedInUserNotifierProvider) as Student, widget.camp.id!);
   }
 
   void toggleSaveCamp() async {
