@@ -19,6 +19,7 @@ class ProfileScreen extends ConsumerStatefulWidget {
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
+    final loggedInUser = ref.watch(loggedInUserNotifierProvider);
     return Scaffold(
       appBar: AppBar(
         scrolledUnderElevation: 0.0,
@@ -69,12 +70,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      wrapText('First Name Last Name', 24),
+                      wrapText(
+                          '${loggedInUser?.firstName} ${loggedInUser?.lastName}',
+                          24),
                       style: getTextStyle("mediumBold",
                           color: AppColors.lightTeal),
                     ),
                     Text(
-                      "email@gmail.com",
+                      loggedInUser!.email,
                       style: getTextStyle("smallBold", color: Colors.grey),
                     ),
                     addVerticalSpace(12),
@@ -86,7 +89,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         borderRadius: BorderRadius.circular(20.0),
                       ),
                       child: Text(
-                        'Role',
+                        loggedInUser.role.toUpperCase(),
                         style: getTextStyle(
                           "smallBold",
                           color: Colors.white, // Text color
