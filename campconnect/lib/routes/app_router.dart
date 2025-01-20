@@ -22,6 +22,7 @@ import '../screens/onboarding_screens/register_screen.dart';
 import '../screens/onboarding_screens/student_onboarding_screen.dart';
 import '../screens/view_saved_camps_screen.dart';
 import '../screens/view_created_camps_screen.dart';
+import '../screens/view_teaching_camps_screen.dart';
 
 class AppRouter {
   // Onboarding Routes
@@ -125,7 +126,7 @@ class AppRouter {
               GoRoute(
                 name: viewTeachingCamps.name,
                 path: viewTeachingCamps.path,
-                builder: (context, state) => const ViewCreatedCampsScreen(),
+                builder: (context, state) => const ViewTeachingCampsScreen(),
               ),
               GoRoute(
                 name: addCampLocation.name,

@@ -30,7 +30,7 @@ class _ViewTeachersScreenState extends ConsumerState<ViewTeachersScreen> {
     return Scaffold(
       appBar: AppBar(
         scrolledUnderElevation: 0.0,
-        backgroundColor: AppColors.lightTeal,
+        backgroundColor: AppColors.darkTeal,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -46,13 +46,19 @@ class _ViewTeachersScreenState extends ConsumerState<ViewTeachersScreen> {
           style: getTextStyle("mediumBold", color: Colors.white),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        child: Column(
+      body: SizedBox.expand(
+        child: Stack(
           children: [
-            const SizedBox(height: 20),
-            Expanded(child: TeacherList(campId: widget.campId)),
-            const SizedBox(height: 10),
+            buildBackground("bg12"), // Add your background here
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Column(
+                children: [
+                  Expanded(child: TeacherList(campId: widget.campId)),
+                  const SizedBox(height: 10),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -75,105 +81,108 @@ class TeacherList extends ConsumerWidget {
                 itemCount: teacherList.length,
                 itemBuilder: (context, index) {
                   final teacher = teacherList[index];
-                  return Card(
-                    color: AppColors.darkTeal,
-                    child: Container(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                width: 30,
-                                height: 30,
-                                decoration: const BoxDecoration(
-                                  color: AppColors.lightTeal,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(
-                                  Icons.person_2_rounded,
-                                  color: Colors.white,
-                                  size: 24,
-                                ),
-                              ),
-                              const SizedBox(width: 20),
-                              Expanded(
-                                child: Text(
-                                  '${teacher.firstName} ${teacher.lastName}',
-                                  style: getTextStyle('mediumBold',
-                                      color: Colors.white),
-                                ),
-                              ),
-                            ],
-                          ),
-                          addVerticalSpace(15),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Text(
-                                        'Experience: ',
-                                        style: getTextStyle("smallBold",
-                                            color: Colors.white),
-                                      ),
-                                      Text(
-                                        '${teacher.teachingExperience} years',
-                                        style: getTextStyle("small",
-                                            color: Colors.white),
-                                      ),
-                                    ],
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Card(
+                      color: AppColors.darkTeal,
+                      child: Container(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  width: 30,
+                                  height: 30,
+                                  decoration: const BoxDecoration(
+                                    color: AppColors.lightTeal,
+                                    shape: BoxShape.circle,
                                   ),
-                                  Row(
-                                    children: [
-                                      Text(
-                                        'Mobile: ',
-                                        style: getTextStyle("smallBold",
-                                            color: Colors.white),
-                                      ),
-                                      Text(
-                                        '${teacher.phoneCode} ${teacher.mobileNumber}',
-                                        style: getTextStyle("small",
-                                            color: Colors.white),
-                                      ),
-                                    ],
+                                  child: const Icon(
+                                    Icons.person_2_rounded,
+                                    color: Colors.white,
+                                    size: 24,
                                   ),
-                                ],
-                              ),
-                              addVerticalSpace(10),
-                              Row(
-                                children: [
-                                  Text(
-                                    'Availability: ',
-                                    style: getTextStyle("smallBold",
+                                ),
+                                const SizedBox(width: 20),
+                                Expanded(
+                                  child: Text(
+                                    '${teacher.firstName} ${teacher.lastName}',
+                                    style: getTextStyle('mediumBold',
                                         color: Colors.white),
                                   ),
-                                  Expanded(
-                                    child: Text(
-                                      teacher.availabilitySchedule,
-                                      style: getTextStyle("small",
+                                ),
+                              ],
+                            ),
+                            addVerticalSpace(15),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Text(
+                                          'Experience: ',
+                                          style: getTextStyle("smallBold",
+                                              color: Colors.white),
+                                        ),
+                                        Text(
+                                          '${teacher.teachingExperience} years',
+                                          style: getTextStyle("small",
+                                              color: Colors.white),
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          'Mobile: ',
+                                          style: getTextStyle("smallBold",
+                                              color: Colors.white),
+                                        ),
+                                        Text(
+                                          '${teacher.phoneCode} ${teacher.mobileNumber}',
+                                          style: getTextStyle("small",
+                                              color: Colors.white),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                addVerticalSpace(10),
+                                Row(
+                                  children: [
+                                    Text(
+                                      'Availability: ',
+                                      style: getTextStyle("smallBold",
                                           color: Colors.white),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              addVerticalSpace(10),
-                              Text(
-                                'Area of Expertise:',
-                                style: getTextStyle("smallBold",
-                                    color: Colors.white),
-                              ),
-                              addVerticalSpace(10),
-                              buildChips(teacher.areasOfExpertise),
-                            ],
-                          ),
-                        ],
+                                    Expanded(
+                                      child: Text(
+                                        teacher.availabilitySchedule,
+                                        style: getTextStyle("small",
+                                            color: Colors.white),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                addVerticalSpace(10),
+                                Text(
+                                  'Area of Expertise:',
+                                  style: getTextStyle("smallBold",
+                                      color: Colors.white),
+                                ),
+                                addVerticalSpace(10),
+                                buildChips(teacher.areasOfExpertise),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   );
@@ -194,7 +203,7 @@ class TeacherList extends ConsumerWidget {
             backgroundColor: Colors.white,
             label: Text(
               item,
-              style: getTextStyle('xsmall', color: AppColors.lightTeal),
+              style: getTextStyle('xsmall', color: AppColors.darkTeal),
             ),
             shape: RoundedRectangleBorder(
               side: const BorderSide(color: Colors.transparent),
