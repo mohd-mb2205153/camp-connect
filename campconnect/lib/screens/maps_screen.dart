@@ -30,8 +30,9 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
   late StreamSubscription<Position> _positionStreamSubscription;
   bool _followUserLocation = true;
 
-  LatLng currentLocation = LatLng(25.186226, 51.555231);
-  LatLng destinationCampLocation = LatLng(25.263923, 51.532632);
+  LatLng currentLocation = LatLng(25.250960, 51.513295);
+  LatLng destinationCampLocation = LatLng(25.25162, 51.52117);
+  // List<LatLng> polyLineCordinates = [LatLng(25.250960, 51.513295), LatLng(25.251625, 51.516506), LatLng(25.25162, 51.52117)];
   List<LatLng> polyLineCordinates = [];
 
   @override
@@ -48,6 +49,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
     super.dispose();
   }
 
+
   void getPolyPoints() async {
     PolylinePoints polylinePoints = PolylinePoints();
     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
@@ -56,11 +58,8 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
           origin: PointLatLng(currentLocation.latitude, currentLocation.longitude), 
           destination: PointLatLng(destinationCampLocation.latitude, destinationCampLocation.longitude), 
           mode: TravelMode.driving),
-      googleApiKey: google_api_key
+      googleApiKey: googleApiKey
       );
-
-      print("This is the current Location: $currentLocation");
-      print("This is the camp locations: $destinationCampLocation");
 
       if (result.points.isNotEmpty){
         result.points.forEach((PointLatLng point) => 
@@ -167,7 +166,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
       polylines: {
         Polyline(polylineId: PolylineId("route"),
           points: polyLineCordinates,
-          color: Colors.redAccent)
+          color: AppColors.blue)
       },
       onMapCreated: (controller) {
         _googleMapController = controller;
@@ -295,7 +294,9 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
                 ),
               ),
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  getPolyPoints();
+                },
                 icon: const Icon(Icons.directions, color: Colors.white),
               ),
               IconButton(
