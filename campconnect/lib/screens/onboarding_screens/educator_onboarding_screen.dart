@@ -166,7 +166,6 @@ class _EducatorOnboardingScreenState
         studentsRef: FirebaseFirestore.instance.collection('students'),
         teachersRef: FirebaseFirestore.instance.collection('teachers'),
         campsRef: FirebaseFirestore.instance.collection('camps'),
-        usersRef: FirebaseFirestore.instance.collection('users'),
         classesRef: FirebaseFirestore.instance.collection('classes'),
       );
 
