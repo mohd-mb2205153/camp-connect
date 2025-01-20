@@ -2,12 +2,14 @@ import 'dart:async';
 
 import 'package:campconnect/models/camp.dart';
 import 'package:campconnect/providers/camp_provider.dart';
+import 'package:campconnect/routes/app_router.dart';
 import 'package:campconnect/theme/constants.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:group_button/group_button.dart';
 
@@ -329,7 +331,11 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  isStudent
+                      ? context.pushNamed(AppRouter.viewSavedCamps.name)
+                      : context.pushNamed(AppRouter.viewCreatedCamps.name);
+                },
                 icon: Image.asset(
                   "assets/images/tent_icon_white.png",
                   fit: BoxFit.contain,
@@ -467,7 +473,9 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
         ),
         icon: customIcon,
         onTap: () {
-          _showCampDetailsModal(context, camp);
+          polyLineCordinates.isEmpty
+              ? _showCampDetailsModal(context, camp)
+              : null;
         },
       );
     }).toList();
@@ -481,6 +489,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
       ),
       builder: (context) => CampDetailsModal(
         camp: camp,
+        isStudent: isStudent,
         onDirectionsPressed: () {
           setState(() {
             destinationCampLocation = LatLng(camp.latitude, camp.longitude);
@@ -496,11 +505,13 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
 class CampDetailsModal extends StatelessWidget {
   final Camp camp;
   final VoidCallback onDirectionsPressed;
+  final bool isStudent;
 
   const CampDetailsModal({
     Key? key,
     required this.camp,
     required this.onDirectionsPressed,
+    required this.isStudent,
   }) : super(key: key);
 
   @override
@@ -604,10 +615,12 @@ class CampDetailsModal extends StatelessWidget {
                     child: SizedBox(
                       height: 36,
                       child: IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          // isStudent? firebase add camp to the list of student.savedCamps
+                        },
                         icon: SizedBox(
                           child: Icon(
-                            Icons.bookmark,
+                            isStudent ? Icons.bookmark : Icons.share,
                             color: AppColors.lightTeal,
                             size: 20,
                           ),

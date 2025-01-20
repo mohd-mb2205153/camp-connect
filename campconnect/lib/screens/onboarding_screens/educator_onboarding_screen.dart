@@ -167,6 +167,7 @@ class _EducatorOnboardingScreenState
         teachersRef: FirebaseFirestore.instance.collection('teachers'),
         campsRef: FirebaseFirestore.instance.collection('camps'),
         usersRef: FirebaseFirestore.instance.collection('users'),
+        classesRef: FirebaseFirestore.instance.collection('classes'),
       );
 
       await repo.addTeacher(updatedTeacher);
