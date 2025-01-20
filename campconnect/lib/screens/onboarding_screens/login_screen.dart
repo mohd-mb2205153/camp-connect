@@ -198,6 +198,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         buildTextField(
           controller: txtEmailController,
           hintText: "Email",
+          keyboardType: TextInputType.emailAddress,
           prefixIcon: Icon(
             Icons.email,
             color: emailFocusNode.hasFocus ? AppColors.lightTeal : Colors.grey,

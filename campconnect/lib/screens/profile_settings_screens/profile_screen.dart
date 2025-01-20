@@ -1,4 +1,6 @@
 import 'package:campconnect/providers/loggedinuser_provider.dart';
+import 'package:campconnect/providers/student_provider.dart';
+import 'package:campconnect/providers/teacher_provider.dart';
 import 'package:campconnect/routes/app_router.dart';
 import 'package:campconnect/theme/constants.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
@@ -18,6 +20,13 @@ class ProfileScreen extends ConsumerStatefulWidget {
 
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   @override
+  void initState() {
+    super.initState();
+    //To avoid missing/late instatiation of CampConncetRepo in these providers.
+    ref.read(studentProviderNotifier);
+    ref.read(teacherProviderNotifier);
+  }
+
   @override
   Widget build(BuildContext context) {
     final loggedInUser = ref.watch(loggedInUserNotifierProvider);
@@ -129,7 +138,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               Icons.person,
               'Personal Information',
               () {
-                context.pushNamed(AppRouter.personal.name);
+                context.pushNamed(AppRouter.personal.name).then((_) {
+                  setState(() {
+                    ref.watch(loggedInUserNotifierProvider);
+                  });
+                });
+
                 ref
                     .read(showNavBarNotifierProvider.notifier)
                     .showBottomNavBar(false);
@@ -137,7 +151,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
             buildMenuItem(Icons.menu_book_rounded, 'Educational Information',
                 () {
-              context.pushNamed(AppRouter.educational.name);
+              context.pushNamed(AppRouter.educational.name).then((_) {
+                setState(() {
+                  ref.watch(loggedInUserNotifierProvider);
+                });
+              });
               ref
                   .read(showNavBarNotifierProvider.notifier)
                   .showBottomNavBar(false);
