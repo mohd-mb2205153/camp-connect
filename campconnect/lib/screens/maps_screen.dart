@@ -49,23 +49,22 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
     super.dispose();
   }
 
-
   void getPolyPoints() async {
     PolylinePoints polylinePoints = PolylinePoints();
     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-      request: 
-        PolylineRequest(
-          origin: PointLatLng(currentLocation.latitude, currentLocation.longitude), 
-          destination: PointLatLng(destinationCampLocation.latitude, destinationCampLocation.longitude), 
-          mode: TravelMode.driving),
-      googleApiKey: googleApiKey
-      );
+        request: PolylineRequest(
+            origin: PointLatLng(
+                currentLocation.latitude, currentLocation.longitude),
+            destination: PointLatLng(destinationCampLocation.latitude,
+                destinationCampLocation.longitude),
+            mode: TravelMode.walking),
+        googleApiKey: googleApiKey);
 
-      if (result.points.isNotEmpty){
-        result.points.forEach((PointLatLng point) => 
+    if (result.points.isNotEmpty) {
+      result.points.forEach((PointLatLng point) =>
           polyLineCordinates.add(LatLng(point.latitude, point.longitude)));
       setState(() {});
-      }
+    }
   }
 
   @override
@@ -144,6 +143,14 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
         children: [
           _buildGoogleMap(),
           _buildHeader(context),
+          AnimatedOpacity(
+            opacity: polyLineCordinates.isNotEmpty ? 1.0 : 0.0,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            child: polyLineCordinates.isNotEmpty
+                ? Stack(children: [_routeCancelButton(context)])
+                : const SizedBox.shrink(),
+          ),
         ],
       ),
       floatingActionButton: _buildFloatingActionButtons(context),
@@ -165,9 +172,13 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
       mapType: MapType.terrain,
       myLocationButtonEnabled: false,
       polylines: {
-        Polyline(polylineId: PolylineId("route"),
-          points: polyLineCordinates,
-          color: AppColors.blue)
+        if (polyLineCordinates.isNotEmpty)
+          Polyline(
+            polylineId: const PolylineId("route"),
+            points: polyLineCordinates,
+            color: AppColors.blue,
+            width: 5, // Adjust width if needed
+          ),
       },
       onMapCreated: (controller) {
         _googleMapController = controller;
@@ -262,15 +273,21 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
     );
   }
 
-  Stack _buildFloatingActionButtons(BuildContext context) {
-    return Stack(
-      alignment: Alignment.bottomRight,
-      children: [
-        _buildFloatingRowActions(),
-        _buildTrackUserLocationButton(context),
-        // Display the cancel button only when a route is shown.
-        polyLineCordinates.isNotEmpty ? _routeCancelButton(context): Container()
-      ],
+  Widget _buildFloatingActionButtons(BuildContext context) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      switchInCurve: Curves.easeInOut,
+      switchOutCurve: Curves.easeInOut,
+      child: polyLineCordinates.isEmpty
+          ? Stack(
+              alignment: Alignment.bottomRight,
+              key: const ValueKey("actions"),
+              children: [
+                _buildFloatingRowActions(),
+                _buildTrackUserLocationButton(context),
+              ],
+            )
+          : null,
     );
   }
 
@@ -335,46 +352,35 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
     );
   }
 
-  Positioned _routeCancelButton(BuildContext context){
+  Positioned _routeCancelButton(BuildContext context) {
     return Positioned(
-      bottom: 70,
-      right: 90,
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.lightTeal,
-          shape: BoxShape.circle,
-        ),
-        child: 
-        ElevatedButton(
-          onPressed: () {   //When a route is cancelled
+      bottom: 80,
+      left: 0,
+      right: 0,
+      child: Center(
+        child: ElevatedButton.icon(
+          onPressed: () {
             setState(() {
-              polyLineCordinates.clear();  //Remove the cordinates
-            }); 
+              polyLineCordinates.clear();
+              debugPrint("polyLineCordinates: $polyLineCordinates");
+            });
           },
+          icon: const Icon(Icons.cancel, color: AppColors.lightTeal),
+          label: Text(
+            "Cancel Route",
+            style: getTextStyle("mediumBold", color: AppColors.lightTeal),
+          ),
           style: ElevatedButton.styleFrom(
-              elevation: 2,
-              backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
+            elevation: 2,
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
             ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.cancel,
-                ),
-                const SizedBox(width: 5,),
-                Text(
-                  "Cancel Route",
-                  style: getTextStyle("small", color: AppColors.teal),
-                ),
-              ],
-            ),
-      )
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+          ),
+        ),
       ),
-      
-      );
+    );
   }
 
   Future<void> _trackUserLocation(BuildContext context) async {
@@ -383,10 +389,6 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
     });
 
     try {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Fetching your location...")),
-      );
-
       Position position = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.high,
@@ -459,13 +461,14 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
       ),
       builder: (context) => CampDetailsModal(
         camp: camp,
-        onDirectionsPressed: (){
+        onDirectionsPressed: () {
           setState(() {
             destinationCampLocation = LatLng(camp.latitude, camp.longitude);
           });
           Navigator.pop(context);
           getPolyPoints();
-        },),
+        },
+      ),
     );
   }
 }
