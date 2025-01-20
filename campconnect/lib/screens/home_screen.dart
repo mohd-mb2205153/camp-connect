@@ -235,7 +235,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(8, 0, 24, 0),
                     child: Image.asset(
-                      'assets/images/unesco_logo.png',
+                      'assets/images/unicef-logo-white.png',
                       width: 48,
                       height: 48,
                       fit: BoxFit.contain,
@@ -248,7 +248,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         children: [
                           const TextSpan(
                             text:
-                                "The UNESCO is offering relief goods and books donations to educational camps for teachers and students.\n\n",
+                                "UNICEF is offering relief goods and books donations to educational camps for teachers and students.\n\n",
                           ),
                           TextSpan(
                             text: "Click here",
