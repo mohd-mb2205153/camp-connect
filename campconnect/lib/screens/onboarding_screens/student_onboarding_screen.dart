@@ -273,7 +273,7 @@ class _StudentOnboardingScreenState
                           ref
                               .read(showNavBarNotifierProvider.notifier)
                               .setActiveBottomNavBar(0);
-                          context.goNamed(AppRouter.home.name);
+                          // context.goNamed(AppRouter.home.name);
                         }
                       },
                       style: ElevatedButton.styleFrom(

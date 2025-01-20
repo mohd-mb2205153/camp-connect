@@ -89,7 +89,6 @@ class _EducatorOnboardingScreenState
 
   bool isAllFilled() {
     return highestEducationLevel != "Select Education Level" &&
-        certifications.isNotEmpty &&
         teachingExperience > 0 &&
         areasOfExpertise.isNotEmpty &&
         willingnessToTravel != "Select Distance" &&
@@ -125,7 +124,7 @@ class _EducatorOnboardingScreenState
         teachingExperience: teachingExperience,
         areasOfExpertise: areasOfExpertise,
         willingnessToTravel: willingnessToTravel,
-        availabilitySchedule: "${fromTime.hour}:00 - ${toTime.hour}:00",
+        availabilitySchedule: availabilitySchedule,
         preferredCampDuration: preferredCampDuration,
       );
 
@@ -245,7 +244,7 @@ class _EducatorOnboardingScreenState
                           ref
                               .read(showNavBarNotifierProvider.notifier)
                               .setActiveBottomNavBar(0);
-                          context.goNamed(AppRouter.home.name);
+                          // context.goNamed(AppRouter.home.name);
                         }
                       },
                       style: ElevatedButton.styleFrom(
@@ -631,7 +630,12 @@ class _EducatorOnboardingScreenState
                               );
                             }
                           }
+
+                          // Update availabilitySchedule
+                          availabilitySchedule =
+                              "${fromTime.hour.toString().padLeft(2, '0')}:00 - ${toTime.hour.toString().padLeft(2, '0')}:00";
                         });
+
                         Navigator.pop(context);
                       },
                     ),
@@ -686,7 +690,9 @@ class _EducatorOnboardingScreenState
               child: GestureDetector(
                 onTap: () => showHourPicker(context, true),
                 child: buildDecoratedInput(
-                  "${fromTime.hour}:00",
+                  fromTime != null
+                      ? "${fromTime.hour.toString().padLeft(2, '0')}:00"
+                      : "From",
                   Icons.access_time,
                 ),
               ),
@@ -696,13 +702,23 @@ class _EducatorOnboardingScreenState
               child: GestureDetector(
                 onTap: () => showHourPicker(context, false),
                 child: buildDecoratedInput(
-                  "${toTime.hour}:00",
+                  toTime != null
+                      ? "${toTime.hour.toString().padLeft(2, '0')}:00"
+                      : "To",
                   Icons.access_time,
                 ),
               ),
             ),
           ],
         ),
+        if (availabilitySchedule.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Text(
+              "Selected Availability: $availabilitySchedule",
+              style: getTextStyle("small", color: Colors.grey),
+            ),
+          ),
       ],
     );
   }

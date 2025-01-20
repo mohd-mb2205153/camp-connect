@@ -7,7 +7,7 @@ class Teacher extends User {
   int teachingExperience; // Number of years of experience
   List<String> areasOfExpertise; // Subjects taught
   String willingnessToTravel; // e.g., "Within 10 km"
-  String availabilitySchedule; // Days and times available
+  String availabilitySchedule; // times available
   String preferredCampDuration; // e.g., "Short-term"
   List<String> createdCamps; // List of created camps
   List<String> teachingCamps; // List of teaching camps
