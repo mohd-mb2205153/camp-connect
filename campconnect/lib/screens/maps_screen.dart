@@ -5,6 +5,7 @@ import 'package:campconnect/providers/camp_provider.dart';
 import 'package:campconnect/theme/constants.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -29,6 +30,10 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
   late StreamSubscription<Position> _positionStreamSubscription;
   bool _followUserLocation = true;
 
+  LatLng currentLocation = LatLng(25.186226, 51.555231);
+  LatLng destinationCampLocation = LatLng(25.263923, 51.532632);
+  List<LatLng> polyLineCordinates = [];
+
   @override
   void initState() {
     super.initState();
@@ -41,6 +46,27 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
     _positionStreamSubscription.cancel();
     _googleMapController?.dispose();
     super.dispose();
+  }
+
+  void getPolyPoints() async {
+    PolylinePoints polylinePoints = PolylinePoints();
+    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+      request: 
+        PolylineRequest(
+          origin: PointLatLng(currentLocation.latitude, currentLocation.longitude), 
+          destination: PointLatLng(destinationCampLocation.latitude, destinationCampLocation.longitude), 
+          mode: TravelMode.driving),
+      googleApiKey: google_api_key
+      );
+
+      print("This is the current Location: $currentLocation");
+      print("This is the camp locations: $destinationCampLocation");
+
+      if (result.points.isNotEmpty){
+        result.points.forEach((PointLatLng point) => 
+          polyLineCordinates.add(LatLng(point.latitude, point.longitude)));
+      setState(() {});
+      }
   }
 
   @override
@@ -138,6 +164,11 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
       zoomControlsEnabled: false,
       mapType: MapType.terrain,
       myLocationButtonEnabled: false,
+      polylines: {
+        Polyline(polylineId: PolylineId("route"),
+          points: polyLineCordinates,
+          color: Colors.redAccent)
+      },
       onMapCreated: (controller) {
         _googleMapController = controller;
       },

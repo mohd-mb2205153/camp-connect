@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+const String google_api_key = "AIzaSyCMX24A8UlDx3KUNqHSXZdwB1MB-pd1Bfo";
 class AppColors {
   static const lightTeal = Color(0xFF36B6B6);
   static const teal = Color(0xFF009999);
