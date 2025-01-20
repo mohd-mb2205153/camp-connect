@@ -4,7 +4,8 @@ import 'package:campconnect/theme/constants.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
 
 import '../providers/show_nav_bar_provider.dart';
-import '../providers/teacher_provider.dart';
+import '../providers/camp_provider.dart';
+import '../providers/student_provider.dart';
 
 class ViewSavedCampsScreen extends ConsumerStatefulWidget {
   final String userId;
@@ -26,9 +27,7 @@ class _ViewSavedCampsScreenState extends ConsumerState<ViewSavedCampsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final createdCamps = ref.watch(createdCampsProvider(widget.userId));
-    print(createdCamps);
-
+    final studentAsyncValue = ref.watch(studentProviderNotifier);
     return Scaffold(
       appBar: AppBar(
         scrolledUnderElevation: 0.0,
@@ -44,7 +43,7 @@ class _ViewSavedCampsScreenState extends ConsumerState<ViewSavedCampsScreen> {
           },
         ),
         title: Text(
-          'View Created Camps',
+          'View Saved Camps',
           style: getTextStyle("mediumBold", color: Colors.white),
         ),
       ),
@@ -52,63 +51,104 @@ class _ViewSavedCampsScreenState extends ConsumerState<ViewSavedCampsScreen> {
         child: Stack(
           children: [
             buildBackground("bg12"),
-            createdCamps.when(
-              data: (camps) => camps.isEmpty
-                  ? const Center(child: Text('No created camps available'))
-                  : ListView.builder(
-                      itemCount: camps.length,
-                      itemBuilder: (context, index) {
-                        final camp = camps[index];
-                        return Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
-                          child: Card(
-                            color: AppColors.darkTeal,
-                            child: Container(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Camp Icon
-                                  Container(
-                                    width: 50,
-                                    height: 50,
-                                    decoration: BoxDecoration(
-                                      color: AppColors.lightTeal,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Image.asset(
-                                      'assets/images/tent_icon_white.png',
-                                      fit: BoxFit.cover,
-                                    ),
+            studentAsyncValue.when(
+              data: (students) {
+                final student = students.firstWhere(
+                  (s) => s.id == widget.userId,
+                );
+
+                if (student == null || student.savedCamps.isEmpty) {
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 60),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.bookmark_add,
+                            size: 32,
+                            color: const Color.fromARGB(179, 245, 245, 245),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'You do not have\n any saved camps',
+                            style: getTextStyle("medium",
+                                color:
+                                    const Color.fromARGB(179, 245, 245, 245)),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+
+                final savedCamps = ref.watch(campProviderNotifier).whenData(
+                      (camps) => camps
+                          .where((camp) => student.savedCamps.contains(camp.id))
+                          .toList(),
+                    );
+
+                return savedCamps.when(
+                  data: (camps) => ListView.builder(
+                    itemCount: camps.length,
+                    itemBuilder: (context, index) {
+                      final camp = camps[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Card(
+                          color: AppColors.darkTeal,
+                          child: Container(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Camp Icon
+                                Container(
+                                  width: 50,
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.lightTeal,
+                                    shape: BoxShape.circle,
                                   ),
-                                  const SizedBox(width: 16),
-                                  // Camp Details
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          camp.name,
-                                          style: getTextStyle('mediumBold',
-                                              color: Colors.white),
-                                        ),
-                                        const SizedBox(height: 8),
-                                        Text(
-                                          camp.description,
-                                          style: getTextStyle('small',
-                                              color: Colors.white70),
-                                        ),
-                                      ],
-                                    ),
+                                  child: Image.asset(
+                                    'assets/images/tent_icon_white.png',
+                                    fit: BoxFit.cover,
                                   ),
-                                ],
-                              ),
+                                ),
+                                const SizedBox(width: 16),
+                                // Camp Details
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        camp.name,
+                                        style: getTextStyle('mediumBold',
+                                            color: Colors.white),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        camp.description,
+                                        style: getTextStyle('small',
+                                            color: Colors.white70),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        );
-                      },
-                    ),
+                        ),
+                      );
+                    },
+                  ),
+                  error: (err, _) => Center(child: Text('Error: $err')),
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                );
+              },
               error: (err, _) => Center(child: Text('Error: $err')),
               loading: () => const Center(child: CircularProgressIndicator()),
             ),

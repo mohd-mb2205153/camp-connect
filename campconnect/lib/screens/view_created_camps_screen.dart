@@ -26,40 +26,43 @@ class _ViewCreatedCampsScreenState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        scrolledUnderElevation: 0.0,
-        backgroundColor: AppColors.darkTeal,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            ref
-                .read(showNavBarNotifierProvider.notifier)
-                .showBottomNavBar(true);
-            Navigator.pop(context);
-          },
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        appBar: AppBar(
+          scrolledUnderElevation: 0.0,
+          backgroundColor: AppColors.darkTeal,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () {
+              ref
+                  .read(showNavBarNotifierProvider.notifier)
+                  .showBottomNavBar(true);
+              Navigator.pop(context);
+            },
+          ),
+          title: Text(
+            'View Created Camps',
+            style: getTextStyle("mediumBold", color: Colors.white),
+          ),
         ),
-        title: Text(
-          'View Created Camps',
-          style: getTextStyle("mediumBold", color: Colors.white),
-        ),
-      ),
-      body: SizedBox.expand(
-        child: Stack(
-          children: [
-            buildBackground("bg12"),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Column(
-                children: [
-                  Expanded(
-                    child: CampListView(userId: widget.userId),
-                  ),
-                ],
+        body: SizedBox.expand(
+          child: Stack(
+            children: [
+              buildBackground("bg12"),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: CreatedCampListView(userId: widget.userId),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -77,9 +80,9 @@ Widget buildBackground(String imageName) {
   );
 }
 
-class CampListView extends ConsumerWidget {
+class CreatedCampListView extends ConsumerWidget {
   final String userId;
-  const CampListView({super.key, required this.userId});
+  const CreatedCampListView({super.key, required this.userId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

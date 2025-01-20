@@ -10,6 +10,7 @@ import 'package:campconnect/providers/teacher_provider.dart';
 import 'package:campconnect/routes/app_router.dart';
 import 'package:campconnect/theme/constants.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -33,6 +34,8 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
   bool isStudent = false;
   bool isTeacher = false;
   dynamic loggedUser;
+  DateTime? lastUpdatedTime;
+  bool hasWifi = true; // check connectivity if needed
 
   GoogleMapController? _googleMapController;
   static const CameraPosition initialCameraPosition =
@@ -55,6 +58,22 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
     _loadCustomIcons();
     _startLiveLocationUpdates();
     initializeUserDetails();
+
+    Timer.periodic(const Duration(seconds: 8), (timer) {
+      if (mounted) {
+        setState(() {
+          lastUpdatedTime = DateTime.now();
+          checkWifiStatus().then((status) => hasWifi = status);
+        });
+      } else {
+        timer.cancel();
+      }
+    });
+  }
+
+  Future<bool> checkWifiStatus() async {
+    final connectivityResult = await Connectivity().checkConnectivity();
+    return connectivityResult == ConnectivityResult.wifi;
   }
 
   void initializeUserDetails() {
@@ -98,6 +117,27 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
       result.points.forEach((PointLatLng point) =>
           polyLineCordinates.add(LatLng(point.latitude, point.longitude)));
       setState(() {});
+    }
+  }
+
+  String getTimeDifferenceString(DateTime timestamp) {
+    final now = DateTime.now();
+    final difference = now.difference(timestamp);
+
+    if (difference.inSeconds < 60) {
+      return "${difference.inSeconds} seconds ago";
+    } else if (difference.inMinutes < 60) {
+      return "${difference.inMinutes} minutes ago";
+    } else if (difference.inHours < 24) {
+      return "${difference.inHours} hours ago";
+    } else if (difference.inDays < 7) {
+      return "${difference.inDays} days ago";
+    } else if (difference.inDays < 30) {
+      return "${(difference.inDays / 7).floor()} weeks ago";
+    } else if (difference.inDays < 365) {
+      return "${(difference.inDays / 30).floor()} months ago";
+    } else {
+      return "${(difference.inDays / 365).floor()} years ago";
     }
   }
 
@@ -317,20 +357,28 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
   }
 
   Widget _buildLastUpdatedText() {
-    return polyLineCordinates.isEmpty
-        ? Text(
-            "Last Updated: Now",
-            style: getTextStyle("small", color: AppColors.white).copyWith(
-              shadows: [
-                Shadow(
-                  offset: Offset(1.0, 1.0),
-                  blurRadius: 2.0,
-                  color: Colors.black.withOpacity(0.6),
-                ),
-              ],
-            ),
-          )
-        : Text("");
+    String displayText;
+    if (lastUpdatedTime == null) {
+      displayText = "Last Updated: Never";
+    } else if (hasWifi) {
+      displayText = "Last Updated: Now";
+    } else {
+      displayText =
+          "Last Updated: ${getTimeDifferenceString(lastUpdatedTime!)}";
+    }
+
+    return Text(
+      displayText,
+      style: getTextStyle("small", color: AppColors.white).copyWith(
+        shadows: [
+          Shadow(
+            offset: Offset(1.0, 1.0),
+            blurRadius: 2.0,
+            color: Colors.black.withOpacity(0.6),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildFloatingActionButtons(BuildContext context) {

@@ -14,6 +14,15 @@ class OnboardingScreen extends ConsumerStatefulWidget {
 
 class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FocusScope.of(context).unfocus();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
@@ -27,14 +36,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         resizeToAvoidBottomInset: false,
         body: Stack(
           children: [
-            // Background Image
             Positioned.fill(
               child: Image.asset(
                 Assets.image('bg1.png'),
                 fit: BoxFit.cover,
               ),
             ),
-            // Top-Left Logo
             Positioned(
               top: 40,
               left: 24,
@@ -45,12 +52,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 ),
               ),
             ),
-            // Lower Half Container
             Align(
               alignment: Alignment.bottomCenter,
               child: SizedBox(
                 width: double.infinity,
-                height: screenHeight(context) * 0.38, // occupies lower half
+                height: screenHeight(context) * 0.38,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

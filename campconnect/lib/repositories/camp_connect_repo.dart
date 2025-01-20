@@ -47,6 +47,7 @@ class CampConnectRepo {
       final teacherSnapshot = await teachersRef.doc(teacherId).get();
 
       final teacherData = teacherSnapshot.data() as Map<String, dynamic>? ?? {};
+
       final createdCampIds =
           List<String>.from(teacherData['createdCamps'] ?? []);
 
@@ -71,6 +72,7 @@ class CampConnectRepo {
 
       final teachingCampIds =
           List<String>.from(teacherData['teachingCamps'] ?? []);
+
       if (teachingCampIds.isEmpty) return [];
 
       final querySnapshot = await campsRef

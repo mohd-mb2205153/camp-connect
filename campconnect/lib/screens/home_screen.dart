@@ -140,9 +140,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         onPressed: () {
           ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(false);
           if (isStudent) {
-            context.pushNamed(AppRouter.viewSavedCamps.name);
+            context.goNamed(AppRouter.viewSavedCamps.name,
+                extra: loggedUser.id);
           } else if (isTeacher) {
-            context.pushNamed(AppRouter.viewTeachingCamps.name);
+            context.goNamed(AppRouter.viewTeachingCamps.name,
+                extra: loggedUser.id);
           }
         },
         style: ElevatedButton.styleFrom(
@@ -179,7 +181,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   .setActiveBottomNavBar(1);
           isStudent
               ? context.replaceNamed(AppRouter.map.name)
-              : context.pushNamed(AppRouter.addCampLocation.name);
+              : context.goNamed(AppRouter.addCampLocation.name);
         },
         style: ElevatedButton.styleFrom(
           elevation: 0,
@@ -302,7 +304,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               Text(
                 textAlign: TextAlign.left,
                 wrapText(
-                  "You ${isStudent ? "have saved" : "are teaching"} over $campCount camp${campCount == 1 ? "" : "s"}.",
+                  "You ${isStudent ? "have saved" : "are teaching"} ${(campCount > 1 || campCount == 0) ? "over" : ""} $campCount camp${campCount == 1 ? "" : "s"}.",
                   17,
                 ),
                 style: getTextStyle("mediumBold", color: Colors.white),
