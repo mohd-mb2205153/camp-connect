@@ -49,6 +49,25 @@ class CampProvider extends AsyncNotifier<List<Camp>> {
   void updateCamp(Camp camp) {
     _repo.updateCamp(camp);
   }
+
+  filterByEducationLevel(List<String> level) {
+  _repo.filterCampByEducationLevel(level).listen((camp) {
+    state = AsyncData(camp);
+  }).onError((error) => print(error));
+  }
+
+  filterByAdditionalSupport(List<String> supports) {
+  _repo.filterCampByAdditionalSupport(supports).listen((camp) {
+    state = AsyncData(camp);
+  }).onError((error) => print(error));
+  }
+
+  filterByLanguages(List<String> languages) {
+  _repo.filterCampByLanguage(languages).listen((camp) {
+    state = AsyncData(camp);
+  }).onError((error) => print(error));
+  }
+
 }
 
 final campProviderNotifier =

@@ -87,22 +87,22 @@ class CampConnectRepo {
       throw Exception('Error fetching teaching camps: $e');
     }
   }
-  Stream<List<Camp>> filterCampByEducationLevel(String level) => campsRef
-    .where("educationLevel", arrayContains: level)
+  Stream<List<Camp>> filterCampByEducationLevel(List<String> levels) => campsRef
+    .where("educationLevel", arrayContainsAny: levels)
     .snapshots()
     .map((snapshot) => snapshot.docs
         .map((doc) => Camp.fromJson(doc.data() as Map<String, dynamic>))
         .toList());
   
-  Stream<List<Camp>> filterCampByAdditionalSupport(String supports) => campsRef
-  .where("additionalSupport", arrayContains: supports)
+  Stream<List<Camp>> filterCampByAdditionalSupport(List<String> supports) => campsRef
+  .where("additionalSupport", arrayContainsAny: supports)
   .snapshots()
   .map((snapshot) => snapshot.docs
       .map((doc) => Camp.fromJson(doc.data() as Map<String, dynamic>))
       .toList());
 
-  Stream<List<Camp>> filterCampByLanguage(String language) => campsRef
-  .where("languages", arrayContains: language)
+  Stream<List<Camp>> filterCampByLanguage(List<String> languages) => campsRef
+  .where("languages", arrayContainsAny: languages)
   .snapshots()
   .map((snapshot) => snapshot.docs
       .map((doc) => Camp.fromJson(doc.data() as Map<String, dynamic>))
