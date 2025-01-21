@@ -175,4 +175,10 @@ class FakeCampConnectRepo implements CampConnectRepo {
     // TODO: implement filterCampByAdditionalSupport
     throw UnimplementedError();
   }
+  
+  @override
+  Stream<List<Camp>> filterCampByLanguage(String language) {
+    // TODO: implement filterCampByLanguage
+    throw UnimplementedError();
+  }
 }
