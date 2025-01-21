@@ -171,29 +171,14 @@ class _EducatorOnboardingScreenState
 
       await repo.addTeacher(updatedTeacher);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            "You have registered successfully",
-            style: getTextStyle("small", color: Colors.white),
-          ),
-          backgroundColor: AppColors.orange,
-        ),
-      );
+      showCustomSnackBar("You have registered successfully!",
+          icon: Icons.check_circle);
 
       ref.read(showNavBarNotifierProvider.notifier).setActiveBottomNavBar(0);
       context.goNamed(AppRouter.home.name);
     } catch (error) {
-      debugPrint("Error saving teacher: $error");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            "Failed to register teacher: $error",
-            style: getTextStyle("small", color: Colors.white),
-          ),
-          backgroundColor: AppColors.orange,
-        ),
-      );
+      showCustomSnackBar("There has been an error with your registration.",
+          icon: Icons.error);
     }
   }
 

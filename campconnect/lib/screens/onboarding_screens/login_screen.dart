@@ -20,7 +20,7 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
-  bool notVisible = true; // password visibility
+  bool notVisible = true;
   bool isEmailValid = false;
   late TextEditingController txtEmailController;
   late TextEditingController txtPasswordController;
@@ -34,6 +34,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   void initState() {
     super.initState();
     ref.read(showNavBarNotifierProvider.notifier);
+    ref.read(loggedInUserNotifierProvider.notifier);
 
     txtEmailController = TextEditingController();
     txtPasswordController = TextEditingController();
@@ -42,7 +43,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     passwordFocusNode = FocusNode();
 
     txtEmailController.addListener(() {
-      // Email validation logic
       final email = txtEmailController.text;
       setState(() {
         isEmailValid =
@@ -110,6 +110,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
       throw Exception("User not found in students or teachers collections");
     } catch (e) {
+      debugPrint("Error during login: $e");
       showCustomSnackBar(
           "You have entered the wrong credentials. Please try again.",
           icon: Icons.error);

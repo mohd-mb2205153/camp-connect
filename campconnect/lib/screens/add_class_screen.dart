@@ -187,19 +187,10 @@ class _AddClassScreenState extends ConsumerState<AddClassScreen> {
                                 campProvider.updateCamp(camp);
                               }
 
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text("Class Added Successfully!")),
-                              );
-
                               context.pop();
                             }
                           } catch (error) {
-                            debugPrint("Error adding class: $error");
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                  content: Text("Error adding class: $error")),
-                            );
+                            showCustomSnackBar("$error", icon: Icons.error);
                           }
                         } else {
                           String errorMessage = "Please fill all fields";
@@ -209,10 +200,6 @@ class _AddClassScreenState extends ConsumerState<AddClassScreen> {
                                   toTime.minute <= fromTime.minute)) {
                             errorMessage = "End time must be after start time.";
                           }
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(errorMessage)),
-                          );
 
                           showCustomSnackBar(errorMessage, icon: Icons.error);
                         }
