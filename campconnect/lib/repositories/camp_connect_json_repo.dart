@@ -32,6 +32,15 @@ class CampConnectJsonRepo {
     return List<String>.from(data);
   }
 
+  Future<List<String>> fetchAdditionalSupport() async {
+    final response =
+        await rootBundle.loadString("assets/data/additional_support.json");
+    final data = json.decode(response) as Map<String, dynamic>;
+    return (data["additionalSupport"] as List<dynamic>)
+        .map<String>((e) => e["label"] as String)
+        .toList();
+  }
+
   Future<List<String>> fetchTeacherEducationLevel() async {
     final String response =
         await rootBundle.loadString('assets/data/teacher_education_level.json');

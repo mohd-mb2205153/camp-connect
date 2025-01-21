@@ -5,6 +5,7 @@ import 'package:campconnect/models/teacher.dart';
 import 'package:campconnect/models/user.dart';
 import 'package:campconnect/providers/camp_provider.dart';
 import 'package:campconnect/providers/class_provider.dart';
+import 'package:campconnect/providers/json_provider.dart';
 import 'package:campconnect/providers/student_provider.dart';
 import 'package:campconnect/providers/teacher_provider.dart';
 import 'package:campconnect/routes/app_router.dart';
@@ -36,6 +37,11 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
   dynamic loggedUser;
   DateTime? lastUpdatedTime;
   bool hasWifi = true; // check connectivity if needed
+  List<String> filteredEduLevels = [];
+  List<String> filteredLanguages = [];
+  List<String> filteredSubjects = [];
+  List<String> filteredAdditional = [];
+  String? selectedFilterType;
 
   GoogleMapController? _googleMapController;
   static const CameraPosition initialCameraPosition =
@@ -312,7 +318,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
             children: [
               _buildCircleIconButton(Icons.search, () {}),
               const Spacer(),
-              _buildFilterButton(),
+              _buildFilterButton(context),
               const Spacer(),
               _buildCircleIconButton(Icons.settings, () {}),
             ],
@@ -336,10 +342,281 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
     );
   }
 
-  ElevatedButton _buildFilterButton() {
+  void showFilterBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return SizedBox(
+          height: screenHeight(context) * .65,
+          child: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setModalState) {
+              return Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.tune, color: Colors.teal),
+                          const SizedBox(width: 10),
+                          Text(
+                            "Filter Camps",
+                            style:
+                                getTextStyle('mediumBold', color: Colors.teal),
+                          ),
+                        ],
+                      ),
+                      Divider(
+                        color: AppColors.teal,
+                        height: 20,
+                      ),
+                      createFilterRadios(setModalState),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      if (selectedFilterType == 'Educational Level')
+                        buildFilterPicker(
+                            setModalState: setModalState,
+                            title: 'Filter Educational Level',
+                            filteredList: filteredEduLevels,
+                            icon: Icons.school,
+                            provider: studentEducationLevelProvider),
+                      if (selectedFilterType == 'Languages')
+                        buildFilterPicker(
+                            setModalState: setModalState,
+                            title: 'Filter Languages',
+                            icon: Icons.language,
+                            filteredList: filteredLanguages,
+                            provider: languagesProvider),
+                      if (selectedFilterType == 'Subjects')
+                        buildFilterPicker(
+                            setModalState: setModalState,
+                            title: 'Filter Subjects',
+                            icon: Icons.subject,
+                            filteredList: filteredSubjects,
+                            provider: subjectsProvider),
+                      if (selectedFilterType == 'Additional Support')
+                        buildFilterPicker(
+                            setModalState: setModalState,
+                            title: 'Additional Support',
+                            icon: Icons.health_and_safety_rounded,
+                            filteredList: filteredAdditional,
+                            provider: additionalSupportProvider),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  Widget createFilterRadios(StateSetter setModalState) {
+    return Wrap(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: RadioListTile(
+                title: Text(
+                  'Educational Level',
+                  style: getTextStyle('small', color: AppColors.teal),
+                ),
+                value: 'Educational Level',
+                groupValue: selectedFilterType,
+                onChanged: (value) {
+                  setModalState(() {
+                    selectedFilterType = value!;
+                  });
+                },
+              ),
+            ),
+            Expanded(
+              child: RadioListTile(
+                title: Text(
+                  'Languages',
+                  style: getTextStyle('small', color: AppColors.teal),
+                ),
+                value: 'Languages',
+                groupValue: selectedFilterType,
+                onChanged: (value) {
+                  setModalState(() {
+                    selectedFilterType = value!;
+                  });
+                },
+              ),
+            ),
+          ],
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: RadioListTile(
+                title: Text(
+                  'Subjects',
+                  style: getTextStyle('small', color: AppColors.teal),
+                ),
+                value: 'Subjects',
+                groupValue: selectedFilterType,
+                onChanged: (value) {
+                  setModalState(() {
+                    selectedFilterType = value!;
+                  });
+                },
+              ),
+            ),
+            Expanded(
+              child: RadioListTile(
+                title: Text(
+                  'Area Radius',
+                  style: getTextStyle('small', color: AppColors.teal),
+                ),
+                value: 'Area Radius',
+                groupValue: selectedFilterType,
+                onChanged: (value) {
+                  setModalState(() {
+                    selectedFilterType = value!;
+                  });
+                },
+              ),
+            ),
+          ],
+        ),
+        Expanded(
+          child: RadioListTile(
+            title: Text(
+              'Additional Support',
+              style: getTextStyle('small', color: AppColors.teal),
+            ),
+            value: 'Additional Support',
+            groupValue: selectedFilterType,
+            onChanged: (value) {
+              setModalState(() {
+                selectedFilterType = value!;
+              });
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget buildFilterPicker({
+    required StateSetter setModalState,
+    required String title,
+    required IconData icon,
+    required List<String> filteredList,
+    required FutureProvider provider,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon, color: Colors.teal),
+                addHorizontalSpace(10),
+                Text(
+                  title,
+                  style: getTextStyle('medium', color: Colors.grey),
+                ),
+                const Spacer(),
+                IconButton(
+                  icon: const Icon(
+                    Icons.add,
+                    color: Colors.grey,
+                  ),
+                  onPressed: () {
+                    ref.watch(provider).when(
+                          data: (list) {
+                            return showModalBottomSheet(
+                              context: context,
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(12),
+                                ),
+                              ),
+                              builder: (_) {
+                                return ListView.builder(
+                                  itemCount: list.length,
+                                  itemBuilder: (_, index) {
+                                    return ListTile(
+                                      title: Text(
+                                        list[index],
+                                        style: getTextStyle("small"),
+                                      ),
+                                      onTap: () {
+                                        setModalState(() {
+                                          if (!filteredList
+                                              .contains(list[index])) {
+                                            filteredList.add(list[index]);
+                                          }
+                                        });
+                                        Navigator.pop(context);
+                                      },
+                                    );
+                                  },
+                                );
+                              },
+                            );
+                          },
+                          loading: () => const CircularProgressIndicator(),
+                          error: (err, stack) => Text('Error: $err'),
+                        );
+                  },
+                ),
+              ],
+            ),
+            const Divider(
+              color: AppColors.lightTeal,
+              thickness: 2,
+            ),
+          ],
+        ),
+        addVerticalSpace(8),
+        Wrap(
+          spacing: 8,
+          children: filteredList
+              .map(
+                (language) => Chip(
+                  backgroundColor: AppColors.lightTeal,
+                  label: Text(
+                    language,
+                    style: getTextStyle('small', color: Colors.white),
+                  ),
+                  deleteIcon: const Icon(Icons.close, color: Colors.white),
+                  onDeleted: () {
+                    setModalState(() {
+                      filteredList.remove(language);
+                    });
+                  },
+                  shape: RoundedRectangleBorder(
+                    side: const BorderSide(
+                      color: Colors.transparent,
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+              )
+              .toList(),
+        ),
+      ],
+    );
+  }
+
+  ElevatedButton _buildFilterButton(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        // Filter button action
+        showFilterBottomSheet(context);
       },
       style: ElevatedButton.styleFrom(
         elevation: 2,
