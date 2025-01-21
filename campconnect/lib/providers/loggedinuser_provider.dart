@@ -1,8 +1,12 @@
+import 'package:campconnect/models/camp.dart';
+import 'package:campconnect/models/class.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/student.dart';
 import '../models/teacher.dart';
 import '../models/user.dart';
 import '../repositories/camp_connect_repo.dart';
+import '../repositories/fake_camp_connect_repo.dart';
 import 'repo_provider.dart';
 
 class LoggedInUserNotifier extends StateNotifier<User?> {
@@ -62,11 +66,9 @@ final loggedInUserNotifierProvider =
   return asyncRepo.when(
     data: (repo) => LoggedInUserNotifier(repo),
     loading: () {
-      // Provide a default state or null while loading
-      throw Exception('Repo is still loading. Ensure this is handled.');
+      return LoggedInUserNotifier(FakeCampConnectRepo());
     },
     error: (error, stackTrace) {
-      // Handle errors gracefully
       throw Exception('Error resolving CampConnectRepo: $error');
     },
   );
