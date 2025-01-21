@@ -163,4 +163,16 @@ class FakeCampConnectRepo implements CampConnectRepo {
     // TODO: implement updateClass
     throw UnimplementedError();
   }
+  
+  @override
+  Stream<List<Camp>> filterCampByEducationLevel(String level) {
+    // TODO: implement filterCampByEducationLevel
+    throw UnimplementedError();
+  }
+  
+  @override
+  Stream<List<Camp>> filterCampByAdditionalSupport(String supports) {
+    // TODO: implement filterCampByAdditionalSupport
+    throw UnimplementedError();
+  }
 }
