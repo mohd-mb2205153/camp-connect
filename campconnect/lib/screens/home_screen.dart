@@ -143,7 +143,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             context.goNamed(AppRouter.viewSavedCamps.name,
                 extra: loggedUser.id);
           } else if (isTeacher) {
-            context.goNamed(AppRouter.viewTeachingCamps.name,
+            context.goNamed(AppRouter.viewCreatedCamps.name,
                 extra: loggedUser.id);
           }
         },

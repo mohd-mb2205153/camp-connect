@@ -419,7 +419,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
                   isStudent
                       ? context.pushNamed(AppRouter.viewSavedCamps.name,
                           extra: loggedUser.id)
-                      : context.pushNamed(AppRouter.viewCreatedCamps.name,
+                      : context.pushNamed(AppRouter.viewTeachingCamps.name,
                           extra: loggedUser.id);
                 },
                 icon: Image.asset(
@@ -615,42 +615,75 @@ class CampDetailsModal extends ConsumerStatefulWidget {
 
 class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
   late bool isSaved;
+  late bool isTeaching;
 
   @override
   void initState() {
     super.initState();
     User? user = ref.read(loggedInUserNotifierProvider);
-    if (user is Student) {
-      isSaved = ref.read(studentProviderNotifier.notifier).isSavedCamp(
-          ref.read(loggedInUserNotifierProvider) as Student, widget.camp.id!);
-    }
+    user is Student
+        ? isSaved = ref.read(studentProviderNotifier.notifier).isSavedCamp(
+            ref.read(loggedInUserNotifierProvider) as Student, widget.camp.id!)
+        : isTeaching = ref
+            .read(teacherProviderNotifier.notifier)
+            .isTeachingCamp(ref.read(loggedInUserNotifierProvider) as Teacher,
+                widget.camp.id!);
   }
 
   void toggleSaveCamp() async {
     final loggedInUser = ref.read(loggedInUserNotifierProvider);
 
-    if (loggedInUser is! Student) return;
+    if (loggedInUser is Student) {
+      final studentNotifier = ref.read(loggedInUserNotifierProvider.notifier);
 
-    final studentNotifier = ref.read(loggedInUserNotifierProvider.notifier);
-
-    setState(() {
-      isSaved = !isSaved;
-    });
-
-    try {
-      if (isSaved) {
-        loggedInUser.savedCamps.add(widget.camp.id!);
-      } else {
-        loggedInUser.savedCamps.remove(widget.camp.id!);
-      }
-
-      await studentNotifier.updateStudent(loggedInUser);
-    } catch (e) {
       setState(() {
-        isSaved = !isSaved;
+        isTeaching = !isTeaching;
       });
+
+      try {
+        if (isSaved) {
+          loggedInUser.savedCamps.add(widget.camp.id!);
+        } else {
+          loggedInUser.savedCamps.remove(widget.camp.id!);
+        }
+
+        await studentNotifier.updateStudent(loggedInUser);
+      } catch (e) {
+        setState(() {
+          isSaved = !isSaved;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error updating saved camps: $e")),
+        );
+      }
+    } else if (loggedInUser is Teacher) {
+      final teacherNotifier = ref.read(loggedInUserNotifierProvider.notifier);
+
+      setState(() {
+        isTeaching = !isTeaching;
+      });
+
+      try {
+        if (isTeaching) {
+          loggedInUser.teachingCamps.add(widget.camp.id!);
+        } else {
+          loggedInUser.teachingCamps.remove(widget.camp.id!);
+        }
+
+        await teacherNotifier.updateTeacher(loggedInUser);
+      } catch (e) {
+        setState(() {
+          isTeaching = !isTeaching;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error updating teaching camps: $e")),
+        );
+      }
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error updating saved camps: $e")),
+        SnackBar(
+            content:
+                Text("Error in determining if user is student or teacher")),
       );
     }
   }
@@ -731,6 +764,23 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
                   onPressed: toggleSaveCamp,
                   icon: Icon(
                     isSaved ? Icons.bookmark : Icons.bookmark_outline_outlined,
+                    color: AppColors.lightTeal,
+                    size: 20,
+                  ),
+                ),
+              ),
+            ),
+          if (!widget.isStudent)
+            Material(
+              elevation: 2,
+              shape: const CircleBorder(),
+              color: const Color.fromARGB(255, 247, 247, 247),
+              child: SizedBox(
+                height: 36,
+                child: IconButton(
+                  onPressed: toggleSaveCamp,
+                  icon: Icon(
+                    isTeaching ? Icons.book : Icons.book_outlined,
                     color: AppColors.lightTeal,
                     size: 20,
                   ),

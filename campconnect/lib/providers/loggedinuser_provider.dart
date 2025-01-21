@@ -37,7 +37,15 @@ class LoggedInUserNotifier extends StateNotifier<User?> {
       throw Exception("Student ID is required to update.");
     }
     await _repo.updateStudent(student);
-    state = student; // Update the local state
+    state = student;
+  }
+
+  Future<void> updateTeacher(Teacher teacher) async {
+    if (teacher.id == null) {
+      throw Exception("Teacher ID is required to update.");
+    }
+    await _repo.updateTeacher(teacher);
+    state = teacher;
   }
 }
 

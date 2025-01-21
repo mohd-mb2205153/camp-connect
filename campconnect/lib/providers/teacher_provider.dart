@@ -75,6 +75,10 @@ class TeacherProvider extends AsyncNotifier<List<Teacher>> {
       rethrow;
     }
   }
+
+  bool isTeachingCamp(Teacher teacher, String campId) {
+    return teacher.teachingCamps.contains(campId);
+  }
 }
 
 final teacherProviderNotifier =
