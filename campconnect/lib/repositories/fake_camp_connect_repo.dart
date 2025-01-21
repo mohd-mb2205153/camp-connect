@@ -182,4 +182,10 @@ class FakeCampConnectRepo implements CampConnectRepo {
     throw UnimplementedError();
   }
   
+  @override
+  Stream<List<Camp>> filterCampsByRange(double userLat, double userLng, double rangeInKm) {
+    // TODO: implement getCampsByRange
+    throw UnimplementedError();
+  }
+  
 }

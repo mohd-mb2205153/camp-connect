@@ -68,6 +68,12 @@ class CampProvider extends AsyncNotifier<List<Camp>> {
   }).onError((error) => print(error));
   }
 
+  filterByRange(double userLat, double userLng, double rangeInKm) {
+    _repo.filterCampsByRange(userLat, userLng, rangeInKm).listen((camp) {
+      state = AsyncData(camp);
+  }).onError((error) => print(error));
+  }
+
 }
 
 final campProviderNotifier =
