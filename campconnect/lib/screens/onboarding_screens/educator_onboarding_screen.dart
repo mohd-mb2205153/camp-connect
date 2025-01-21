@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../../models/teacher.dart';
+import '../../providers/loggedinuser_provider.dart';
 import '../../providers/show_nav_bar_provider.dart';
 import '../../repositories/camp_connect_repo.dart';
 import '../../services/auth_services.dart';
@@ -171,6 +172,10 @@ class _EducatorOnboardingScreenState
 
       await repo.addTeacher(updatedTeacher);
 
+      ref
+          .read(loggedInUserNotifierProvider.notifier)
+          .setTeacher(updatedTeacher);
+
       showCustomSnackBar("You have registered successfully!",
           icon: Icons.check_circle);
 
@@ -189,7 +194,7 @@ class _EducatorOnboardingScreenState
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
-        resizeToAvoidBottomInset: true,
+        resizeToAvoidBottomInset: false,
         extendBodyBehindAppBar: true,
         appBar: buildAppBar(context),
         body: Column(

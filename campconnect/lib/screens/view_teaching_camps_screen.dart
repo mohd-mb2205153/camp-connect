@@ -1,4 +1,5 @@
 import 'package:campconnect/providers/show_nav_bar_provider.dart';
+import 'package:campconnect/widgets/empty_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/teacher_provider.dart';
@@ -91,7 +92,7 @@ class TeachingCampListView extends ConsumerWidget {
 
     return teachingCamps.when(
       data: (camps) => camps.isEmpty
-          ? const Center(child: Text('No teaching camps available'))
+          ? const EmptyScreen()
           : ListView.builder(
               itemCount: camps.length,
               itemBuilder: (context, index) {

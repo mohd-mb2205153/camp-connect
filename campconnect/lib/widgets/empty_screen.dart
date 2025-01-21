@@ -13,13 +13,14 @@ class EmptyScreen extends StatelessWidget {
         children: [
           const Icon(
             Icons.info_outline,
-            color: Colors.grey,
+            color: const Color.fromARGB(179, 245, 245, 245),
             size: 48,
           ),
           const SizedBox(height: 16),
           Text(
             "This screen is currently empty.",
-            style: getTextStyle("small", color: Colors.grey),
+            style: getTextStyle("medium",
+                color: const Color.fromARGB(179, 245, 245, 245)),
           ),
         ],
       ),

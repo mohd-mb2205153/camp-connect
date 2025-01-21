@@ -16,6 +16,7 @@ import 'package:go_router/go_router.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../../models/user.dart';
+import '../../providers/loggedinuser_provider.dart';
 import '../../providers/show_nav_bar_provider.dart';
 
 class StudentOnboardingScreen extends ConsumerStatefulWidget {
@@ -167,6 +168,10 @@ class _StudentOnboardingScreenState
       );
 
       await repo.addStudent(updatedStudent);
+
+      ref
+          .read(loggedInUserNotifierProvider.notifier)
+          .setStudent(updatedStudent);
 
       showCustomSnackBar("You have registered successfully!",
           icon: Icons.check_circle);

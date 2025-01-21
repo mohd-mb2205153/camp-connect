@@ -34,7 +34,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   void initState() {
     super.initState();
     ref.read(showNavBarNotifierProvider.notifier);
-    ref.read(loggedInUserNotifierProvider.notifier);
 
     txtEmailController = TextEditingController();
     txtPasswordController = TextEditingController();

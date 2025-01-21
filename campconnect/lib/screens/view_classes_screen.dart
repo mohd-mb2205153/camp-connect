@@ -6,9 +6,11 @@ import '../models/class.dart';
 import '../models/teacher.dart';
 import '../providers/loggedinuser_provider.dart';
 import '../providers/show_nav_bar_provider.dart';
+import '../providers/class_provider.dart';
 import '../routes/app_router.dart';
 import '../theme/constants.dart';
 import '../utils/helper_widgets.dart';
+import '../widgets/empty_screen.dart';
 
 class ViewClassesScreen extends ConsumerStatefulWidget {
   final String campId;
@@ -30,6 +32,7 @@ class _ViewClassesScreenState extends ConsumerState<ViewClassesScreen> {
     initializeUserDetails();
     Future.microtask(() {
       ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(false);
+      ref.read(classProviderNotifier.notifier).initializeClasses();
     });
   }
 
@@ -54,6 +57,8 @@ class _ViewClassesScreenState extends ConsumerState<ViewClassesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final classesAsync = ref.watch(classProviderNotifier);
+
     return Scaffold(
       appBar: AppBar(
         scrolledUnderElevation: 0.0,
@@ -91,13 +96,135 @@ class _ViewClassesScreenState extends ConsumerState<ViewClassesScreen> {
       body: SizedBox.expand(
         child: Stack(
           children: [
-            buildBackground("bg12"), // Background for the screen
+            buildBackground("bg12"),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8),
               child: Column(
                 children: [
-                  Expanded(child: ClassList(campId: widget.campId)),
-                  const SizedBox(height: 10),
+                  Expanded(
+                    child: classesAsync.when(
+                      data: (classes) {
+                        final campClasses = classes
+                            .where((c) =>
+                                c.teacher.teachingCamps.contains(widget.campId))
+                            .toList();
+
+                        return campClasses.isEmpty
+                            ? const EmptyScreen()
+                            : ListView.builder(
+                                itemCount: campClasses.length,
+                                itemBuilder: (context, index) {
+                                  final classItem = campClasses[index];
+                                  return Padding(
+                                    padding: const EdgeInsets.only(top: 8.0),
+                                    child: Card(
+                                      color: AppColors.darkTeal,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Container(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.library_books,
+                                                  color: Colors.white,
+                                                  size: 24,
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Text(
+                                                  classItem.subject,
+                                                  style: getTextStyle(
+                                                      'mediumBold',
+                                                      color: Colors.white),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 12),
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  'Subtopic: ',
+                                                  style: getTextStyle(
+                                                      'smallBold',
+                                                      color: Colors.white),
+                                                ),
+                                                Expanded(
+                                                  child: Text(
+                                                    classItem.subtitle,
+                                                    style: getTextStyle('small',
+                                                        color: Colors.white70),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 12),
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  'Teacher: ',
+                                                  style: getTextStyle(
+                                                      'smallBold',
+                                                      color: Colors.white),
+                                                ),
+                                                Expanded(
+                                                  child: Text(
+                                                    "${classItem.teacher.firstName} ${classItem.teacher.lastName}",
+                                                    style: getTextStyle('small',
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 10),
+                                            Text(
+                                              'Description:',
+                                              style: getTextStyle('smallBold',
+                                                  color: Colors.white),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              classItem.description,
+                                              style: getTextStyle('small',
+                                                  color: Colors.white70),
+                                            ),
+                                            const SizedBox(height: 10),
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  'Time: ',
+                                                  style: getTextStyle(
+                                                      'smallBold',
+                                                      color: Colors.white),
+                                                ),
+                                                Expanded(
+                                                  child: Text(
+                                                    '${classItem.timeFrom} - ${classItem.timeTo}',
+                                                    style: getTextStyle('small',
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                      },
+                      loading: () =>
+                          const Center(child: CircularProgressIndicator()),
+                      error: (err, stack) => Center(child: Text('Error: $err')),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -116,121 +243,5 @@ class _ViewClassesScreenState extends ConsumerState<ViewClassesScreen> {
         ),
       ),
     );
-  }
-}
-
-class ClassList extends StatelessWidget {
-  final String campId;
-
-  const ClassList({super.key, required this.campId});
-
-  @override
-  Widget build(BuildContext context) {
-    // Placeholder data
-    final classes = List.generate(
-      5,
-      (index) => Class(
-        id: 'class_$index',
-        teacher: Teacher(
-          id: 'teacher_$index',
-          firstName: 'Teacher $index',
-          lastName: 'LastName',
-          dateOfBirth: DateTime(1980 + index, 1, 1),
-          nationality: 'Country',
-          primaryLanguages: ['English'],
-          phoneCode: '+974',
-          mobileNumber: '6681562$index',
-          highestEducationLevel: 'Master’s',
-          teachingExperience: 5,
-          areasOfExpertise: ['Math', 'Science'],
-          willingnessToTravel: 'Within 10 km',
-          availabilitySchedule: '9 AM - 3 PM',
-          preferredCampDuration: 'Short-term',
-        ),
-        description: 'This is a placeholder description for Class $index.',
-        subject: 'Subject $index',
-        subtitle: 'Subtitle $index',
-        timeFrom: '10:00 AM',
-        timeTo: '12:00 PM',
-      ),
-    );
-
-    return classes.isEmpty
-        ? const Center(child: Text('No classes available'))
-        : ListView.builder(
-            itemCount: classes.length,
-            itemBuilder: (context, index) {
-              final classItem = classes[index];
-              return Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Card(
-                  color: AppColors.darkTeal,
-                  child: Container(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          classItem.subject,
-                          style:
-                              getTextStyle('mediumBold', color: Colors.white),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          classItem.subtitle,
-                          style: getTextStyle('small', color: Colors.white70),
-                        ),
-                        addVerticalSpace(10),
-                        Row(
-                          children: [
-                            Text(
-                              'Teacher: ',
-                              style: getTextStyle('smallBold',
-                                  color: Colors.white),
-                            ),
-                            Expanded(
-                              child: Text(
-                                classItem.teacher.firstName,
-                                style:
-                                    getTextStyle('small', color: Colors.white),
-                              ),
-                            ),
-                          ],
-                        ),
-                        addVerticalSpace(10),
-                        Text(
-                          'Description:',
-                          style: getTextStyle('smallBold', color: Colors.white),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          classItem.description,
-                          style: getTextStyle('small', color: Colors.white70),
-                        ),
-                        addVerticalSpace(10),
-                        Row(
-                          children: [
-                            Text(
-                              'Time: ',
-                              style: getTextStyle('smallBold',
-                                  color: Colors.white),
-                            ),
-                            Expanded(
-                              child: Text(
-                                '${classItem.timeFrom} - ${classItem.timeTo}',
-                                style:
-                                    getTextStyle('small', color: Colors.white),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            },
-          );
   }
 }

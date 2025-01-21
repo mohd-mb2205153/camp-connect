@@ -397,7 +397,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  userPhoneCode.isNotEmpty ? "+$userPhoneCode" : "Phone Code",
+                  userPhoneCode.isNotEmpty ? userPhoneCode : "Phone Code",
                   style: getTextStyle("smallBold", color: Colors.white),
                 ),
                 addHorizontalSpace(8),

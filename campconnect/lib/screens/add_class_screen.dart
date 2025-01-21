@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:campconnect/providers/loggedinuser_provider.dart';
 import 'package:campconnect/providers/repo_provider.dart';
+import 'package:campconnect/routes/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/cupertino.dart';
@@ -103,9 +104,9 @@ class _AddClassScreenState extends ConsumerState<AddClassScreen> {
             padding: const EdgeInsets.all(16.0),
             child: ListView(
               children: [
-                const Text(
+                Text(
                   "Teacher",
-                  style: TextStyle(fontSize: 14, color: AppColors.lightTeal),
+                  style: getTextStyle("small", color: AppColors.lightTeal),
                 ),
                 addVerticalSpace(8),
                 buildTextField(
@@ -115,12 +116,12 @@ class _AddClassScreenState extends ConsumerState<AddClassScreen> {
                   prefixIcon: const Icon(Icons.person, color: Colors.grey),
                   focusNode: teacherFocus,
                 ),
-                const SizedBox(height: 16),
+                addVerticalSpace(16),
                 buildSubjectPicker(context),
-                const SizedBox(height: 16),
-                const Text(
+                addVerticalSpace(16),
+                Text(
                   "Subtitle",
-                  style: TextStyle(fontSize: 14, color: AppColors.lightTeal),
+                  style: getTextStyle("small", color: AppColors.lightTeal),
                 ),
                 addVerticalSpace(8),
                 buildTextField(
@@ -129,10 +130,10 @@ class _AddClassScreenState extends ConsumerState<AddClassScreen> {
                   prefixIcon: const Icon(Icons.title, color: Colors.grey),
                   focusNode: subtitleFocus,
                 ),
-                const SizedBox(height: 16),
-                const Text(
+                addVerticalSpace(16),
+                Text(
                   "Description",
-                  style: TextStyle(fontSize: 14, color: AppColors.lightTeal),
+                  style: getTextStyle("small", color: AppColors.lightTeal),
                 ),
                 addVerticalSpace(8),
                 buildTextArea(
@@ -141,9 +142,9 @@ class _AddClassScreenState extends ConsumerState<AddClassScreen> {
                   prefixIcon: const Icon(Icons.description, color: Colors.grey),
                   focusNode: descriptionFocus,
                 ),
-                const SizedBox(height: 16),
+                addVerticalSpace(16),
                 buildClassSchedulePicker(),
-                const SizedBox(height: 24),
+                addVerticalSpace(24),
                 Center(
                   child: SizedBox(
                     width: double.infinity,
@@ -187,7 +188,7 @@ class _AddClassScreenState extends ConsumerState<AddClassScreen> {
                                 campProvider.updateCamp(camp);
                               }
 
-                              context.pop();
+                              context.goNamed(AppRouter.map.name);
                             }
                           } catch (error) {
                             showCustomSnackBar("$error", icon: Icons.error);
@@ -213,9 +214,9 @@ class _AddClassScreenState extends ConsumerState<AddClassScreen> {
                         ),
                         elevation: 4,
                       ),
-                      child: const Text(
-                        "Add Camp",
-                        style: TextStyle(color: Colors.white),
+                      child: Text(
+                        "Add a Class",
+                        style: getTextStyle("smallBold", color: Colors.white),
                       ),
                     ),
                   ),
@@ -397,7 +398,7 @@ class _AddClassScreenState extends ConsumerState<AddClassScreen> {
                 ),
               ),
             ),
-            const SizedBox(width: 16),
+            addHorizontalSpace(16),
             Expanded(
               child: GestureDetector(
                 onTap: () => showHourPicker(context, false),

@@ -744,7 +744,7 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
                 children: [
                   SizedBox(
                     child: Text(
-                      wrapText(widget.camp.description, 50),
+                      wrapText(widget.camp.description, 45),
                       style: getTextStyle("small", color: Colors.black38),
                     ),
                   ),

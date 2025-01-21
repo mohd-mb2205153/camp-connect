@@ -6,7 +6,6 @@ import '../models/student.dart';
 import '../models/teacher.dart';
 import '../models/user.dart';
 import '../repositories/camp_connect_repo.dart';
-import '../repositories/fake_camp_connect_repo.dart';
 import 'repo_provider.dart';
 
 class LoggedInUserNotifier extends StateNotifier<User?> {
@@ -66,7 +65,7 @@ final loggedInUserNotifierProvider =
   return asyncRepo.when(
     data: (repo) => LoggedInUserNotifier(repo),
     loading: () {
-      return LoggedInUserNotifier(FakeCampConnectRepo());
+      throw Exception('Repo is still loading. Ensure this is handled.');
     },
     error: (error, stackTrace) {
       throw Exception('Error resolving CampConnectRepo: $error');
