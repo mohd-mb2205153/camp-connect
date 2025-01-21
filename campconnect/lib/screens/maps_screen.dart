@@ -11,6 +11,7 @@ import 'package:campconnect/providers/teacher_provider.dart';
 import 'package:campconnect/routes/app_router.dart';
 import 'package:campconnect/theme/constants.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
+import 'package:campconnect/widgets/edit_screen_fields.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -57,6 +58,8 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
   late LatLng currentLocation;
   late LatLng destinationCampLocation;
   List<LatLng> polyLineCordinates = [];
+
+  TextEditingController areaRadiusController = TextEditingController();
 
   @override
   void initState() {
@@ -105,6 +108,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
   void dispose() {
     _positionStreamSubscription.cancel();
     _googleMapController?.dispose();
+    areaRadiusController.dispose();
     super.dispose();
   }
 
@@ -352,7 +356,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
       ),
       builder: (context) {
         return SizedBox(
-          height: screenHeight(context) * .65,
+          height: screenHeight(context) * .6,
           child: StatefulBuilder(
             builder: (BuildContext context, StateSetter setModalState) {
               return Padding(
@@ -369,6 +373,10 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
                             style:
                                 getTextStyle('mediumBold', color: Colors.teal),
                           ),
+                          Expanded(
+                            child: SizedBox(),
+                          ),
+                          _buildClearAllFilters(context),
                         ],
                       ),
                       Divider(
@@ -376,6 +384,11 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
                         height: 20,
                       ),
                       createFilterRadios(setModalState),
+                      Divider(
+                        color: AppColors.teal,
+                        height: 20,
+                        thickness: 15,
+                      ),
                       SizedBox(
                         height: 10,
                       ),
@@ -407,6 +420,26 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
                             icon: Icons.health_and_safety_rounded,
                             filteredList: filteredAdditional,
                             provider: additionalSupportProvider),
+                      if (selectedFilterType == 'Area Radius')
+                        Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Filter Area Radius:',
+                                  style: getTextStyle('medium',
+                                      color: AppColors.teal),
+                                ),
+                                EditScreenTextField(
+                                  label: 'Filter Area Radius',
+                                  controller: areaRadiusController,
+                                  type: TextInputType.number,
+                                ),
+                              ],
+                            ),
+                          ],
+                        )
                     ],
                   ),
                 ),
@@ -616,6 +649,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
   ElevatedButton _buildFilterButton(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
+        selectedFilterType = null;
         showFilterBottomSheet(context);
       },
       style: ElevatedButton.styleFrom(
@@ -629,6 +663,26 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
       child: Text(
         "Filter",
         style: getTextStyle("mediumBold", color: AppColors.teal),
+      ),
+    );
+  }
+
+  ElevatedButton _buildClearAllFilters(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () {
+        // handleClearAll();
+      },
+      style: ElevatedButton.styleFrom(
+        elevation: 2,
+        backgroundColor: Colors.teal,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
+      ),
+      child: Text(
+        "Clear All",
+        style: getTextStyle("mediumBold", color: AppColors.white),
       ),
     );
   }
