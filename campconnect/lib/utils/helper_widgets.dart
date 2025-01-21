@@ -39,6 +39,7 @@ Widget buildTextField({
   bool obscureText = false,
   Widget? suffixIcon,
   Icon? prefixIcon,
+  bool readOnly = false,
   required FocusNode focusNode,
 }) {
   return TextField(
@@ -46,6 +47,7 @@ Widget buildTextField({
     keyboardType: keyboardType,
     obscureText: obscureText,
     focusNode: focusNode,
+    readOnly: readOnly,
     decoration: InputDecoration(
       hintText: hintText,
       prefixIcon: prefixIcon,
@@ -100,24 +102,6 @@ Widget buildTextArea({
   );
 }
 
-InputDecoration buildInputDecoration(String hintText) {
-  return InputDecoration(
-    hintText: hintText,
-    hintStyle: const TextStyle(
-      color: Colors.grey,
-      overflow: TextOverflow.ellipsis,
-    ),
-    isDense: true,
-    hintMaxLines: 1,
-    enabledBorder: const UnderlineInputBorder(
-      borderSide: BorderSide(color: Colors.grey),
-    ),
-    focusedBorder: const UnderlineInputBorder(
-      borderSide: BorderSide(color: AppColors.lightTeal, width: 2),
-    ),
-  );
-}
-
 AppBar buildAppBar(BuildContext context) {
   return AppBar(
     scrolledUnderElevation: 0.0,
@@ -159,20 +143,42 @@ Widget buildDecoratedInput(String text, IconData icon) {
     decoration: buildInputDecoration(""),
     child: Row(
       children: [
+        addHorizontalSpace(12),
         Icon(icon, color: Colors.grey),
-        addHorizontalSpace(8),
+        addHorizontalSpace(12),
         Expanded(
-          child: Text(
-            text,
-            overflow: TextOverflow.ellipsis,
-            maxLines: 1,
-            style: getTextStyle(
-              'medium',
-              color: Colors.grey,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Text(
+              text,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+              style: getTextStyle(
+                'medium',
+                color: Colors.grey,
+              ),
             ),
           ),
         ),
       ],
+    ),
+  );
+}
+
+InputDecoration buildInputDecoration(String hintText) {
+  return InputDecoration(
+    hintText: hintText,
+    hintStyle: const TextStyle(
+      color: Colors.grey,
+      overflow: TextOverflow.ellipsis,
+    ),
+    isDense: true,
+    hintMaxLines: 1,
+    enabledBorder: const UnderlineInputBorder(
+      borderSide: BorderSide(color: Colors.grey),
+    ),
+    focusedBorder: const UnderlineInputBorder(
+      borderSide: BorderSide(color: AppColors.lightTeal, width: 2),
     ),
   );
 }

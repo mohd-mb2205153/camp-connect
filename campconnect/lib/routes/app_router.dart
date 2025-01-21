@@ -18,6 +18,7 @@ import 'package:campconnect/screens/view_teachers_screen.dart';
 import 'package:go_router/go_router.dart';
 
 import '../models/teacher.dart';
+import '../screens/add_class_screen.dart';
 import '../screens/onboarding_screens/register_screen.dart';
 import '../screens/onboarding_screens/student_onboarding_screen.dart';
 import '../screens/view_saved_camps_screen.dart';
@@ -55,6 +56,9 @@ class AppRouter {
   static const addCampLocation =
       (name: 'addCampLocation', path: 'addCampLocation');
   static const addCamp = (name: 'addCamp', path: 'addCamp:location');
+
+  // Add Class Route
+  static const addClass = (name: 'addClass', path: 'addClass');
 
   // Profile Settings Routes
   static const personal = (name: 'personal', path: 'personal');
@@ -171,6 +175,16 @@ class AppRouter {
                   final campId = state.extra as String;
                   return ViewClassesScreen(campId: campId);
                 },
+                routes: [
+                  GoRoute(
+                    path: addClass.path,
+                    name: addClass.name,
+                    builder: (context, state) {
+                      final campId = state.extra as String;
+                      return AddClassScreen(campId: campId);
+                    },
+                  ),
+                ],
               ),
               GoRoute(
                 path: viewTeachers.path,

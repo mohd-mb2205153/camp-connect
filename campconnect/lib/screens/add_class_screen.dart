@@ -1,163 +1,78 @@
 import 'dart:convert';
 
-import 'package:campconnect/models/camp.dart';
-import 'package:campconnect/providers/camp_provider.dart';
-import 'package:campconnect/providers/json_provider.dart';
-import 'package:campconnect/providers/teacher_provider.dart';
-import 'package:campconnect/routes/app_router.dart';
-import 'package:campconnect/widgets/filter_dropdown.dart';
+import 'package:campconnect/providers/loggedinuser_provider.dart';
+import 'package:campconnect/providers/repo_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:geocoding/geocoding.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:campconnect/theme/constants.dart';
-import 'package:campconnect/utils/helper_widgets.dart';
 
-import '../providers/loggedinuser_provider.dart';
+import '../models/class.dart';
+import '../models/teacher.dart';
+import '../providers/camp_provider.dart';
+import '../providers/class_provider.dart';
 import '../providers/show_nav_bar_provider.dart';
+import '../theme/constants.dart';
+import '../utils/helper_widgets.dart';
 
 class AddClassScreen extends ConsumerStatefulWidget {
-  final String location;
-  const AddClassScreen({super.key, required this.location});
+  final String campId;
+  const AddClassScreen({super.key, required this.campId});
 
   @override
   ConsumerState<AddClassScreen> createState() => _AddClassScreenState();
 }
 
 class _AddClassScreenState extends ConsumerState<AddClassScreen> {
-  bool isStudent = false;
-  bool isTeacher = false;
-  dynamic loggedUser;
-
-  final nameController = TextEditingController();
+  final teacherController = TextEditingController();
+  final subtitleController = TextEditingController();
   final descriptionController = TextEditingController();
-  final statusOfResourcesController = TextEditingController();
 
-  final FocusNode campNameFocus = FocusNode();
-  final FocusNode campDescriptionFocus = FocusNode();
-  final FocusNode campStatusOfResourcesFocus = FocusNode();
+  final FocusNode teacherFocus = FocusNode();
+  final FocusNode subtitleFocus = FocusNode();
+  final FocusNode descriptionFocus = FocusNode();
 
-  String? locationString;
-  List<String>? latlng;
-  double? latitude;
-  double? longitude;
-  LatLng? location;
-  String? address;
+  List<String> subjectOptions = [];
+  String selectedSubject = '';
 
-  late List<String> additionalSupports = [];
-  List<String> selectedAdditionalSupports = [];
-  late List<String> educationalLevelOptions = [];
-  List<String> selectedEducationalLevels = [];
+  TimeOfDay fromTime = TimeOfDay.now();
+  TimeOfDay toTime = TimeOfDay.fromDateTime(
+    DateTime.now().add(const Duration(hours: 1)),
+  );
 
-  late List<String> languageOptions = [];
-  List<String> selectedLanguages = [];
+  String classSchedule = "";
 
   @override
   void initState() {
     super.initState();
-    locationString = widget.location;
-    latlng = locationString!.split("|");
-    latitude = double.parse(latlng![0]);
-    longitude = double.parse(latlng![1]);
-    address = latlng![2];
-    location = LatLng(latitude!, longitude!);
-    loadAdditionalSupports();
-    loadEducationalLevels();
-    loadLanguages();
-    initializeUserDetails();
+    final loggedUser = ref.read(loggedInUserNotifierProvider);
+    ref.read(classProviderNotifier.notifier);
     ref.read(campProviderNotifier.notifier);
-    ref.read(teacherProviderNotifier.notifier);
-    Future.microtask(() {
-      ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(false);
-    });
+
+    if (loggedUser is Teacher) {
+      teacherController.text = '${loggedUser.firstName} ${loggedUser.lastName}';
+    }
+
+    loadSubjects();
   }
 
-  void initializeUserDetails() {
-    Future.microtask(() {
-      final userNotifier = ref.read(loggedInUserNotifierProvider.notifier);
-
-      loggedUser = userNotifier.teacher;
-
-      ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(true);
-
-      setState(() {});
-    });
-  }
-
-  Future<void> loadAdditionalSupports() async {
+  Future<void> loadSubjects() async {
     try {
       final data = await DefaultAssetBundle.of(context)
-          .loadString("assets/data/additional_support.json");
-      final parsedData = json.decode(data) as Map<String, dynamic>;
-      additionalSupports = (parsedData["additionalSupport"] as List<dynamic>)
-          .map<String>((e) => e["label"] as String)
-          .toList();
+          .loadString("assets/data/subjects.json");
+      subjectOptions = List<String>.from(json.decode(data) as List);
       setState(() {});
     } catch (error) {
-      debugPrint("Error loading additional supports data: $error");
+      debugPrint("Error loading subjects data: $error");
     }
   }
 
-  Future<void> loadEducationalLevels() async {
-    try {
-      final data = await DefaultAssetBundle.of(context)
-          .loadString("assets/data/education_level.json");
-      educationalLevelOptions = List<String>.from(json.decode(data) as List);
-      setState(() {});
-    } catch (error) {
-      debugPrint("Error loading educational levels data: $error");
-    }
-  }
-
-  Future<void> loadLanguages() async {
-    try {
-      final langJson = await DefaultAssetBundle.of(context)
-          .loadString("assets/data/lang.json");
-      languageOptions = (json.decode(langJson) as List)
-          .map((item) => item["name"] as String)
-          .toList();
-      setState(() {});
-    } catch (error) {
-      debugPrint("Error loading languages data: $error");
-    }
-  }
-
-  void addCamp() async {
-    final newCamp = Camp(
-      name: nameController.text,
-      educationLevel: selectedEducationalLevels,
-      description: descriptionController.text,
-      latitude: latitude!,
-      longitude: longitude!,
-      statusOfResources: statusOfResourcesController.text,
-      additionalSupport: selectedAdditionalSupports,
-      languages: selectedLanguages,
-    );
-
-    try {
-      final teacherId = loggedUser.id;
-
-      final campId = await ref
-          .read(campProviderNotifier.notifier)
-          .addCamp(newCamp, teacherId);
-
-      if (loggedUser != null) {
-        final teacherId = loggedUser.id;
-        await ref
-            .read(teacherProviderNotifier.notifier)
-            .addCreatedCamp(teacherId, campId);
-        await ref
-            .read(teacherProviderNotifier.notifier)
-            .addTeachingCamp(teacherId, campId);
-      }
-
-      ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(true);
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to add camp: $e")),
-      );
-    }
+  @override
+  void dispose() {
+    teacherController.dispose();
+    subtitleFocus.dispose();
+    descriptionController.dispose();
+    super.dispose();
   }
 
   @override
@@ -166,171 +81,158 @@ class _AddClassScreenState extends ConsumerState<AddClassScreen> {
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
         if (!didPop) {
-          ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(true);
           Navigator.of(context).pop(result);
         }
         return;
       },
-      child: Scaffold(
-        appBar: AppBar(
-          scrolledUnderElevation: 0.0,
-          backgroundColor: AppColors.lightTeal,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () {
-              ref
-                  .read(showNavBarNotifierProvider.notifier)
-                  .showBottomNavBar(true);
-              context.pop();
-            },
+      child: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus();
+        },
+        child: Scaffold(
+          resizeToAvoidBottomInset: true,
+          extendBodyBehindAppBar: false,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            scrolledUnderElevation: 0,
+            elevation: 0,
+            title: Text("Add a Class",
+                style: getTextStyle("mediumBold", color: AppColors.teal)),
           ),
-          title: Text(
-            'Add Camp Details',
-            style: getTextStyle("mediumBold", color: Colors.white),
-          ),
-        ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
-            child: Column(
+          body: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ListView(
               children: [
-                addVerticalSpace(12),
-                Column(
-                  children: [
-                    Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Camp Name",
-                              textAlign: TextAlign.start,
-                              style: getTextStyle("small",
-                                  color: AppColors.lightTeal),
-                            ),
-                          ],
-                        ),
-                        buildTextField(
-                          controller: nameController,
-                          hintText: "Enter Camp Name",
-                          focusNode: campNameFocus,
-                          prefixIcon: Icon(
-                            Icons.add_home,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                const Text(
+                  "Teacher",
+                  style: TextStyle(fontSize: 14, color: AppColors.lightTeal),
                 ),
-                addVerticalSpace(12),
-                Column(
-                  children: [
-                    Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Camp Description",
-                              textAlign: TextAlign.start,
-                              style: getTextStyle("small",
-                                  color: AppColors.lightTeal),
-                            ),
-                          ],
-                        ),
-                        buildTextArea(
-                          controller: descriptionController,
-                          hintText: "Enter camp details here",
-                          focusNode: campDescriptionFocus,
-                          prefixIcon: Icon(
-                            Icons.assignment,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                addVerticalSpace(8),
+                buildTextField(
+                  readOnly: true,
+                  controller: teacherController,
+                  hintText: "Teacher Name",
+                  prefixIcon: const Icon(Icons.person, color: Colors.grey),
+                  focusNode: teacherFocus,
                 ),
-                addVerticalSpace(12),
-                buildEducationLevelsPicker(),
-                addVerticalSpace(12),
-                Column(
-                  children: [
-                    Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Status of Resources",
-                              textAlign: TextAlign.start,
-                              style: getTextStyle("small",
-                                  color: AppColors.lightTeal),
-                            ),
-                          ],
-                        ),
-                        buildTextArea(
-                          controller: statusOfResourcesController,
-                          hintText: "Enter the status of resources",
-                          focusNode: campStatusOfResourcesFocus,
-                          prefixIcon: Icon(
-                            Icons.water,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                addVerticalSpace(12),
-                buildAdditionalSupportPicker(),
-                addVerticalSpace(12),
-                buildLanguages(),
                 const SizedBox(height: 16),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 60),
+                buildSubjectPicker(context),
+                const SizedBox(height: 16),
+                const Text(
+                  "Subtitle",
+                  style: TextStyle(fontSize: 14, color: AppColors.lightTeal),
+                ),
+                addVerticalSpace(8),
+                buildTextField(
+                  controller: subtitleController,
+                  hintText: "Enter Subtitle",
+                  prefixIcon: const Icon(Icons.title, color: Colors.grey),
+                  focusNode: subtitleFocus,
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  "Description",
+                  style: TextStyle(fontSize: 14, color: AppColors.lightTeal),
+                ),
+                addVerticalSpace(8),
+                buildTextArea(
+                  controller: descriptionController,
+                  hintText: "Enter Description",
+                  prefixIcon: const Icon(Icons.description, color: Colors.grey),
+                  focusNode: descriptionFocus,
+                ),
+                const SizedBox(height: 16),
+                buildClassSchedulePicker(),
+                const SizedBox(height: 24),
+                Center(
                   child: SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                        onPressed: () {
-                          if (nameController.text.isNotEmpty &&
-                              descriptionController.text.isNotEmpty &&
-                              selectedEducationalLevels.isNotEmpty) {
-                            addCamp();
-                            context.goNamed(AppRouter.map.name);
-                            ref
-                                .read(showNavBarNotifierProvider.notifier)
-                                .showBottomNavBar(true);
-                            ref
-                                .read(showNavBarNotifierProvider.notifier)
-                                .setActiveBottomNavBar(1);
-                          } else {
+                      onPressed: () async {
+                        if (teacherController.text.isNotEmpty &&
+                            selectedSubject.isNotEmpty &&
+                            subtitleController.text.isNotEmpty &&
+                            descriptionController.text.isNotEmpty &&
+                            (toTime.hour > fromTime.hour ||
+                                (toTime.hour == fromTime.hour &&
+                                    toTime.minute > fromTime.minute))) {
+                          try {
+                            final loggedUser =
+                                ref.read(loggedInUserNotifierProvider);
+                            if (loggedUser is Teacher) {
+                              final newClass = Class(
+                                id: '',
+                                teacher: loggedUser,
+                                description: descriptionController.text,
+                                subject: selectedSubject,
+                                subtitle: subtitleController.text,
+                                timeFrom:
+                                    '${fromTime.hour.toString().padLeft(2, '0')}:00',
+                                timeTo:
+                                    '${toTime.hour.toString().padLeft(2, '0')}:00',
+                              );
+
+                              final classProvider =
+                                  ref.read(classProviderNotifier.notifier);
+                              final classId =
+                                  await classProvider.addClass(newClass);
+
+                              final campProvider =
+                                  ref.read(campProviderNotifier.notifier);
+                              final camp =
+                                  await campProvider.getCampById(widget.campId);
+
+                              if (camp != null) {
+                                camp.addClass(classId);
+                                campProvider.updateCamp(camp);
+                              }
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text("Class Added Successfully!")),
+                              );
+
+                              context.pop();
+                            }
+                          } catch (error) {
+                            debugPrint("Error adding class: $error");
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content:
-                                    Text("Please fill in all required fields."),
-                              ),
+                              SnackBar(
+                                  content: Text("Error adding class: $error")),
                             );
                           }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.lightTeal,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 24, vertical: 12), // Padding
-                          shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(12), // Rounded corners
-                          ),
-                          elevation: 4, // Shadow elevation
+                        } else {
+                          String errorMessage = "Please fill all fields";
+
+                          if (toTime.hour < fromTime.hour ||
+                              (toTime.hour == fromTime.hour &&
+                                  toTime.minute <= fromTime.minute)) {
+                            errorMessage = "End time must be after start time.";
+                          }
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(errorMessage)),
+                          );
+
+                          showCustomSnackBar(errorMessage, icon: Icons.error);
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.lightTeal,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Text(
-                          "Add Camp",
-                          style: getTextStyle("medium", color: Colors.white),
-                        )),
+                        elevation: 4,
+                      ),
+                      child: const Text(
+                        "Add Camp",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
                   ),
-                )
+                ),
               ],
             ),
           ),
@@ -339,385 +241,199 @@ class _AddClassScreenState extends ConsumerState<AddClassScreen> {
     );
   }
 
-  Widget buildEducationalLevelPicker() {
+  Widget buildSubjectPicker(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
+        const Row(
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Icon(Icons.language, color: Colors.grey),
-            addHorizontalSpace(10),
             Text(
-              "Add Educational Levels",
-              style: getTextStyle('medium', color: Colors.grey),
-            ),
-            const Spacer(),
-            IconButton(
-              icon: const Icon(
-                Icons.add,
-                color: Colors.grey,
-              ),
-              onPressed: () {
-                showModalBottomSheet(
-                  context: context,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(12),
-                    ),
-                  ),
-                  builder: (_) {
-                    return ListView.builder(
-                      itemCount: educationalLevelOptions.length,
-                      itemBuilder: (_, index) {
-                        return ListTile(
-                          title: Text(
-                            educationalLevelOptions[index],
-                            style: getTextStyle("small"),
-                          ),
-                          onTap: () {
-                            setState(() {
-                              if (!selectedEducationalLevels
-                                  .contains(educationalLevelOptions[index])) {
-                                selectedEducationalLevels
-                                    .add(educationalLevelOptions[index]);
-                              }
-                            });
-                            Navigator.pop(context);
-                          },
-                        );
-                      },
-                    );
-                  },
-                );
-              },
+              "Class Subject",
+              textAlign: TextAlign.start,
+              style: TextStyle(fontSize: 14, color: AppColors.lightTeal),
             ),
           ],
-        ),
-        const Divider(
-          color: AppColors.lightTeal,
-          thickness: 2,
         ),
         addVerticalSpace(8),
-        Wrap(
-          spacing: 8,
-          children: selectedEducationalLevels
-              .map(
-                (level) => Chip(
-                  backgroundColor: AppColors.lightTeal,
-                  label: Text(
-                    level,
-                    style: getTextStyle('small', color: Colors.white),
-                  ),
-                  deleteIcon: const Icon(Icons.close, color: Colors.white),
-                  onDeleted: () {
-                    setState(() {
-                      selectedEducationalLevels.remove(level);
-                    });
-                  },
-                  shape: RoundedRectangleBorder(
-                    side: const BorderSide(
-                      color: Colors.transparent,
-                    ),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
-              )
-              .toList(),
-        ),
-      ],
-    );
-  }
-
-  Widget buildEducationLevelsPicker() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text(
-              "Education Levels",
-              textAlign: TextAlign.start,
-              style: getTextStyle("small", color: AppColors.lightTeal),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            Icon(Icons.book, color: Colors.grey),
-            const SizedBox(width: 10),
-            Text(
-              "Education Levels",
-              style: getTextStyle('medium', color: Colors.grey),
-            ),
-            const Spacer(),
-            IconButton(
-              icon: const Icon(Icons.add, color: Colors.grey),
-              onPressed: () {
-                showModalBottomSheet(
-                  context: context,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(12),
-                    ),
-                  ),
-                  builder: (_) {
-                    return ListView.builder(
-                      itemCount: educationalLevelOptions.length,
-                      itemBuilder: (_, index) {
-                        return ListTile(
-                          title: Text(
-                            educationalLevelOptions[index],
-                            style: getTextStyle("small"),
-                          ),
-                          onTap: () {
-                            setState(() {
-                              if (!selectedEducationalLevels
-                                  .contains(educationalLevelOptions[index])) {
-                                selectedEducationalLevels
-                                    .add(educationalLevelOptions[index]);
-                              }
-                            });
-                            Navigator.pop(context);
+        GestureDetector(
+          onTap: () => showCupertinoModalPopup(
+            context: context,
+            builder: (_) {
+              int tempIndex = subjectOptions.indexOf(selectedSubject);
+              return Container(
+                color: Colors.white,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        CupertinoButton(
+                          child: const Text("Cancel"),
+                          onPressed: () {
+                            context.pop();
                           },
-                        );
-                      },
-                    );
-                  },
-                );
-              },
-            ),
-          ],
-        ),
-        const Divider(color: AppColors.lightTeal, thickness: 2),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          children: selectedEducationalLevels
-              .map(
-                (subject) => Chip(
-                  backgroundColor: AppColors.lightTeal,
-                  label: Text(
-                    subject,
-                    style: getTextStyle('small', color: Colors.white),
-                  ),
-                  deleteIcon: const Icon(Icons.close, color: Colors.white),
-                  onDeleted: () {
-                    setState(() {
-                      selectedEducationalLevels.remove(subject);
-                    });
-                  },
-                  shape: RoundedRectangleBorder(
-                    side: const BorderSide(
-                      color: Colors.transparent,
-                    ),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
-              )
-              .toList(),
-        ),
-      ],
-    );
-  }
-
-  Widget buildAdditionalSupportPicker() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text(
-              "Additional Supports",
-              textAlign: TextAlign.start,
-              style: getTextStyle("small", color: AppColors.lightTeal),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            Icon(Icons.book, color: Colors.grey),
-            const SizedBox(width: 10),
-            Text(
-              "Additional Supports",
-              style: getTextStyle('medium', color: Colors.grey),
-            ),
-            const Spacer(),
-            IconButton(
-              icon: const Icon(Icons.add, color: Colors.grey),
-              onPressed: () {
-                showModalBottomSheet(
-                  context: context,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(12),
-                    ),
-                  ),
-                  builder: (_) {
-                    return ListView.builder(
-                      itemCount: additionalSupports.length,
-                      itemBuilder: (_, index) {
-                        return ListTile(
-                          title: Text(
-                            additionalSupports[index],
-                            style: getTextStyle("small"),
-                          ),
-                          onTap: () {
-                            setState(() {
-                              if (!selectedAdditionalSupports
-                                  .contains(additionalSupports[index])) {
-                                selectedAdditionalSupports
-                                    .add(additionalSupports[index]);
-                              }
-                            });
-                            Navigator.pop(context);
-                          },
-                        );
-                      },
-                    );
-                  },
-                );
-              },
-            ),
-          ],
-        ),
-        const Divider(color: AppColors.lightTeal, thickness: 2),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          children: selectedAdditionalSupports
-              .map(
-                (subject) => Chip(
-                  backgroundColor: AppColors.lightTeal,
-                  label: Text(
-                    subject,
-                    style: getTextStyle('small', color: Colors.white),
-                  ),
-                  deleteIcon: const Icon(Icons.close, color: Colors.white),
-                  onDeleted: () {
-                    setState(() {
-                      selectedAdditionalSupports.remove(subject);
-                    });
-                  },
-                  shape: RoundedRectangleBorder(
-                    side: const BorderSide(
-                      color: Colors.transparent,
-                    ),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
-              )
-              .toList(),
-        ),
-      ],
-    );
-  }
-
-  Widget buildLanguages() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text(
-                  "Add Languages",
-                  textAlign: TextAlign.start,
-                  style: getTextStyle("small", color: AppColors.lightTeal),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Icon(Icons.language, color: Colors.grey),
-                addHorizontalSpace(10),
-                Text(
-                  "Add Languages",
-                  style: getTextStyle('medium', color: Colors.grey),
-                ),
-                const Spacer(),
-                IconButton(
-                  icon: const Icon(
-                    Icons.add,
-                    color: Colors.grey,
-                  ),
-                  onPressed: () {
-                    showModalBottomSheet(
-                      context: context,
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(12),
                         ),
-                      ),
-                      builder: (_) {
-                        return ListView.builder(
-                          itemCount: languageOptions.length,
-                          itemBuilder: (_, index) {
-                            return ListTile(
-                              title: Text(
-                                languageOptions[index],
-                                style: getTextStyle("small"),
-                              ),
-                              onTap: () {
-                                setState(() {
-                                  if (!selectedLanguages
-                                      .contains(languageOptions[index])) {
-                                    selectedLanguages
-                                        .add(languageOptions[index]);
-                                  }
-                                });
-                                Navigator.pop(context);
-                              },
-                            );
+                        CupertinoButton(
+                          child: const Text("Confirm"),
+                          onPressed: () {
+                            setState(() {
+                              selectedSubject = subjectOptions[tempIndex];
+                            });
+                            context.pop();
                           },
-                        );
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 250,
+                      child: CupertinoPicker(
+                        scrollController: FixedExtentScrollController(
+                          initialItem: tempIndex >= 0 ? tempIndex : 0,
+                        ),
+                        itemExtent: 32,
+                        onSelectedItemChanged: (index) {
+                          tempIndex = index;
+                        },
+                        children: subjectOptions
+                            .map((level) => Text(
+                                  level,
+                                  style: const TextStyle(fontSize: 16),
+                                ))
+                            .toList(),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+          child: buildDecoratedInput(
+              selectedSubject.isEmpty ? "Select a subject" : selectedSubject,
+              Icons.school),
+        ),
+      ],
+    );
+  }
+
+  Widget buildClassSchedulePicker() {
+    void showHourPicker(BuildContext context, bool isFrom) {
+      showCupertinoModalPopup(
+        context: context,
+        builder: (_) {
+          int tempHour = isFrom ? fromTime.hour : toTime.hour;
+          return Container(
+            color: Colors.white,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                addVerticalSpace(8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    CupertinoButton(
+                      child: const Text("Cancel"),
+                      onPressed: () => context.pop(),
+                    ),
+                    CupertinoButton(
+                      child: const Text("Confirm"),
+                      onPressed: () {
+                        setState(() {
+                          if (isFrom) {
+                            fromTime = TimeOfDay(hour: tempHour, minute: 0);
+
+                            if (toTime.hour <= fromTime.hour) {
+                              toTime = TimeOfDay(
+                                hour: (fromTime.hour + 1) % 24,
+                                minute: 0,
+                              );
+                            }
+                          } else {
+                            toTime = TimeOfDay(hour: tempHour, minute: 0);
+
+                            if (toTime.hour <= fromTime.hour) {
+                              toTime = TimeOfDay(
+                                hour: (fromTime.hour + 1) % 24,
+                                minute: 0,
+                              );
+                            }
+                          }
+
+                          classSchedule =
+                              "${fromTime.hour.toString().padLeft(2, '0')}:00 - ${toTime.hour.toString().padLeft(2, '0')}:00";
+                        });
+
+                        context.pop();
                       },
-                    );
-                  },
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 250,
+                  child: CupertinoPicker(
+                    scrollController: FixedExtentScrollController(
+                      initialItem: tempHour,
+                    ),
+                    itemExtent: 32,
+                    onSelectedItemChanged: (selectedHour) {
+                      tempHour = selectedHour;
+                    },
+                    children: List.generate(
+                      24,
+                      (hour) => Text("$hour:00"),
+                    ),
+                  ),
                 ),
               ],
             ),
-            const Divider(
-              color: AppColors.lightTeal,
-              thickness: 2,
+          );
+        },
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Class Schedule",
+          style: TextStyle(fontSize: 14, color: AppColors.lightTeal),
+        ),
+        addVerticalSpace(8),
+        Row(
+          children: [
+            Expanded(
+              child: GestureDetector(
+                onTap: () => showHourPicker(context, true),
+                child: buildDecoratedInput(
+                  "${fromTime.hour.toString().padLeft(2, '0')}:00",
+                  Icons.access_time,
+                ),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: GestureDetector(
+                onTap: () => showHourPicker(context, false),
+                child: buildDecoratedInput(
+                  "${toTime.hour.toString().padLeft(2, '0')}:00",
+                  Icons.access_time,
+                ),
+              ),
             ),
           ],
         ),
-        addVerticalSpace(8),
-        Wrap(
-          spacing: 8,
-          children: selectedLanguages
-              .map(
-                (language) => Chip(
-                  backgroundColor: AppColors.lightTeal,
-                  label: Text(
-                    language,
-                    style: getTextStyle('small', color: Colors.white),
-                  ),
-                  deleteIcon: const Icon(Icons.close, color: Colors.white),
-                  onDeleted: () {
-                    setState(() {
-                      selectedLanguages.remove(language);
-                    });
-                  },
-                  shape: RoundedRectangleBorder(
-                    side: const BorderSide(
-                      color: Colors.transparent,
-                    ),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
-              )
-              .toList(),
-        ),
       ],
+    );
+  }
+
+  void showCustomSnackBar(String message,
+      {Color? backgroundColor, IconData? icon}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      CustomSnackBar.create(
+        message: message,
+        backgroundColor: backgroundColor,
+        icon: icon,
+      ),
     );
   }
 }

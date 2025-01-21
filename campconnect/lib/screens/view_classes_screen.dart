@@ -4,7 +4,9 @@ import 'package:go_router/go_router.dart';
 
 import '../models/class.dart';
 import '../models/teacher.dart';
+import '../providers/loggedinuser_provider.dart';
 import '../providers/show_nav_bar_provider.dart';
+import '../routes/app_router.dart';
 import '../theme/constants.dart';
 import '../utils/helper_widgets.dart';
 
@@ -18,11 +20,35 @@ class ViewClassesScreen extends ConsumerStatefulWidget {
 }
 
 class _ViewClassesScreenState extends ConsumerState<ViewClassesScreen> {
+  bool isStudent = false;
+  bool isTeacher = false;
+  dynamic loggedUser;
+
   @override
   void initState() {
     super.initState();
+    initializeUserDetails();
     Future.microtask(() {
       ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(false);
+    });
+  }
+
+  void initializeUserDetails() {
+    Future.microtask(() {
+      final userNotifier = ref.read(loggedInUserNotifierProvider.notifier);
+
+      isStudent = userNotifier.isStudent;
+      isTeacher = userNotifier.isTeacher;
+
+      if (isStudent) {
+        loggedUser = userNotifier.student;
+      } else if (isTeacher) {
+        loggedUser = userNotifier.teacher;
+      }
+
+      ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(true);
+
+      setState(() {});
     });
   }
 
@@ -42,6 +68,21 @@ class _ViewClassesScreenState extends ConsumerState<ViewClassesScreen> {
             context.pop();
           },
         ),
+        actions: [
+          isTeacher
+              ? IconButton(
+                  icon: const Icon(Icons.note_add, color: Colors.white),
+                  onPressed: () {
+                    ref
+                        .read(showNavBarNotifierProvider.notifier)
+                        .showBottomNavBar(false);
+
+                    context.goNamed(AppRouter.addClass.name,
+                        extra: widget.campId);
+                  },
+                )
+              : Text(""),
+        ],
         title: Text(
           'View Classes',
           style: getTextStyle("mediumBold", color: Colors.white),

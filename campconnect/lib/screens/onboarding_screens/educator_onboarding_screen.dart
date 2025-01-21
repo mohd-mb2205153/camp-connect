@@ -204,7 +204,7 @@ class _EducatorOnboardingScreenState
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
-        resizeToAvoidBottomInset: false,
+        resizeToAvoidBottomInset: true,
         extendBodyBehindAppBar: true,
         appBar: buildAppBar(context),
         body: Column(
@@ -664,7 +664,6 @@ class _EducatorOnboardingScreenState
                             }
                           }
 
-                          // Update availabilitySchedule
                           availabilitySchedule =
                               "${fromTime.hour.toString().padLeft(2, '0')}:00 - ${toTime.hour.toString().padLeft(2, '0')}:00";
                         });

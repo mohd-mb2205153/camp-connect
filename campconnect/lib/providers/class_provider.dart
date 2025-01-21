@@ -24,8 +24,17 @@ class ClassProvider extends AsyncNotifier<List<Class>> {
 
   Future<Class?> getClassById(String id) => _repo.getClassById(id);
 
-  void addClass(Class classData) {
-    _repo.addClass(classData);
+  Future<String> addClass(Class newClass) async {
+    try {
+      final classId = await _repo.addClass(newClass);
+      final currentClasses = state.value ?? [];
+      state = AsyncValue.data([...currentClasses, newClass]);
+
+      return classId;
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
+    }
   }
 
   void deleteClass(Class classData) {

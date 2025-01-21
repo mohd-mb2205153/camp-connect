@@ -32,6 +32,8 @@ class LoggedInUserNotifier extends StateNotifier<User?> {
 
   bool get isLoggedIn => state != null;
 
+  String? get userId => state?.id;
+
   Future<void> updateStudent(Student student) async {
     if (student.id == null) {
       throw Exception("Student ID is required to update.");
@@ -46,6 +48,10 @@ class LoggedInUserNotifier extends StateNotifier<User?> {
     }
     await _repo.updateTeacher(teacher);
     state = teacher;
+  }
+
+  String? getLoggedInUserId() {
+    return userId;
   }
 }
 

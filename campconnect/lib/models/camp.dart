@@ -1,7 +1,3 @@
-import 'package:campconnect/models/class.dart';
-import 'package:campconnect/models/teacher.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-
 class Camp {
   String? id; // Unique identifier for the camp
   String name; // Name of the camp
@@ -31,6 +27,13 @@ class Camp {
     this.languages,
   });
 
+  void addClass(String classId) {
+    this.classId ??= [];
+    if (!this.classId!.contains(classId)) {
+      this.classId!.add(classId);
+    }
+  }
+
   factory Camp.fromJson(Map<String, dynamic> json) {
     return Camp(
       id: json['id'],
@@ -44,7 +47,7 @@ class Camp {
       teacherId:
           json['teacherId'] != null ? List<String>.from(json['teacherId']) : [],
       classId:
-          json['classesIds'] != null ? List<String>.from(json['classId']) : [],
+          json['classId'] != null ? List<String>.from(json['classId']) : [],
       statusOfResources: json['statusOfResources'] ?? '',
       additionalSupport: json['additionalSupport'] != null
           ? List<String>.from(json['additionalSupport'])
@@ -70,69 +73,3 @@ class Camp {
     };
   }
 }
-
-// import 'package:campconnect/models/student.dart';
-// import 'package:campconnect/models/teacher.dart';
-// import 'package:google_maps_flutter/google_maps_flutter.dart';
-
-// import 'package:cloud_firestore/cloud_firestore.dart';
-
-// class Camp {
-//   String? id;
-//   String name;
-//   String educationLevel;
-//   String subject;
-//   String description;
-//   bool specialNeeds;
-//   double latitude;
-//   double longitude;
-//   List<String>? teachers; // Store teacher IDs (Firestore references)
-//   List<String>? students; // Store student IDs (Firestore references)
-
-//   Camp({
-//     this.id,
-//     required this.name,
-//     required this.educationLevel,
-//     required this.subject,
-//     required this.description,
-//     required this.specialNeeds,
-//     required this.latitude,
-//     required this.longitude,
-//     this.teachers,
-//     this.students,
-//   });
-
-//   // Factory method to create a Camp from JSON (Firestore document)
-//   factory Camp.fromJson(Map<String, dynamic> json) {
-//     return Camp(
-//       id: json['id'],
-//       name: json['name'],
-//       educationLevel: json['educationLevel'] ?? '',
-//       subject: json['subject'],
-//       description: json['description'] ?? '',
-//       specialNeeds: json['specialNeeds'] ?? false,
-//       latitude: (json['latitude'] as num).toDouble(), // Ensure double type
-//       longitude: (json['longitude'] as num).toDouble(), // Ensure double type
-//       teachers:
-//           json['teachers'] != null ? List<String>.from(json['teachers']) : [],
-//       students:
-//           json['students'] != null ? List<String>.from(json['students']) : [],
-//     );
-//   }
-
-//   // Convert a Camp object to JSON for Firestore
-//   Map<String, dynamic> toJson() {
-//     return {
-//       "id": id,
-//       "name": name,
-//       "educationLevel": educationLevel,
-//       "subject": subject,
-//       "description": description,
-//       "specialNeeds": specialNeeds,
-//       "latitude": latitude,
-//       "longitude": longitude,
-//       "teachers": teachers ?? [],
-//       "students": students ?? [],
-//     };
-//   }
-// }

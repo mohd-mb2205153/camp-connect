@@ -154,10 +154,19 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
 
       ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(true);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to add camp: $e")),
-      );
+      showCustomSnackBar("Failed to add camp $e", icon: Icons.error);
     }
+  }
+
+  void showCustomSnackBar(String message,
+      {Color? backgroundColor, IconData? icon}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      CustomSnackBar.create(
+        message: message,
+        backgroundColor: backgroundColor,
+        icon: icon,
+      ),
+    );
   }
 
   @override
@@ -307,12 +316,9 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
                                 .read(showNavBarNotifierProvider.notifier)
                                 .setActiveBottomNavBar(1);
                           } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content:
-                                    Text("Please fill in all required fields."),
-                              ),
-                            );
+                            showCustomSnackBar(
+                                "Please fill in all required fields.",
+                                icon: Icons.error);
                           }
                         },
                         style: ElevatedButton.styleFrom(

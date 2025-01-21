@@ -37,8 +37,9 @@ class CampConnectRepo {
     return docId;
   }
 
-  Future<void> updateCamp(Camp camp) =>
-      campsRef.doc(camp.id).update(camp.toJson());
+  Future<void> updateCamp(Camp camp) async {
+    await campsRef.doc(camp.id).update(camp.toJson());
+  }
 
   Future<void> deleteCamp(Camp camp) => campsRef.doc(camp.id).delete();
 
@@ -177,10 +178,11 @@ class CampConnectRepo {
                 Class.fromJson(snapshot.data() as Map<String, dynamic>),
           );
 
-  Future<void> addClass(Class classData) async {
-    final docId = classesRef.doc().id;
-    classData.id = docId;
-    await classesRef.doc(classData.id).set(classData.toJson());
+  Future<String> addClass(Class classData) async {
+    final docRef = classesRef.doc(); // Generate new document ID
+    classData.id = docRef.id;
+    await docRef.set(classData.toJson());
+    return docRef.id;
   }
 
   Future<void> updateClass(Class classData) =>
