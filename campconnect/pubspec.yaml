@@ -54,7 +54,7 @@ dependencies:
   url_launcher: ^6.1.10
   flutter_svg: ^2.0.17
   location: ^7.0.1
-  connectivity_plus: ^3.0.3
+  connectivity_plus: ^6.1.2
   flutter_polyline_points: ^2.1.0
 
 dev_dependencies:
