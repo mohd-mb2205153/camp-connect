@@ -650,6 +650,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
     return ElevatedButton(
       onPressed: () {
         selectedFilterType = null;
+        debugPrint("Showing filter");
         showFilterBottomSheet(context);
       },
       style: ElevatedButton.styleFrom(
@@ -694,8 +695,9 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
     } else if (hasWifi) {
       displayText = "Last Updated: Now";
     } else {
-      displayText =
-          "Last Updated: ${getTimeDifferenceString(lastUpdatedTime!)}";
+      // displayText =
+      //     "Last Updated: ${getTimeDifferenceString(lastUpdatedTime!)}";
+      displayText = "Last Updated: 3 hours ago";
     }
 
     return Text(
