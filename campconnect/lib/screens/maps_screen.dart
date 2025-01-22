@@ -43,6 +43,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
   List<String> filteredSubjects = [];
   List<String> filteredAdditional = [];
   String? selectedFilterType;
+  TextEditingController areaRadiusController = TextEditingController();
 
   GoogleMapController? _googleMapController;
   static const CameraPosition initialCameraPosition =
@@ -59,14 +60,13 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
   late LatLng destinationCampLocation;
   List<LatLng> polyLineCordinates = [];
 
-  TextEditingController areaRadiusController = TextEditingController();
-
   @override
   void initState() {
     super.initState();
     _loadCustomIcons();
     _startLiveLocationUpdates();
     initializeUserDetails();
+    // ref.read(campProviderNotifier.notifier).initializeCamps();
 
     Timer.periodic(const Duration(seconds: 8), (timer) {
       if (mounted) {
@@ -343,7 +343,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
     );
   }
 
-  void showFilterBottomSheet(BuildContext context) {
+  void _buildFilterBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -382,7 +382,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
                         color: AppColors.teal,
                         height: 20,
                       ),
-                      createFilterRadios(setModalState),
+                      _buildFilterRadios(setModalState),
                       Divider(
                         color: AppColors.teal,
                         height: 20,
@@ -392,28 +392,29 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
                         height: 10,
                       ),
                       if (selectedFilterType == 'Educational Level')
-                        buildFilterPicker(
-                            setModalState: setModalState,
-                            title: 'Filter Educational Level',
-                            filteredList: filteredEduLevels,
-                            icon: Icons.school,
-                            provider: studentEducationLevelProvider),
+                        _buildFilterPicker(
+                          setModalState: setModalState,
+                          title: 'Filter Educational Level',
+                          filteredList: filteredEduLevels,
+                          icon: Icons.school,
+                          provider: studentEducationLevelProvider,
+                        ),
                       if (selectedFilterType == 'Languages')
-                        buildFilterPicker(
+                        _buildFilterPicker(
                             setModalState: setModalState,
                             title: 'Filter Languages',
                             icon: Icons.language,
                             filteredList: filteredLanguages,
                             provider: languagesProvider),
                       if (selectedFilterType == 'Subjects')
-                        buildFilterPicker(
+                        _buildFilterPicker(
                             setModalState: setModalState,
                             title: 'Filter Subjects',
                             icon: Icons.subject,
                             filteredList: filteredSubjects,
                             provider: subjectsProvider),
                       if (selectedFilterType == 'Additional Support')
-                        buildFilterPicker(
+                        _buildFilterPicker(
                             setModalState: setModalState,
                             title: 'Additional Support',
                             icon: Icons.health_and_safety_rounded,
@@ -450,7 +451,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
     );
   }
 
-  Widget createFilterRadios(StateSetter setModalState) {
+  Widget _buildFilterRadios(StateSetter setModalState) {
     return Wrap(
       children: [
         Row(
@@ -540,7 +541,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
     );
   }
 
-  Widget buildFilterPicker({
+  Widget _buildFilterPicker({
     required StateSetter setModalState,
     required String title,
     required IconData icon,
@@ -591,6 +592,16 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
                                           if (!filteredList
                                               .contains(list[index])) {
                                             filteredList.add(list[index]);
+                                          }
+                                        });
+                                        setState(() {
+                                          if (title ==
+                                              'Filter Educational Level') {
+                                            ref
+                                                .read(campProviderNotifier
+                                                    .notifier)
+                                                .filterByEducationLevel(
+                                                    filteredList);
                                           }
                                         });
                                         Navigator.pop(context);
@@ -651,7 +662,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
       onPressed: () {
         selectedFilterType = null;
         debugPrint("Showing filter");
-        showFilterBottomSheet(context);
+        _buildFilterBottomSheet(context);
       },
       style: ElevatedButton.styleFrom(
         elevation: 2,
