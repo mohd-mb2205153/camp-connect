@@ -1,8 +1,6 @@
-import 'package:campconnect/google_map.dart';
-import 'package:campconnect/models/student.dart';
 import 'package:campconnect/models/user.dart';
-import 'package:campconnect/screens/add_camp_location_screen.dart';
-import 'package:campconnect/screens/add_camp_screen.dart';
+import 'package:campconnect/screens/add_screens/add_camp_location_screen.dart';
+import 'package:campconnect/screens/add_screens/add_camp_screen.dart';
 import 'package:campconnect/screens/home_screen.dart';
 import 'package:campconnect/screens/onboarding_screens/educator_onboarding_screen.dart';
 import 'package:campconnect/screens/onboarding_screens/login_screen.dart';
@@ -13,17 +11,16 @@ import 'package:campconnect/screens/profile_settings_screens/personal_info_scree
 import 'package:campconnect/screens/profile_settings_screens/profile_screen.dart';
 import 'package:campconnect/screens/onboarding_screens/register_role_screen.dart';
 import 'package:campconnect/screens/shell_screen.dart';
-import 'package:campconnect/screens/view_classes_screen.dart';
-import 'package:campconnect/screens/view_teachers_screen.dart';
+import 'package:campconnect/screens/view_screens/view_classes_screen.dart';
+import 'package:campconnect/screens/view_screens/view_teachers_screen.dart';
 import 'package:go_router/go_router.dart';
 
-import '../models/teacher.dart';
-import '../screens/add_class_screen.dart';
+import '../screens/add_screens/add_class_screen.dart';
 import '../screens/onboarding_screens/register_screen.dart';
 import '../screens/onboarding_screens/student_onboarding_screen.dart';
-import '../screens/view_saved_camps_screen.dart';
-import '../screens/view_created_camps_screen.dart';
-import '../screens/view_teaching_camps_screen.dart';
+import '../screens/view_screens/view_saved_camps_screen.dart';
+import '../screens/view_screens/view_created_camps_screen.dart';
+import '../screens/view_screens/view_teaching_camps_screen.dart';
 
 class AppRouter {
   // Onboarding Routes

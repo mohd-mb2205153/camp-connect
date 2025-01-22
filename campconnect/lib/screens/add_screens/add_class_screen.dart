@@ -1,20 +1,18 @@
 import 'dart:convert';
 
 import 'package:campconnect/providers/loggedinuser_provider.dart';
-import 'package:campconnect/providers/repo_provider.dart';
 import 'package:campconnect/routes/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 
-import '../models/class.dart';
-import '../models/teacher.dart';
-import '../providers/camp_provider.dart';
-import '../providers/class_provider.dart';
-import '../providers/show_nav_bar_provider.dart';
-import '../theme/constants.dart';
-import '../utils/helper_widgets.dart';
+import '../../models/class.dart';
+import '../../models/teacher.dart';
+import '../../providers/camp_provider.dart';
+import '../../providers/class_provider.dart';
+import '../../theme/constants.dart';
+import '../../utils/helper_widgets.dart';
 
 class AddClassScreen extends ConsumerStatefulWidget {
   final String campId;

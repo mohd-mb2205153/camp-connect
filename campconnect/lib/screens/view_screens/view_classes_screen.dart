@@ -2,15 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../models/class.dart';
-import '../models/teacher.dart';
-import '../providers/loggedinuser_provider.dart';
-import '../providers/show_nav_bar_provider.dart';
-import '../providers/class_provider.dart';
-import '../routes/app_router.dart';
-import '../theme/constants.dart';
-import '../utils/helper_widgets.dart';
-import '../widgets/empty_screen.dart';
+import '../../providers/loggedinuser_provider.dart';
+import '../../providers/show_nav_bar_provider.dart';
+import '../../providers/class_provider.dart';
+import '../../routes/app_router.dart';
+import '../../theme/constants.dart';
+import '../../widgets/empty_screen.dart';
 
 class ViewClassesScreen extends ConsumerStatefulWidget {
   final String campId;

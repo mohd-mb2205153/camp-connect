@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:campconnect/theme/constants.dart';
-import 'package:campconnect/utils/helper_widgets.dart';
 
-import '../providers/show_nav_bar_provider.dart';
-import '../providers/camp_provider.dart';
-import '../providers/student_provider.dart';
-import '../widgets/empty_screen.dart';
+import '../../providers/show_nav_bar_provider.dart';
+import '../../providers/camp_provider.dart';
+import '../../providers/student_provider.dart';
+import '../../widgets/empty_screen.dart';
 
 class ViewSavedCampsScreen extends ConsumerStatefulWidget {
   final String userId;

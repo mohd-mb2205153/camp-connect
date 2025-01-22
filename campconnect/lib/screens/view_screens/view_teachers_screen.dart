@@ -4,8 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:campconnect/providers/teacher_provider.dart';
 import 'package:campconnect/theme/constants.dart';
-import '../providers/show_nav_bar_provider.dart';
-import '../widgets/empty_screen.dart';
+import '../../providers/show_nav_bar_provider.dart';
+import '../../widgets/empty_screen.dart';
 
 class ViewTeachersScreen extends ConsumerStatefulWidget {
   final String campId;

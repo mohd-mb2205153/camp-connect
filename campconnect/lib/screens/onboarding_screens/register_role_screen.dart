@@ -1,11 +1,9 @@
-import 'package:campconnect/models/student.dart';
 import 'package:campconnect/theme/constants.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../models/teacher.dart';
 import '../../models/user.dart';
 import '../../routes/app_router.dart';
 

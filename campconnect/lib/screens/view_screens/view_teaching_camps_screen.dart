@@ -1,24 +1,22 @@
-import 'package:campconnect/utils/helper_widgets.dart';
+import 'package:campconnect/providers/show_nav_bar_provider.dart';
 import 'package:campconnect/widgets/empty_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../providers/show_nav_bar_provider.dart';
-import '../providers/teacher_provider.dart';
-import '../routes/app_router.dart';
-import '../theme/constants.dart';
+import '../../providers/teacher_provider.dart';
+import '../../theme/constants.dart';
 
-class ViewCreatedCampsScreen extends ConsumerStatefulWidget {
+class ViewTeachingCampsScreen extends ConsumerStatefulWidget {
   final String userId;
-  const ViewCreatedCampsScreen({super.key, required this.userId});
+  const ViewTeachingCampsScreen({super.key, required this.userId});
 
   @override
-  ConsumerState<ViewCreatedCampsScreen> createState() =>
-      _ViewCreatedCampsScreenState();
+  ConsumerState<ViewTeachingCampsScreen> createState() =>
+      _ViewTeachingCampsScreenState();
 }
 
-class _ViewCreatedCampsScreenState
-    extends ConsumerState<ViewCreatedCampsScreen> {
+class _ViewTeachingCampsScreenState
+    extends ConsumerState<ViewTeachingCampsScreen> {
   @override
   void initState() {
     super.initState();
@@ -42,12 +40,12 @@ class _ViewCreatedCampsScreenState
               ref
                   .read(showNavBarNotifierProvider.notifier)
                   .showBottomNavBar(true);
+
               context.pop();
-              // context.goNamed(AppRouter.home.name);
             },
           ),
           title: Text(
-            'View Created Camps',
+            'View Teaching Camps',
             style: getTextStyle("mediumBold", color: Colors.white),
           ),
         ),
@@ -60,7 +58,7 @@ class _ViewCreatedCampsScreenState
                 child: Column(
                   children: [
                     Expanded(
-                      child: CreatedCampListView(userId: widget.userId),
+                      child: TeachingCampListView(userId: widget.userId),
                     ),
                   ],
                 ),
@@ -84,15 +82,15 @@ Widget buildBackground(String imageName) {
   );
 }
 
-class CreatedCampListView extends ConsumerWidget {
+class TeachingCampListView extends ConsumerWidget {
   final String userId;
-  const CreatedCampListView({super.key, required this.userId});
+  const TeachingCampListView({super.key, required this.userId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final createdCamps = ref.watch(createdCampsProvider(userId));
+    final teachingCamps = ref.watch(teachingCampsProvider(userId));
 
-    return createdCamps.when(
+    return teachingCamps.when(
       data: (camps) => camps.isEmpty
           ? const EmptyScreen()
           : ListView.builder(

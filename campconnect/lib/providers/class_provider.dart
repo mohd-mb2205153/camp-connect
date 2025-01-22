@@ -1,8 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/class.dart';
-import '../models/teacher.dart';
-import '../models/student.dart';
 import '../repositories/camp_connect_repo.dart';
 import '../providers/repo_provider.dart';
 

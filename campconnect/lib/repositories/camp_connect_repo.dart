@@ -1,7 +1,6 @@
 import 'package:campconnect/models/class.dart';
 import 'package:campconnect/models/student.dart';
 import 'package:campconnect/models/teacher.dart';
-import 'package:campconnect/models/user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -88,40 +87,45 @@ class CampConnectRepo {
       throw Exception('Error fetching teaching camps: $e');
     }
   }
+
   Stream<List<Camp>> filterCampByEducationLevel(List<String> levels) => campsRef
-    .where("educationLevel", arrayContainsAny: levels)
-    .snapshots()
-    .map((snapshot) => snapshot.docs
-        .map((doc) => Camp.fromJson(doc.data() as Map<String, dynamic>))
-        .toList());
-  
-  Stream<List<Camp>> filterCampByAdditionalSupport(List<String> supports) => campsRef
-  .where("additionalSupport", arrayContainsAny: supports)
-  .snapshots()
-  .map((snapshot) => snapshot.docs
-      .map((doc) => Camp.fromJson(doc.data() as Map<String, dynamic>))
-      .toList());
+      .where("educationLevel", arrayContainsAny: levels)
+      .snapshots()
+      .map((snapshot) => snapshot.docs
+          .map((doc) => Camp.fromJson(doc.data() as Map<String, dynamic>))
+          .toList());
+
+  Stream<List<Camp>> filterCampByAdditionalSupport(List<String> supports) =>
+      campsRef
+          .where("additionalSupport", arrayContainsAny: supports)
+          .snapshots()
+          .map((snapshot) => snapshot.docs
+              .map((doc) => Camp.fromJson(doc.data() as Map<String, dynamic>))
+              .toList());
 
   Stream<List<Camp>> filterCampByLanguage(List<String> languages) => campsRef
-  .where("languages", arrayContainsAny: languages)
-  .snapshots()
-  .map((snapshot) => snapshot.docs
-      .map((doc) => Camp.fromJson(doc.data() as Map<String, dynamic>))
-      .toList());
+      .where("languages", arrayContainsAny: languages)
+      .snapshots()
+      .map((snapshot) => snapshot.docs
+          .map((doc) => Camp.fromJson(doc.data() as Map<String, dynamic>))
+          .toList());
 
-  Stream<List<Camp>> filterCampsByRange(double userLat, double userLng, double rangeInKm) {
+  Stream<List<Camp>> filterCampsByRange(
+      double userLat, double userLng, double rangeInKm) {
     return campsRef
-    .where((camp) {
-      double campLat = camp['latitude'];
-      double campLng = camp['longitude'];
-      
-      double distance = Geolocator.distanceBetween(userLat, userLng, campLat, campLng) / 1000; // Convert to km
-      return distance <= rangeInKm;
-    })
-    .snapshots()
-    .map((snapshot) => snapshot.docs
-        .map((doc) => Camp.fromJson(doc.data() as Map<String, dynamic>))
-        .toList());
+        .where((camp) {
+          double campLat = camp['latitude'];
+          double campLng = camp['longitude'];
+
+          double distance =
+              Geolocator.distanceBetween(userLat, userLng, campLat, campLng) /
+                  1000; // Convert to km
+          return distance <= rangeInKm;
+        })
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => Camp.fromJson(doc.data() as Map<String, dynamic>))
+            .toList());
   }
 
   // (*) Student Repository ===================================================================

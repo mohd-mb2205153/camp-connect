@@ -1,6 +1,3 @@
-import 'package:campconnect/models/camp.dart';
-import 'package:campconnect/models/class.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/student.dart';
 import '../models/teacher.dart';

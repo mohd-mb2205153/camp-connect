@@ -1,4 +1,3 @@
-import 'package:campconnect/models/camp.dart';
 import 'user.dart';
 
 class Teacher extends User {

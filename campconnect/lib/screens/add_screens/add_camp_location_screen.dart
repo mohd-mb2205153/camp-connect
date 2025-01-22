@@ -2,14 +2,13 @@ import 'dart:async';
 import 'package:campconnect/theme/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:lottie/lottie.dart' as lottie;
 
-import '../providers/show_nav_bar_provider.dart';
-import '../routes/app_router.dart';
+import '../../providers/show_nav_bar_provider.dart';
+import '../../routes/app_router.dart';
 
 class AddCampLocationScreen extends ConsumerStatefulWidget {
   const AddCampLocationScreen({super.key});
