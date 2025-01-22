@@ -123,19 +123,19 @@ class AppRouter {
             builder: (context, state) => const HomeScreen(),
             routes: [
               GoRoute(
+                path: viewCreatedCamps.path,
+                name: viewCreatedCamps.name,
+                builder: (context, state) {
+                  final userId = state.extra as String;
+                  return ViewCreatedCampsScreen(userId: userId);
+                },
+              ),
+              GoRoute(
                 name: viewSavedCamps.name,
                 path: viewSavedCamps.path,
                 builder: (context, state) {
                   final userId = state.extra as String;
                   return ViewSavedCampsScreen(userId: userId);
-                },
-              ),
-              GoRoute(
-                name: viewTeachingCamps.name,
-                path: viewTeachingCamps.path,
-                builder: (context, state) {
-                  final userId = state.extra as String;
-                  return ViewTeachingCampsScreen(userId: userId);
                 },
               ),
               GoRoute(
@@ -161,11 +161,11 @@ class AppRouter {
             builder: (context, state) => const MapsScreen(),
             routes: [
               GoRoute(
-                path: viewCreatedCamps.path,
-                name: viewCreatedCamps.name,
+                name: viewTeachingCamps.name,
+                path: viewTeachingCamps.path,
                 builder: (context, state) {
                   final userId = state.extra as String;
-                  return ViewCreatedCampsScreen(userId: userId);
+                  return ViewTeachingCampsScreen(userId: userId);
                 },
               ),
               GoRoute(

@@ -1065,7 +1065,7 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
                   ),
                   addHorizontalSpace(12),
                   Text(
-                    widget.camp.name,
+                    wrapText(widget.camp.name, 22),
                     style: getTextStyle("largeBold", color: AppColors.teal),
                   ),
                 ],

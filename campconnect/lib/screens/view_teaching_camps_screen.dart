@@ -2,6 +2,7 @@ import 'package:campconnect/providers/show_nav_bar_provider.dart';
 import 'package:campconnect/widgets/empty_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../providers/teacher_provider.dart';
 import '../theme/constants.dart';
 import '../utils/helper_widgets.dart';
@@ -41,7 +42,7 @@ class _ViewTeachingCampsScreenState
                   .read(showNavBarNotifierProvider.notifier)
                   .showBottomNavBar(true);
 
-              Navigator.pop(context);
+              context.pop();
             },
           ),
           title: Text(

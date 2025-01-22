@@ -140,10 +140,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         onPressed: () {
           ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(false);
           if (isStudent) {
-            context.goNamed(AppRouter.viewSavedCamps.name,
+            context.pushNamed(AppRouter.viewSavedCamps.name,
                 extra: loggedUser.id);
           } else if (isTeacher) {
-            context.goNamed(AppRouter.viewCreatedCamps.name,
+            context.pushNamed(AppRouter.viewCreatedCamps.name,
                 extra: loggedUser.id);
           }
         },

@@ -2,8 +2,10 @@ import 'package:campconnect/utils/helper_widgets.dart';
 import 'package:campconnect/widgets/empty_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../providers/show_nav_bar_provider.dart';
 import '../providers/teacher_provider.dart';
+import '../routes/app_router.dart';
 import '../theme/constants.dart';
 
 class ViewCreatedCampsScreen extends ConsumerStatefulWidget {
@@ -40,7 +42,8 @@ class _ViewCreatedCampsScreenState
               ref
                   .read(showNavBarNotifierProvider.notifier)
                   .showBottomNavBar(true);
-              Navigator.pop(context);
+              context.pop();
+              // context.goNamed(AppRouter.home.name);
             },
           ),
           title: Text(
