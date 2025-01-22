@@ -48,6 +48,13 @@ CampConnect is a Flutter-based mobile application designed to bridge the gap bet
      - Username: ali@gmail.com
      - Password: ali123
 
+## Future Plans
+
+We have exciting plans to enhance the functionality of our app in the future:
+
+- **Offline Functionality**: Allow users to access the app and its features without an internet connection.
+- **Advanced Filtering**: Implement filters to allow users to search and sort camps based on specific attributes for a more personalized experience.
+
 ---
 
 ## Credits
