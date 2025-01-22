@@ -952,13 +952,15 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
   void initState() {
     super.initState();
     User? user = ref.read(loggedInUserNotifierProvider);
-    user is Student
-        ? isSaved = ref.read(studentProviderNotifier.notifier).isSavedCamp(
-            ref.read(loggedInUserNotifierProvider) as Student, widget.camp.id!)
-        : isTeaching = ref
-            .read(teacherProviderNotifier.notifier)
-            .isTeachingCamp(ref.read(loggedInUserNotifierProvider) as Teacher,
-                widget.camp.id!);
+    if (user is Student) {
+      isSaved = ref.read(studentProviderNotifier.notifier).isSavedCamp(
+          ref.read(loggedInUserNotifierProvider) as Student, widget.camp.id!);
+      isTeaching = false;
+    } else {
+      isTeaching = ref.read(teacherProviderNotifier.notifier).isTeachingCamp(
+          ref.read(loggedInUserNotifierProvider) as Teacher, widget.camp.id!);
+      isSaved = false;
+    }
   }
 
   void toggleSaveCamp() async {
@@ -968,7 +970,7 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
       final studentNotifier = ref.read(loggedInUserNotifierProvider.notifier);
 
       setState(() {
-        isTeaching = !isTeaching;
+        isSaved = !isSaved;
       });
 
       try {
