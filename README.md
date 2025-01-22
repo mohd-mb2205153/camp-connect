@@ -19,7 +19,7 @@ CampConnect is a Flutter-based mobile application designed to bridge the gap bet
    ```bash
    flutter pub get
    ```
-3. Set up a Firebase project for backend support (Optional):
+3. Set up a Firebase project for backend support (Optional, only execute this step if you want to view the backend):
    - Create a Firebase project ([Firebase Console](https://console.firebase.google.com/))
    - Add your app's configuration file (`google-services.json` for Android, `GoogleService-Info.plist` for iOS) to the respective directories (`android/app` and `ios/Runner`).
    
@@ -40,6 +40,13 @@ CampConnect is a Flutter-based mobile application designed to bridge the gap bet
      ```bash
      flutter run
      ```
+- **Sign-in on the App:**
+   - Log in as Student using the given credential:
+     - Username: peter@gmail.com
+     - Password: peter123
+   - Log in as Teacher using the given credential:
+     - Username: ali@gmail.com
+     - Password: ali123
 
 ---
 
