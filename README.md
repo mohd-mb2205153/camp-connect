@@ -19,7 +19,7 @@ CampConnect is a Flutter-based mobile application designed to bridge the gap bet
    ```bash
    flutter pub get
    ```
-3. Set up a Firebase project for backend support:
+3. Set up a Firebase project for backend support (Optional):
    - Create a Firebase project ([Firebase Console](https://console.firebase.google.com/))
    - Add your app's configuration file (`google-services.json` for Android, `GoogleService-Info.plist` for iOS) to the respective directories (`android/app` and `ios/Runner`).
    
