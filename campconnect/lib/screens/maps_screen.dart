@@ -4,7 +4,6 @@ import 'package:campconnect/models/camp.dart';
 import 'package:campconnect/models/teacher.dart';
 import 'package:campconnect/models/user.dart';
 import 'package:campconnect/providers/camp_provider.dart';
-import 'package:campconnect/providers/class_provider.dart';
 import 'package:campconnect/providers/json_provider.dart';
 import 'package:campconnect/providers/student_provider.dart';
 import 'package:campconnect/providers/teacher_provider.dart';
@@ -19,7 +18,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:group_button/group_button.dart';
 
 import '../models/student.dart';
 import '../providers/loggedinuser_provider.dart';
@@ -373,7 +371,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
                                   color: Colors.teal),
                             ),
                             Spacer(),
-                            _buildClearAllFilters(context),
+                            _buildClearAllFilters(setModalState),
                           ],
                         ),
                       ),
@@ -679,10 +677,21 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
     );
   }
 
-  ElevatedButton _buildClearAllFilters(BuildContext context) {
+  void handleClearFilter() {
+    ref.read(campProviderNotifier.notifier).initializeCamps();
+    filteredAdditional = [];
+    filteredEduLevels = [];
+    filteredLanguages = [];
+    filteredSubjects = [];
+    areaRadiusController.text = '';
+  }
+
+  ElevatedButton _buildClearAllFilters(StateSetter setModalState) {
     return ElevatedButton(
       onPressed: () {
-        // handleClearAll();
+        setModalState(() {
+          handleClearFilter();
+        });
       },
       style: ElevatedButton.styleFrom(
         elevation: 2,
