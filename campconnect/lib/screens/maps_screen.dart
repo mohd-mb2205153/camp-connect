@@ -255,12 +255,9 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
     );
   }
 
-  AppBar _buildAppBar({Camp? camp}) {
+  AppBar? _buildAppBar({Camp? camp}) {
     return polyLineCordinates.isEmpty
-        ? AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-          )
+        ? null
         : AppBar(
             backgroundColor: AppColors.teal,
             title: Text(
@@ -364,21 +361,23 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      Row(
-                        children: [
-                          const Icon(Icons.tune, color: Colors.teal),
-                          const SizedBox(width: 10),
-                          Text(
-                            "Filter Camps",
-                            style:
-                                getTextStyle('mediumBold', color: Colors.teal),
-                          ),
-                          Expanded(
-                            child: SizedBox(),
-                          ),
-                          _buildClearAllFilters(context),
-                        ],
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.tune, color: Colors.teal),
+                            const SizedBox(width: 10),
+                            Text(
+                              "Filter Camps",
+                              style: getTextStyle('mediumBold',
+                                  color: Colors.teal),
+                            ),
+                            Spacer(),
+                            _buildClearAllFilters(context),
+                          ],
+                        ),
                       ),
+                      addVerticalSpace(8),
                       Divider(
                         color: AppColors.teal,
                         height: 20,
@@ -387,7 +386,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
                       Divider(
                         color: AppColors.teal,
                         height: 20,
-                        thickness: 15,
+                        thickness: 1,
                       ),
                       SizedBox(
                         height: 10,
@@ -609,9 +608,10 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
                 ),
               ],
             ),
+            addVerticalSpace(8),
             const Divider(
               color: AppColors.lightTeal,
-              thickness: 2,
+              thickness: 1,
             ),
           ],
         ),
@@ -679,11 +679,11 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(30),
         ),
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
+        padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 10),
       ),
       child: Text(
         "Clear All",
-        style: getTextStyle("mediumBold", color: AppColors.white),
+        style: getTextStyle("smallBold", color: AppColors.white),
       ),
     );
   }
@@ -1031,6 +1031,7 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            addVerticalSpace(12),
             _buildHeader(context),
             addVerticalSpace(12),
             _buildOptions(context, widget.camp.id),
