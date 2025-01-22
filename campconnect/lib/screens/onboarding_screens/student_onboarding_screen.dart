@@ -344,7 +344,7 @@ class _StudentOnboardingScreenState
                   showPhoneCode: true,
                   onSelect: (Country country) {
                     setState(() {
-                      emergencyUserPhoneCode = '+${country.phoneCode}';
+                      emergencyUserPhoneCode = country.phoneCode;
                     });
                   },
                   countryListTheme: CountryListThemeData(

@@ -231,7 +231,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              addVerticalSpace(20),
               buildNameFields(),
               addVerticalSpace(20),
               buildEmailField(),
@@ -339,6 +338,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       hintText: "Email",
       prefixIcon: const Icon(Icons.email, color: Colors.grey),
       focusNode: emailFocus,
+      keyboardType: TextInputType.emailAddress,
     );
   }
 

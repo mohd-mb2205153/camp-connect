@@ -79,7 +79,7 @@ class _EducatorOnboardingScreenState
       willingnessToTravel: '',
       availabilitySchedule: '',
       preferredCampDuration: '',
-      primaryLanguages: [],
+      primaryLanguages: user.primaryLanguages,
     );
   }
 
