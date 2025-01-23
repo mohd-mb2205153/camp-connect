@@ -72,7 +72,8 @@ class TeacherList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final teachersAsync = ref.watch(teachersByCampIdProvider(campId));
-    print(teachersAsync);
+    debugPrint(teachersAsync.toString());
+
     return teachersAsync.when(
       data: (teacherList) {
         return teacherList.isEmpty

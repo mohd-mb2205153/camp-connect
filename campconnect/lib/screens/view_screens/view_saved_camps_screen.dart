@@ -21,13 +21,14 @@ class _ViewSavedCampsScreenState extends ConsumerState<ViewSavedCampsScreen> {
   void initState() {
     super.initState();
     Future.microtask(() {
+      debugPrint(widget.userId);
       ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(false);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final studentAsyncValue = ref.watch(studentProviderNotifier);
+    final studentAsync = ref.watch(studentProviderNotifier);
     return Scaffold(
       appBar: AppBar(
         scrolledUnderElevation: 0.0,
@@ -51,7 +52,7 @@ class _ViewSavedCampsScreenState extends ConsumerState<ViewSavedCampsScreen> {
         child: Stack(
           children: [
             buildBackground("bg12"),
-            studentAsyncValue.when(
+            studentAsync.when(
               data: (students) {
                 final student = students.firstWhere(
                   (s) => s.id == widget.userId,

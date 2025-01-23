@@ -8,7 +8,6 @@ class Teacher extends User {
   String willingnessToTravel; // e.g., "Within 10 km"
   String availabilitySchedule; // times available
   String preferredCampDuration; // e.g., "Short-term"
-  List<String> createdCamps; // List of created camps
   List<String> teachingCamps; // List of teaching camps
 
   Teacher({
@@ -31,7 +30,6 @@ class Teacher extends User {
     List<String>? createdCamps,
     List<String>? teachingCamps,
   })  : certifications = certifications ?? [],
-        createdCamps = createdCamps ?? [],
         teachingCamps = teachingCamps ?? [],
         super(role: 'teacher');
 
@@ -55,7 +53,6 @@ Teacher(
   willingnessToTravel: $willingnessToTravel,
   availabilitySchedule: $availabilitySchedule,
   preferredCampDuration: $preferredCampDuration,
-  createdCamps: $createdCamps,
   teachingCamps: $teachingCamps,
   role: $role
 )
@@ -82,9 +79,6 @@ Teacher(
       willingnessToTravel: json['willingnessToTravel'],
       availabilitySchedule: json['availabilitySchedule'],
       preferredCampDuration: json['preferredCampDuration'],
-      createdCamps: json['createdCamps'] != null
-          ? List<String>.from(json['createdCamps'])
-          : [],
       teachingCamps: json['teachingCamps'] != null
           ? List<String>.from(json['teachingCamps'])
           : [],
@@ -102,7 +96,6 @@ Teacher(
         'willingnessToTravel': willingnessToTravel,
         'availabilitySchedule': availabilitySchedule,
         'preferredCampDuration': preferredCampDuration,
-        'createdCamps': createdCamps,
         'teachingCamps': teachingCamps,
       });
   }
@@ -124,7 +117,6 @@ Teacher(
     String? willingnessToTravel,
     String? availabilitySchedule,
     String? preferredCampDuration,
-    List<String>? createdCamps,
     List<String>? teachingCamps,
   }) {
     return Teacher(
@@ -146,7 +138,6 @@ Teacher(
       availabilitySchedule: availabilitySchedule ?? this.availabilitySchedule,
       preferredCampDuration:
           preferredCampDuration ?? this.preferredCampDuration,
-      createdCamps: createdCamps ?? this.createdCamps,
       teachingCamps: teachingCamps ?? this.teachingCamps,
     );
   }

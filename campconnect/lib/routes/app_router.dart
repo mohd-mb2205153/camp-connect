@@ -19,7 +19,6 @@ import '../screens/add_screens/add_class_screen.dart';
 import '../screens/onboarding_screens/register_screen.dart';
 import '../screens/onboarding_screens/student_onboarding_screen.dart';
 import '../screens/view_screens/view_saved_camps_screen.dart';
-import '../screens/view_screens/view_created_camps_screen.dart';
 import '../screens/view_screens/view_teaching_camps_screen.dart';
 
 class AppRouter {
@@ -44,8 +43,6 @@ class AppRouter {
       (name: 'viewSavedCamps', path: '/viewSavedCamps');
   static const viewTeachingCamps =
       (name: 'viewTeachingCamps', path: '/viewTeachingCamps');
-  static const viewCreatedCamps =
-      (name: 'viewCreatedCamps', path: '/viewCreatedCamps');
   static const viewTeachers = (name: 'viewTeachers', path: '/viewTeachers');
   static const viewClasses = (name: 'viewClasses', path: '/viewClasses');
 
@@ -120,11 +117,11 @@ class AppRouter {
             builder: (context, state) => const HomeScreen(),
             routes: [
               GoRoute(
-                path: viewCreatedCamps.path,
-                name: viewCreatedCamps.name,
+                name: viewTeachingCamps.name,
+                path: viewTeachingCamps.path,
                 builder: (context, state) {
                   final userId = state.extra as String;
-                  return ViewCreatedCampsScreen(userId: userId);
+                  return ViewTeachingCampsScreen(userId: userId);
                 },
               ),
               GoRoute(

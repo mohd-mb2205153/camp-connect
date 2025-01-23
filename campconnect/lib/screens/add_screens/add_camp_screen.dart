@@ -143,9 +143,6 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
         final teacherId = loggedUser.id;
         await ref
             .read(teacherProviderNotifier.notifier)
-            .addCreatedCamp(teacherId, campId);
-        await ref
-            .read(teacherProviderNotifier.notifier)
             .addTeachingCamp(teacherId, campId);
       }
 

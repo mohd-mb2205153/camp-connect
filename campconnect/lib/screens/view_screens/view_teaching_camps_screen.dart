@@ -20,6 +20,7 @@ class _ViewTeachingCampsScreenState
   @override
   void initState() {
     super.initState();
+    debugPrint(widget.userId);
     Future.microtask(() {
       ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(false);
     });
@@ -89,7 +90,7 @@ class TeachingCampListView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final teachingCampsAsync = ref.watch(teachingCampsProvider(userId));
-
+    debugPrint(teachingCampsAsync.toString());
     return teachingCampsAsync.when(
       data: (camps) => camps.isEmpty
           ? const EmptyScreen()

@@ -43,36 +43,15 @@ class TeacherProvider extends AsyncNotifier<List<Teacher>> {
     _repo.updateTeacher(teacher);
   }
 
-  Future<void> addCreatedCamp(String teacherId, String campId) async {
-    try {
-      await _repo.addCampToTeacher(
-        teacherId: teacherId,
-        campId: campId,
-        field: 'createdCamps',
-      );
-    } catch (e) {
-      state = AsyncError(e, StackTrace.current);
-    }
-  }
-
   Future<void> addTeachingCamp(String teacherId, String campId) async {
     try {
       await _repo.addCampToTeacher(
         teacherId: teacherId,
         campId: campId,
-        field: 'teachingCamps',
+        teachingCamps: 'teachingCamps',
       );
     } catch (e) {
       state = AsyncError(e, StackTrace.current);
-    }
-  }
-
-  Future<List<Camp>> getCreatedCamps(String teacherId) async {
-    try {
-      return await _repo.getCreatedCampsByTeacherId(teacherId);
-    } catch (e) {
-      state = AsyncError(e, StackTrace.current);
-      rethrow;
     }
   }
 
@@ -89,12 +68,6 @@ final teachersByCampIdProvider =
     FutureProvider.family<List<Teacher>, String>((ref, campId) async {
   final repo = await ref.watch(repoProvider.future);
   return repo.getTeachersByCampId(campId);
-});
-
-final createdCampsProvider =
-    FutureProvider.family<List<Camp>, String>((ref, teacherId) async {
-  final repo = await ref.watch(repoProvider.future);
-  return repo.getCreatedCampsByTeacherId(teacherId);
 });
 
 final teachingCampsProvider =
