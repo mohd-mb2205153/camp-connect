@@ -20,7 +20,6 @@ class _ViewTeachingCampsScreenState
   @override
   void initState() {
     super.initState();
-    ref.read(teacherProviderNotifier);
     Future.microtask(() {
       ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(false);
     });
