@@ -3,30 +3,30 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final languagesProvider = FutureProvider<List<String>>((ref) async {
   CampConnectJsonRepo repo = CampConnectJsonRepo();
-  return await repo.fetchLanguages();
+  return repo.fetchLanguages();
 });
 
 final studentEducationLevelProvider = FutureProvider<List<String>>((ref) async {
   CampConnectJsonRepo repo = CampConnectJsonRepo();
-  return await repo.fetchStudentEducationLevel();
+  return repo.fetchStudentEducationLevel();
 });
 
 final subjectsProvider = FutureProvider<List<String>>((ref) async {
   CampConnectJsonRepo repo = CampConnectJsonRepo();
-  return await repo.fetchSubjects();
+  return repo.fetchSubjects();
 });
 
 final countryProvider = FutureProvider<List<String>>((ref) async {
   CampConnectJsonRepo repo = CampConnectJsonRepo();
-  return await repo.fetchCountries();
+  return repo.fetchCountries();
 });
 
 final teachedEducationLevelProvider = FutureProvider<List<String>>((ref) async {
   CampConnectJsonRepo repo = CampConnectJsonRepo();
-  return await repo.fetchTeacherEducationLevel();
+  return repo.fetchTeacherEducationLevel();
 });
 
 final additionalSupportProvider = FutureProvider<List<String>>((ref) async {
   CampConnectJsonRepo repo = CampConnectJsonRepo();
-  return await repo.fetchAdditionalSupport();
+  return repo.fetchAdditionalSupport();
 });
