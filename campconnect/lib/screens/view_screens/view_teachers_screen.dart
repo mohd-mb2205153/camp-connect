@@ -27,38 +27,48 @@ class _ViewTeachersScreenState extends ConsumerState<ViewTeachersScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        scrolledUnderElevation: 0.0,
-        backgroundColor: AppColors.darkTeal,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            ref
-                .read(showNavBarNotifierProvider.notifier)
-                .showBottomNavBar(true);
-            context.pop();
-          },
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (!didPop) {
+          ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(true);
+          Navigator.of(context).pop(result);
+        }
+        return;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          scrolledUnderElevation: 0.0,
+          backgroundColor: AppColors.darkTeal,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () {
+              ref
+                  .read(showNavBarNotifierProvider.notifier)
+                  .showBottomNavBar(true);
+              context.pop();
+            },
+          ),
+          title: Text(
+            'View Teachers',
+            style: getTextStyle("mediumBold", color: Colors.white),
+          ),
         ),
-        title: Text(
-          'View Teachers',
-          style: getTextStyle("mediumBold", color: Colors.white),
-        ),
-      ),
-      body: SizedBox.expand(
-        child: Stack(
-          children: [
-            buildBackground("bg12"),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Column(
-                children: [
-                  Expanded(child: TeacherList(campId: widget.campId)),
-                ],
+        body: SizedBox.expand(
+          child: Stack(
+            children: [
+              buildBackground("bg12"),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Column(
+                  children: [
+                    Expanded(child: TeacherList(campId: widget.campId)),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

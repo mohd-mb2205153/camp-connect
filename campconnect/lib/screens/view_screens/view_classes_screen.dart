@@ -56,176 +56,192 @@ class _ViewClassesScreenState extends ConsumerState<ViewClassesScreen> {
   Widget build(BuildContext context) {
     final classesAsync = ref.watch(classProviderNotifier);
 
-    return Scaffold(
-      appBar: AppBar(
-        scrolledUnderElevation: 0.0,
-        backgroundColor: AppColors.darkTeal,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            ref
-                .read(showNavBarNotifierProvider.notifier)
-                .showBottomNavBar(true);
-            context.pop();
-          },
-        ),
-        actions: [
-          isTeacher
-              ? IconButton(
-                  icon: const Icon(Icons.note_add, color: Colors.white),
-                  onPressed: () {
-                    ref
-                        .read(showNavBarNotifierProvider.notifier)
-                        .showBottomNavBar(false);
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (!didPop) {
+          ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(true);
+          Navigator.of(context).pop(result);
+        }
+        return;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          scrolledUnderElevation: 0.0,
+          backgroundColor: AppColors.darkTeal,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () {
+              ref
+                  .read(showNavBarNotifierProvider.notifier)
+                  .showBottomNavBar(true);
+              context.pop();
+            },
+          ),
+          actions: [
+            isTeacher
+                ? IconButton(
+                    icon: const Icon(Icons.note_add, color: Colors.white),
+                    onPressed: () {
+                      ref
+                          .read(showNavBarNotifierProvider.notifier)
+                          .showBottomNavBar(false);
 
-                    context.goNamed(AppRouter.addClass.name,
-                        extra: widget.campId);
-                  },
-                )
-              : Text(""),
-        ],
-        title: Text(
-          'View Classes',
-          style: getTextStyle("mediumBold", color: Colors.white),
+                      context.goNamed(AppRouter.addClass.name,
+                          extra: widget.campId);
+                    },
+                  )
+                : Text(""),
+          ],
+          title: Text(
+            'View Classes',
+            style: getTextStyle("mediumBold", color: Colors.white),
+          ),
         ),
-      ),
-      body: SizedBox.expand(
-        child: Stack(
-          children: [
-            buildBackground("bg12"),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Column(
-                children: [
-                  Expanded(
-                    child: classesAsync.when(
-                      data: (classes) {
-                        final campClasses = classes
-                            .where((c) =>
-                                c.teacher.teachingCamps.contains(widget.campId))
-                            .toList();
+        body: SizedBox.expand(
+          child: Stack(
+            children: [
+              buildBackground("bg12"),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: classesAsync.when(
+                        data: (classes) {
+                          final campClasses = classes
+                              .where((c) => c.teacher.teachingCamps
+                                  .contains(widget.campId))
+                              .toList();
 
-                        return campClasses.isEmpty
-                            ? const EmptyScreen()
-                            : ListView.builder(
-                                itemCount: campClasses.length,
-                                itemBuilder: (context, index) {
-                                  final classItem = campClasses[index];
-                                  return Padding(
-                                    padding: const EdgeInsets.only(top: 8.0),
-                                    child: Card(
-                                      color: AppColors.darkTeal,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Container(
-                                        padding: const EdgeInsets.all(16.0),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Row(
-                                              children: [
-                                                Icon(
-                                                  Icons.library_books,
-                                                  color: Colors.white,
-                                                  size: 24,
-                                                ),
-                                                const SizedBox(width: 8),
-                                                Text(
-                                                  classItem.subject,
-                                                  style: getTextStyle(
-                                                      'mediumBold',
-                                                      color: Colors.white),
-                                                ),
-                                              ],
-                                            ),
-                                            const SizedBox(height: 12),
-                                            Row(
-                                              children: [
-                                                Text(
-                                                  'Subtopic: ',
-                                                  style: getTextStyle(
-                                                      'smallBold',
-                                                      color: Colors.white),
-                                                ),
-                                                Expanded(
-                                                  child: Text(
-                                                    classItem.subtitle,
-                                                    style: getTextStyle('small',
-                                                        color: Colors.white70),
+                          return campClasses.isEmpty
+                              ? const EmptyScreen()
+                              : ListView.builder(
+                                  itemCount: campClasses.length,
+                                  itemBuilder: (context, index) {
+                                    final classItem = campClasses[index];
+                                    return Padding(
+                                      padding: const EdgeInsets.only(top: 8.0),
+                                      child: Card(
+                                        color: AppColors.darkTeal,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        child: Container(
+                                          padding: const EdgeInsets.all(16.0),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Icon(
+                                                    Icons.library_books,
+                                                    color: Colors.white,
+                                                    size: 24,
                                                   ),
-                                                ),
-                                              ],
-                                            ),
-                                            const SizedBox(height: 12),
-                                            Row(
-                                              children: [
-                                                Text(
-                                                  'Teacher: ',
-                                                  style: getTextStyle(
-                                                      'smallBold',
-                                                      color: Colors.white),
-                                                ),
-                                                Expanded(
-                                                  child: Text(
-                                                    "${classItem.teacher.firstName} ${classItem.teacher.lastName}",
-                                                    style: getTextStyle('small',
+                                                  const SizedBox(width: 8),
+                                                  Text(
+                                                    classItem.subject,
+                                                    style: getTextStyle(
+                                                        'mediumBold',
                                                         color: Colors.white),
                                                   ),
-                                                ),
-                                              ],
-                                            ),
-                                            const SizedBox(height: 10),
-                                            Text(
-                                              'Description:',
-                                              style: getTextStyle('smallBold',
-                                                  color: Colors.white),
-                                            ),
-                                            const SizedBox(height: 4),
-                                            Text(
-                                              classItem.description,
-                                              style: getTextStyle('small',
-                                                  color: Colors.white70),
-                                            ),
-                                            const SizedBox(height: 10),
-                                            Row(
-                                              children: [
-                                                Text(
-                                                  'Time: ',
-                                                  style: getTextStyle(
-                                                      'smallBold',
-                                                      color: Colors.white),
-                                                ),
-                                                Expanded(
-                                                  child: Text(
-                                                    '${classItem.timeFrom} - ${classItem.timeTo}',
-                                                    style: getTextStyle('small',
+                                                ],
+                                              ),
+                                              const SizedBox(height: 12),
+                                              Row(
+                                                children: [
+                                                  Text(
+                                                    'Subtopic: ',
+                                                    style: getTextStyle(
+                                                        'smallBold',
                                                         color: Colors.white),
                                                   ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
+                                                  Expanded(
+                                                    child: Text(
+                                                      classItem.subtitle,
+                                                      style: getTextStyle(
+                                                          'small',
+                                                          color:
+                                                              Colors.white70),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              const SizedBox(height: 12),
+                                              Row(
+                                                children: [
+                                                  Text(
+                                                    'Teacher: ',
+                                                    style: getTextStyle(
+                                                        'smallBold',
+                                                        color: Colors.white),
+                                                  ),
+                                                  Expanded(
+                                                    child: Text(
+                                                      "${classItem.teacher.firstName} ${classItem.teacher.lastName}",
+                                                      style: getTextStyle(
+                                                          'small',
+                                                          color: Colors.white),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              const SizedBox(height: 10),
+                                              Text(
+                                                'Description:',
+                                                style: getTextStyle('smallBold',
+                                                    color: Colors.white),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                classItem.description,
+                                                style: getTextStyle('small',
+                                                    color: Colors.white70),
+                                              ),
+                                              const SizedBox(height: 10),
+                                              Row(
+                                                children: [
+                                                  Text(
+                                                    'Time: ',
+                                                    style: getTextStyle(
+                                                        'smallBold',
+                                                        color: Colors.white),
+                                                  ),
+                                                  Expanded(
+                                                    child: Text(
+                                                      '${classItem.timeFrom} - ${classItem.timeTo}',
+                                                      style: getTextStyle(
+                                                          'small',
+                                                          color: Colors.white),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  );
-                                },
-                              );
-                      },
-                      loading: () =>
-                          const Center(child: CircularProgressIndicator()),
-                      error: (err, stack) => Center(child: Text('Error: $err')),
+                                    );
+                                  },
+                                );
+                        },
+                        loading: () =>
+                            const Center(child: CircularProgressIndicator()),
+                        error: (err, stack) =>
+                            Center(child: Text('Error: $err')),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
