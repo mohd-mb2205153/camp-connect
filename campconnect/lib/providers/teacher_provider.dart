@@ -39,8 +39,11 @@ class TeacherProvider extends AsyncNotifier<List<Teacher>> {
     _repo.deleteTeacher(teacher);
   }
 
-  void updateTeacher(Teacher teacher) {
-    _repo.updateTeacher(teacher);
+  void updateTeacher(Teacher teacher) async {
+    await _repo.updateTeacher(teacher);
+    state = AsyncData(List<Teacher>.from(state.value ?? [])
+      ..removeWhere((t) => t.id == teacher.id)
+      ..add(teacher));
   }
 
   Future<void> addTeachingCamp(String teacherId, String campId) async {

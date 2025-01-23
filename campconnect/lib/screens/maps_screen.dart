@@ -986,7 +986,7 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
     }
   }
 
-  void toggleSaveCamp() {
+  void toggleCamp() {
     final loggedInUser = ref.read(loggedInUserNotifierProvider);
 
     if (loggedInUser is Student) {
@@ -1118,7 +1118,7 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
               child: SizedBox(
                 height: 36,
                 child: IconButton(
-                  onPressed: toggleSaveCamp,
+                  onPressed: toggleCamp,
                   icon: Icon(
                     isSaved ? Icons.bookmark : Icons.bookmark_outline_outlined,
                     color: AppColors.lightTeal,
@@ -1135,7 +1135,7 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
               child: SizedBox(
                 height: 36,
                 child: IconButton(
-                  onPressed: toggleSaveCamp,
+                  onPressed: toggleCamp,
                   icon: Icon(
                     isTeaching ? Icons.book : Icons.book_outlined,
                     color: AppColors.lightTeal,
