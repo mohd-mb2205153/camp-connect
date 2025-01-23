@@ -58,6 +58,10 @@ class TeacherProvider extends AsyncNotifier<List<Teacher>> {
     }
   }
 
+  Future<List<Camp>> getTeachingCampsByTeacherId(String teacherId) {
+    return _repo.getTeachingCampsByTeacherId(teacherId);
+  }
+
   bool isTeachingCamp(Teacher teacher, String campId) {
     return teacher.teachingCamps.contains(campId);
   }
@@ -73,8 +77,8 @@ final teachersByCampIdProvider =
   return repo.getTeachersByCampId(campId);
 });
 
-final teachingCampsProvider =
-    FutureProvider.family<List<Camp>, String>((ref, teacherId) async {
-  final repo = await ref.watch(repoProvider.future);
-  return repo.getTeachingCampsByTeacherId(teacherId);
-});
+// final teachingCampsProvider =
+//     FutureProvider.family<List<Camp>, String>((ref, teacherId) async {
+//   final repo = await ref.watch(repoProvider.future);
+//   return repo.getTeachingCampsByTeacherId(teacherId);
+// });

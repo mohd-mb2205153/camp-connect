@@ -1014,6 +1014,7 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
       }
     } else if (loggedInUser is Teacher) {
       final teacherNotifier = ref.read(loggedInUserNotifierProvider.notifier);
+      final campNotifer = ref.read(campProviderNotifier.notifier);
 
       setState(() {
         isTeaching = !isTeaching;
@@ -1022,10 +1023,13 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
       try {
         if (isTeaching) {
           loggedInUser.teachingCamps.add(widget.camp.id!);
+          widget.camp.teacherId?.add(loggedInUser.id!);
         } else {
           loggedInUser.teachingCamps.remove(widget.camp.id!);
+          widget.camp.teacherId?.remove(loggedInUser.id!);
         }
 
+        campNotifer.updateCamp(widget.camp);
         teacherNotifier.updateTeacher(loggedInUser);
       } catch (e) {
         setState(() {

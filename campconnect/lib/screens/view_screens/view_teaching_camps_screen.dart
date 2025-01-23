@@ -20,6 +20,7 @@ class _ViewTeachingCampsScreenState
   @override
   void initState() {
     super.initState();
+    ref.read(teacherProviderNotifier);
     Future.microtask(() {
       ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(false);
     });
@@ -88,8 +89,6 @@ class TeachingCampListView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final teachingCampsAsync = ref.watch(teachingCampsProvider(userId));
-
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
@@ -99,64 +98,79 @@ class TeachingCampListView extends ConsumerWidget {
         }
         return;
       },
-      child: teachingCampsAsync.when(
-        data: (camps) => camps.isEmpty
-            ? const EmptyScreen()
-            : ListView.builder(
-                itemCount: camps.length,
-                itemBuilder: (context, index) {
-                  final camp = camps[index];
-                  return Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Card(
-                      color: AppColors.darkTeal,
-                      child: Container(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Camp Icon
-                            Container(
-                              width: 50,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                color: AppColors.lightTeal,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Image.asset(
-                                'assets/images/tent_icon_white.png',
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            // Camp Details
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    camp.name,
-                                    style: getTextStyle('mediumBold',
-                                        color: Colors.white),
+      child: FutureBuilder(
+        future: ref
+            .read(teacherProviderNotifier.notifier)
+            .getTeachingCampsByTeacherId(userId),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            print(snapshot);
+          }
+          if (snapshot.hasData) {
+            return snapshot.data!.isEmpty
+                ? const EmptyScreen()
+                : ListView.builder(
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (context, index) {
+                      final camp = snapshot.data![index];
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Card(
+                          color: AppColors.darkTeal,
+                          child: Container(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Camp Icon
+                                Container(
+                                  width: 50,
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.lightTeal,
+                                    shape: BoxShape.circle,
                                   ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    camp.description,
-                                    style: getTextStyle('small',
-                                        color: Colors.white70),
+                                  child: Image.asset(
+                                    'assets/images/tent_icon_white.png',
+                                    fit: BoxFit.cover,
                                   ),
-                                ],
-                              ),
+                                ),
+                                const SizedBox(width: 16),
+                                // Camp Details
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        camp.name,
+                                        style: getTextStyle('mediumBold',
+                                            color: Colors.white),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        camp.description,
+                                        style: getTextStyle('small',
+                                            color: Colors.white70),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   );
-                },
-              ),
-        error: (err, _) => Center(child: Text('Error: $err')),
-        loading: () => const Center(child: CircularProgressIndicator()),
+          }
+          return Center(
+            child: Text(
+              'Loading Teaching Camps...',
+              style: getTextStyle('mediumBold', color: AppColors.white),
+            ),
+          );
+        },
       ),
     );
   }
