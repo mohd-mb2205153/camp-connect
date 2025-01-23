@@ -1,14 +1,15 @@
+import 'package:campconnect/providers/student_provider.dart';
+import 'package:campconnect/providers/teacher_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/student.dart';
 import '../models/teacher.dart';
 import '../models/user.dart';
-import '../repositories/camp_connect_repo.dart';
-import 'repo_provider.dart';
 
-class LoggedInUserNotifier extends StateNotifier<User?> {
-  final CampConnectRepo _repo;
-
-  LoggedInUserNotifier(this._repo) : super(null);
+class LoggedInUserNotifier extends Notifier<User?> {
+  @override
+  User? build() {
+    return null;
+  }
 
   void setStudent(Student student) {
     state = student;
@@ -34,19 +35,19 @@ class LoggedInUserNotifier extends StateNotifier<User?> {
 
   String? get userId => state?.id;
 
-  Future<void> updateStudent(Student student) async {
+  void updateStudent(Student student) {
     if (student.id == null) {
       throw Exception("Student ID is required to update.");
     }
-    await _repo.updateStudent(student);
+    ref.read(studentProviderNotifier.notifier).updateStudent(student);
     state = student;
   }
 
-  Future<void> updateTeacher(Teacher teacher) async {
+  void updateTeacher(Teacher teacher) {
     if (teacher.id == null) {
       throw Exception("Teacher ID is required to update.");
     }
-    await _repo.updateTeacher(teacher);
+    ref.read(teacherProviderNotifier.notifier).updateTeacher(teacher);
     state = teacher;
   }
 
@@ -56,16 +57,4 @@ class LoggedInUserNotifier extends StateNotifier<User?> {
 }
 
 final loggedInUserNotifierProvider =
-    StateNotifierProvider<LoggedInUserNotifier, User?>((ref) {
-  final asyncRepo = ref.watch(repoProvider);
-
-  return asyncRepo.when(
-    data: (repo) => LoggedInUserNotifier(repo),
-    loading: () {
-      throw Exception('Repo is still loading. Ensure this is handled.');
-    },
-    error: (error, stackTrace) {
-      throw Exception('Error resolving CampConnectRepo: $error');
-    },
-  );
-});
+    NotifierProvider<LoggedInUserNotifier, User?>(() => LoggedInUserNotifier());

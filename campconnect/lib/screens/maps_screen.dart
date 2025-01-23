@@ -569,46 +569,47 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
                   onPressed: () {
                     ref.watch(provider).when(
                           data: (list) {
-                            return showModalBottomSheet(
-                              context: context,
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.vertical(
-                                  top: Radius.circular(12),
+                            setState(() {
+                              showModalBottomSheet(
+                                context: context,
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(12),
+                                  ),
                                 ),
-                              ),
-                              builder: (_) {
-                                return ListView.builder(
-                                  itemCount: list.length,
-                                  itemBuilder: (_, index) {
-                                    return ListTile(
-                                      title: Text(
-                                        list[index],
-                                        style: getTextStyle("small"),
-                                      ),
-                                      onTap: () {
-                                        setModalState(() {
-                                          if (!filteredList
-                                              .contains(list[index])) {
-                                            filteredList.add(list[index]);
-                                          }
-                                        });
-                                        setState(() {
-                                          if (title ==
-                                              'Filter Educational Level') {
-                                            ref
-                                                .read(campProviderNotifier
-                                                    .notifier)
-                                                .filterByEducationLevel(
-                                                    filteredList);
-                                          }
-                                        });
-                                        Navigator.pop(context);
-                                      },
-                                    );
-                                  },
-                                );
-                              },
-                            );
+                                builder: (_) {
+                                  return ListView.builder(
+                                    itemCount: list.length,
+                                    itemBuilder: (_, index) {
+                                      return ListTile(
+                                        title: Text(
+                                          list[index],
+                                          style: getTextStyle("small"),
+                                        ),
+                                        onTap: () {
+                                          setModalState(() {
+                                            if (!filteredList
+                                                .contains(list[index])) {
+                                              filteredList.add(list[index]);
+                                            }
+
+                                            if (title ==
+                                                'Filter Educational Level') {
+                                              ref
+                                                  .read(campProviderNotifier
+                                                      .notifier)
+                                                  .filterByEducationLevel(
+                                                      filteredList);
+                                            }
+                                          });
+                                          Navigator.pop(context);
+                                        },
+                                      );
+                                    },
+                                  );
+                                },
+                              );
+                            });
                           },
                           loading: () => const CircularProgressIndicator(),
                           error: (err, stack) => Text('Error: $err'),
@@ -985,7 +986,7 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
     }
   }
 
-  void toggleSaveCamp() async {
+  void toggleSaveCamp() {
     final loggedInUser = ref.read(loggedInUserNotifierProvider);
 
     if (loggedInUser is Student) {
@@ -1002,7 +1003,7 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
           loggedInUser.savedCamps.remove(widget.camp.id!);
         }
 
-        await studentNotifier.updateStudent(loggedInUser);
+        studentNotifier.updateStudent(loggedInUser);
       } catch (e) {
         setState(() {
           isSaved = !isSaved;
@@ -1025,7 +1026,7 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
           loggedInUser.teachingCamps.remove(widget.camp.id!);
         }
 
-        await teacherNotifier.updateTeacher(loggedInUser);
+        teacherNotifier.updateTeacher(loggedInUser);
       } catch (e) {
         setState(() {
           isTeaching = !isTeaching;
