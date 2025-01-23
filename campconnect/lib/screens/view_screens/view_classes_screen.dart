@@ -27,6 +27,7 @@ class _ViewClassesScreenState extends ConsumerState<ViewClassesScreen> {
   void initState() {
     super.initState();
     initializeUserDetails();
+    ref.read(classProviderNotifier);
     debugPrint(widget.campId);
     Future.microtask(() {
       ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(false);

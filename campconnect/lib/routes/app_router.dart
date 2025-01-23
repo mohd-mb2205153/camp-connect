@@ -155,14 +155,6 @@ class AppRouter {
             builder: (context, state) => const MapsScreen(),
             routes: [
               GoRoute(
-                name: viewTeachingCamps.name,
-                path: viewTeachingCamps.path,
-                builder: (context, state) {
-                  final userId = state.extra as String;
-                  return ViewTeachingCampsScreen(userId: userId);
-                },
-              ),
-              GoRoute(
                 path: viewClasses.path,
                 name: viewClasses.name,
                 builder: (context, state) {
