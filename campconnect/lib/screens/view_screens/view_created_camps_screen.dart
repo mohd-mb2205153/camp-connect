@@ -88,9 +88,9 @@ class CreatedCampListView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final createdCamps = ref.watch(createdCampsProvider(userId));
+    final createdCampsAsync = ref.watch(createdCampsProvider(userId));
 
-    return createdCamps.when(
+    return createdCampsAsync.when(
       data: (camps) => camps.isEmpty
           ? const EmptyScreen()
           : ListView.builder(

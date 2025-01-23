@@ -19,6 +19,7 @@ class _ViewTeachersScreenState extends ConsumerState<ViewTeachersScreen> {
   @override
   void initState() {
     super.initState();
+    debugPrint(widget.campId);
     Future.microtask(() {
       ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(false);
     });
@@ -70,9 +71,9 @@ class TeacherList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final teachers = ref.watch(teachersByCampIdProvider(campId));
-    print(teachers);
-    return teachers.when(
+    final teachersAsync = ref.watch(teachersByCampIdProvider(campId));
+    print(teachersAsync);
+    return teachersAsync.when(
       data: (teacherList) {
         return teacherList.isEmpty
             ? const EmptyScreen()
