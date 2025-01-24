@@ -131,102 +131,177 @@ class _ViewClassesScreenState extends ConsumerState<ViewClassesScreen> {
                                           borderRadius:
                                               BorderRadius.circular(12),
                                         ),
-                                        child: Container(
-                                          padding: const EdgeInsets.all(16.0),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Row(
+                                        child: Stack(
+                                          children: [
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.all(16.0),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
                                                 children: [
-                                                  Icon(
-                                                    Icons.library_books,
+                                                  Row(
+                                                    children: [
+                                                      Icon(
+                                                        Icons.library_books,
+                                                        color: Colors.white,
+                                                        size: 24,
+                                                      ),
+                                                      const SizedBox(width: 8),
+                                                      Text(
+                                                        classItem.subject,
+                                                        style: getTextStyle(
+                                                            'mediumBold',
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const SizedBox(height: 12),
+                                                  Row(
+                                                    children: [
+                                                      Text(
+                                                        'Subtopic: ',
+                                                        style: getTextStyle(
+                                                            'smallBold',
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                      Expanded(
+                                                        child: Text(
+                                                          classItem.subtitle,
+                                                          style: getTextStyle(
+                                                              'small',
+                                                              color: Colors
+                                                                  .white70),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const SizedBox(height: 12),
+                                                  Row(
+                                                    children: [
+                                                      Text(
+                                                        'Teacher: ',
+                                                        style: getTextStyle(
+                                                            'smallBold',
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                      Expanded(
+                                                        child: Text(
+                                                          "${classItem.teacher.firstName} ${classItem.teacher.lastName}",
+                                                          style: getTextStyle(
+                                                              'small',
+                                                              color:
+                                                                  Colors.white),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const SizedBox(height: 10),
+                                                  Text(
+                                                    'Description:',
+                                                    style: getTextStyle(
+                                                        'smallBold',
+                                                        color: Colors.white),
+                                                  ),
+                                                  const SizedBox(height: 4),
+                                                  Text(
+                                                    classItem.description,
+                                                    style: getTextStyle('small',
+                                                        color: Colors.white70),
+                                                  ),
+                                                  const SizedBox(height: 10),
+                                                  Row(
+                                                    children: [
+                                                      Text(
+                                                        'Time: ',
+                                                        style: getTextStyle(
+                                                            'smallBold',
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                      Expanded(
+                                                        child: Text(
+                                                          '${classItem.timeFrom} - ${classItem.timeTo}',
+                                                          style: getTextStyle(
+                                                              'small',
+                                                              color:
+                                                                  Colors.white),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            if (isTeacher)
+                                              Positioned(
+                                                top: 12,
+                                                right: 16,
+                                                child: GestureDetector(
+                                                  onTap: () {
+                                                    showModalBottomSheet(
+                                                      backgroundColor:
+                                                          AppColors.darkTeal,
+                                                      context: context,
+                                                      builder: (context) {
+                                                        return Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(16.0),
+                                                          child: Column(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .min,
+                                                            children: [
+                                                              ListTile(
+                                                                leading:
+                                                                    const Icon(
+                                                                  Icons.edit,
+                                                                  color: Colors
+                                                                      .white,
+                                                                ),
+                                                                title: Text(
+                                                                  'Edit Class',
+                                                                  style: getTextStyle(
+                                                                      "mediumBold",
+                                                                      color: Colors
+                                                                          .white),
+                                                                ),
+                                                                onTap: () {},
+                                                              ),
+                                                              ListTile(
+                                                                leading:
+                                                                    const Icon(
+                                                                  Icons.delete,
+                                                                  color: Colors
+                                                                      .white,
+                                                                ),
+                                                                title: Text(
+                                                                    'Delete Class',
+                                                                    style: getTextStyle(
+                                                                        "mediumBold",
+                                                                        color: Colors
+                                                                            .white)),
+                                                                onTap: () {},
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        );
+                                                      },
+                                                    );
+                                                  },
+                                                  child: const Icon(
+                                                    Icons.more_horiz,
                                                     color: Colors.white,
-                                                    size: 24,
                                                   ),
-                                                  const SizedBox(width: 8),
-                                                  Text(
-                                                    classItem.subject,
-                                                    style: getTextStyle(
-                                                        'mediumBold',
-                                                        color: Colors.white),
-                                                  ),
-                                                ],
+                                                ),
                                               ),
-                                              const SizedBox(height: 12),
-                                              Row(
-                                                children: [
-                                                  Text(
-                                                    'Subtopic: ',
-                                                    style: getTextStyle(
-                                                        'smallBold',
-                                                        color: Colors.white),
-                                                  ),
-                                                  Expanded(
-                                                    child: Text(
-                                                      classItem.subtitle,
-                                                      style: getTextStyle(
-                                                          'small',
-                                                          color:
-                                                              Colors.white70),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              const SizedBox(height: 12),
-                                              Row(
-                                                children: [
-                                                  Text(
-                                                    'Teacher: ',
-                                                    style: getTextStyle(
-                                                        'smallBold',
-                                                        color: Colors.white),
-                                                  ),
-                                                  Expanded(
-                                                    child: Text(
-                                                      "${classItem.teacher.firstName} ${classItem.teacher.lastName}",
-                                                      style: getTextStyle(
-                                                          'small',
-                                                          color: Colors.white),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              const SizedBox(height: 10),
-                                              Text(
-                                                'Description:',
-                                                style: getTextStyle('smallBold',
-                                                    color: Colors.white),
-                                              ),
-                                              const SizedBox(height: 4),
-                                              Text(
-                                                classItem.description,
-                                                style: getTextStyle('small',
-                                                    color: Colors.white70),
-                                              ),
-                                              const SizedBox(height: 10),
-                                              Row(
-                                                children: [
-                                                  Text(
-                                                    'Time: ',
-                                                    style: getTextStyle(
-                                                        'smallBold',
-                                                        color: Colors.white),
-                                                  ),
-                                                  Expanded(
-                                                    child: Text(
-                                                      '${classItem.timeFrom} - ${classItem.timeTo}',
-                                                      style: getTextStyle(
-                                                          'small',
-                                                          color: Colors.white),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
+                                          ],
                                         ),
                                       ),
                                     );
