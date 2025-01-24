@@ -57,33 +57,6 @@ class _ViewSavedCampsScreenState extends ConsumerState<ViewSavedCampsScreen> {
                 final student = students.firstWhere(
                   (s) => s.id == widget.userId,
                 );
-
-                // if (student == null || student.savedCamps.isEmpty) {
-                //   return Center(
-                //     child: Padding(
-                //       padding: const EdgeInsets.only(bottom: 60),
-                //       child: Column(
-                //         mainAxisAlignment: MainAxisAlignment.center,
-                //         children: [
-                //           Icon(
-                //             Icons.bookmark_add,
-                //             size: 32,
-                //             color: const Color.fromARGB(179, 245, 245, 245),
-                //           ),
-                //           const SizedBox(height: 16),
-                //           Text(
-                //             'You do not have\n any saved camps',
-                //             style: getTextStyle("medium",
-                //                 color:
-                //                     const Color.fromARGB(179, 245, 245, 245)),
-                //             textAlign: TextAlign.center,
-                //           ),
-                //         ],
-                //       ),
-                //     ),
-                //   );
-                // }
-
                 final savedCamps = ref.watch(campProviderNotifier).whenData(
                       (camps) => camps
                           .where((camp) => student.savedCamps.contains(camp.id))
@@ -101,48 +74,109 @@ class _ViewSavedCampsScreenState extends ConsumerState<ViewSavedCampsScreen> {
                               padding: const EdgeInsets.only(top: 8.0),
                               child: Card(
                                 color: AppColors.darkTeal,
-                                child: Container(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      // Camp Icon
-                                      Container(
-                                        width: 50,
-                                        height: 50,
-                                        decoration: BoxDecoration(
-                                          color: AppColors.lightTeal,
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: Image.asset(
-                                          'assets/images/tent_icon_white.png',
-                                          fit: BoxFit.cover,
+                                child: Stack(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(16.0),
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            width: 50,
+                                            height: 50,
+                                            decoration: BoxDecoration(
+                                              color: AppColors.lightTeal,
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: Image.asset(
+                                              'assets/images/tent_icon_white.png',
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 16),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      camp.name,
+                                                      style: getTextStyle(
+                                                          'mediumBold',
+                                                          color: Colors.white),
+                                                    ),
+                                                  ],
+                                                ),
+                                                const SizedBox(height: 8),
+                                                Text(
+                                                  camp.description,
+                                                  style: getTextStyle('small',
+                                                      color: Colors.white70),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Positioned(
+                                      top: 12,
+                                      right: 16,
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          showModalBottomSheet(
+                                            backgroundColor: AppColors.darkTeal,
+                                            context: context,
+                                            builder: (context) {
+                                              return Container(
+                                                padding:
+                                                    const EdgeInsets.all(16.0),
+                                                child: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    ListTile(
+                                                      leading: const Icon(
+                                                        Icons.edit,
+                                                        color: Colors.white,
+                                                      ),
+                                                      title: Text(
+                                                        'Edit Saved Camp',
+                                                        style: getTextStyle(
+                                                            "mediumBold",
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                      onTap: () {},
+                                                    ),
+                                                    ListTile(
+                                                      leading: const Icon(
+                                                        Icons.delete,
+                                                        color: Colors.white,
+                                                      ),
+                                                      title: Text('Delete Camp',
+                                                          style: getTextStyle(
+                                                              "mediumBold",
+                                                              color: Colors
+                                                                  .white)),
+                                                      onTap: () {},
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            },
+                                          );
+                                        },
+                                        child: const Icon(
+                                          Icons.more_horiz,
+                                          color: Colors.white,
                                         ),
                                       ),
-                                      const SizedBox(width: 16),
-                                      // Camp Details
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              camp.name,
-                                              style: getTextStyle('mediumBold',
-                                                  color: Colors.white),
-                                            ),
-                                            const SizedBox(height: 8),
-                                            Text(
-                                              camp.description,
-                                              style: getTextStyle('small',
-                                                  color: Colors.white70),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             );
