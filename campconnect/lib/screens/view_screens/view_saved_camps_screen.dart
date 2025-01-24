@@ -132,6 +132,7 @@ class _ViewSavedCampsScreenState extends ConsumerState<ViewSavedCampsScreen> {
                                             context: context,
                                             builder: (context) {
                                               return Container(
+                                                height: 150,
                                                 padding:
                                                     const EdgeInsets.all(16.0),
                                                 child: Column(
@@ -140,24 +141,11 @@ class _ViewSavedCampsScreenState extends ConsumerState<ViewSavedCampsScreen> {
                                                   children: [
                                                     ListTile(
                                                       leading: const Icon(
-                                                        Icons.edit,
-                                                        color: Colors.white,
-                                                      ),
-                                                      title: Text(
-                                                        'Edit Saved Camp',
-                                                        style: getTextStyle(
-                                                            "mediumBold",
-                                                            color:
-                                                                Colors.white),
-                                                      ),
-                                                      onTap: () {},
-                                                    ),
-                                                    ListTile(
-                                                      leading: const Icon(
                                                         Icons.delete,
                                                         color: Colors.white,
                                                       ),
-                                                      title: Text('Delete Camp',
+                                                      title: Text(
+                                                          'Remove from Camps',
                                                           style: getTextStyle(
                                                               "mediumBold",
                                                               color: Colors

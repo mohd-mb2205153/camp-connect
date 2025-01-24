@@ -250,6 +250,7 @@ class _ViewClassesScreenState extends ConsumerState<ViewClassesScreen> {
                                                       context: context,
                                                       builder: (context) {
                                                         return Container(
+                                                          height: 150,
                                                           padding:
                                                               const EdgeInsets
                                                                   .all(16.0),
