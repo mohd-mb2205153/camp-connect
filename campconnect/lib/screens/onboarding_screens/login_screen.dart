@@ -6,6 +6,7 @@ import 'package:campconnect/routes/app_router.dart';
 import 'package:campconnect/theme/constants.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -72,7 +73,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final password = txtPasswordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
-      showCustomSnackBar("Please fill in all fields", icon: Icons.error);
+      ScaffoldMessenger.of(context).showSnackBar(customSnackbar(
+        message: "Please fill in all fields",
+        icon: Icons.error,
+      ));
       return;
     }
 
@@ -108,23 +112,30 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       }
 
       throw Exception("User not found in students or teachers collections");
+    } on FirebaseAuthException catch (e) {
+      final errorMessage = switch (e.code) {
+        'user-not-found' => "No user found for that email.",
+        'wrong-password' => "Incorrect password. Please try again.",
+        'invalid-email' => "The email address is invalid.",
+        _ => "An unexpected error occurred during login. Please try again.",
+      };
+
+      customSnackbar(
+        message: errorMessage,
+        icon: Icons.error,
+      );
+    } on FirebaseException catch (e) {
+      customSnackbar(
+        message: "Database error: ${e.message ?? 'Unknown error occurred'}",
+        icon: Icons.error,
+      );
     } catch (e) {
       debugPrint("Error during login: $e");
-      showCustomSnackBar(
-          "You have entered the wrong credentials. Please try again.",
-          icon: Icons.error);
+      customSnackbar(
+        message: "Something went wrong. Please try again later.",
+        icon: Icons.error,
+      );
     }
-  }
-
-  void showCustomSnackBar(String message,
-      {Color? backgroundColor, IconData? icon}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      CustomSnackBar.create(
-        message: message,
-        backgroundColor: backgroundColor,
-        icon: icon,
-      ),
-    );
   }
 
   @override

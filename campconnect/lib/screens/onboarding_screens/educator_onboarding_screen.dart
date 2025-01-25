@@ -124,20 +124,9 @@ class _EducatorOnboardingScreenState
   }
 
   void handleRegisterTeacher() async {
-    void showCustomSnackBar(String message,
-        {Color? backgroundColor, IconData? icon}) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        CustomSnackBar.create(
-          message: message,
-          backgroundColor: backgroundColor,
-          icon: icon,
-        ),
-      );
-    }
-
     if (!isAllFilled()) {
-      showCustomSnackBar(
-        'All fields are required. Please complete the form.',
+      customSnackbar(
+        message: 'All fields are required. Please complete the form.',
         backgroundColor: AppColors.orange,
         icon: Icons.error,
       );
@@ -176,13 +165,15 @@ class _EducatorOnboardingScreenState
           .read(loggedInUserNotifierProvider.notifier)
           .setTeacher(updatedTeacher);
 
-      showCustomSnackBar("You have registered successfully!",
+      customSnackbar(
+          message: "You have registered successfully!",
           icon: Icons.check_circle);
 
       ref.read(showNavBarNotifierProvider.notifier).setActiveBottomNavBar(0);
       context.goNamed(AppRouter.home.name);
     } catch (error) {
-      showCustomSnackBar("There has been an error with your registration.",
+      customSnackbar(
+          message: "There has been an error with your registration.",
           icon: Icons.error);
     }
   }

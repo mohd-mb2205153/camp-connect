@@ -189,7 +189,8 @@ class _AddClassScreenState extends ConsumerState<AddClassScreen> {
                               context.goNamed(AppRouter.map.name);
                             }
                           } catch (error) {
-                            showCustomSnackBar("$error", icon: Icons.error);
+                            customSnackbar(
+                                message: "$error", icon: Icons.error);
                           }
                         } else {
                           String errorMessage = "Please fill all fields";
@@ -200,7 +201,8 @@ class _AddClassScreenState extends ConsumerState<AddClassScreen> {
                             errorMessage = "End time must be after start time.";
                           }
 
-                          showCustomSnackBar(errorMessage, icon: Icons.error);
+                          customSnackbar(
+                              message: errorMessage, icon: Icons.error);
                         }
                       },
                       style: ElevatedButton.styleFrom(
@@ -409,17 +411,6 @@ class _AddClassScreenState extends ConsumerState<AddClassScreen> {
           ],
         ),
       ],
-    );
-  }
-
-  void showCustomSnackBar(String message,
-      {Color? backgroundColor, IconData? icon}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      CustomSnackBar.create(
-        message: message,
-        backgroundColor: backgroundColor,
-        icon: icon,
-      ),
     );
   }
 }

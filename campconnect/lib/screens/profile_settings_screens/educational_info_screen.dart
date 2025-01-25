@@ -122,13 +122,10 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
                 setState(() {
                   if (isEditing) {
                     handleUpdate(user);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      CustomSnackBar.create(
-                        message: 'Educational Details Updated',
+                    customSnackbar(
+                        message: "Educational Details Updated",
                         backgroundColor: AppColors.lightTeal,
-                        icon: Icons.task_alt,
-                      ),
-                    );
+                        icon: Icons.task_alt);
                   }
                   isEditing = !isEditing;
                   if (isEditing) {

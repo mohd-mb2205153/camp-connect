@@ -176,12 +176,10 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                 setState(() {
                   if (isEditing) {
                     handleUpdate(user);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      CustomSnackBar.create(
-                        message: 'Personal Details Updated',
-                        backgroundColor: AppColors.lightTeal,
-                        icon: Icons.task_alt,
-                      ),
+                    customSnackbar(
+                      message: 'Personal Details Updated',
+                      backgroundColor: AppColors.lightTeal,
+                      icon: Icons.task_alt,
                     );
                   }
                   isEditing = !isEditing;

@@ -141,21 +141,10 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
             .addCampToTeacher(loggedUser, newCamp);
       }
     } catch (e) {
-      showCustomSnackBar("Failed to add camp $e", icon: Icons.error);
+      customSnackbar(message: "Failed to add camp $e", icon: Icons.error);
     } finally {
       context.goNamed(AppRouter.map.name);
     }
-  }
-
-  void showCustomSnackBar(String message,
-      {Color? backgroundColor, IconData? icon}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      CustomSnackBar.create(
-        message: message,
-        backgroundColor: backgroundColor,
-        icon: icon,
-      ),
-    );
   }
 
   @override
@@ -304,8 +293,8 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
                                 .read(showNavBarNotifierProvider.notifier)
                                 .setActiveBottomNavBar(1);
                           } else {
-                            showCustomSnackBar(
-                                "Please fill in all required fields.",
+                            customSnackbar(
+                                message: "Please fill in all required fields.",
                                 icon: Icons.error);
                           }
                         },

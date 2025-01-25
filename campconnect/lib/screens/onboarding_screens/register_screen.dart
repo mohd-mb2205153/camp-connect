@@ -88,55 +88,50 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   }
 
   bool validateFields(BuildContext context) {
-    void showCustomSnackBar(String message,
-        {Color? backgroundColor, IconData? icon}) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        CustomSnackBar.create(
-          message: message,
-          backgroundColor: backgroundColor,
-          icon: icon,
-        ),
-      );
-    }
-
     if (!isAllFilled()) {
-      showCustomSnackBar("All fields are required.", icon: Icons.error);
+      customSnackbar(message: "All fields are required.", icon: Icons.error);
       return false;
     }
 
     final email = txtEmailController.text.trim();
     final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
     if (!emailRegex.hasMatch(email)) {
-      showCustomSnackBar("Please enter a valid email address.");
+      customSnackbar(
+          message: "Please enter a valid email address.", icon: Icons.email);
       return false;
     }
 
     final password = txtPasswordController.text.trim();
     if (password.length < 6) {
-      showCustomSnackBar("Password must be at least 6 characters long.");
+      customSnackbar(
+          message: "Password must be at least 6 characters long.",
+          icon: Icons.password);
       return false;
     }
 
     final firstName = txtFirstNameController.text.trim();
     if (firstName.isEmpty || firstName.length < 2) {
-      showCustomSnackBar("First name must be at least 2 characters long.");
+      customSnackbar(message: "First name must be at least 2 characters long.");
       return false;
     }
 
     final lastName = txtLastNameController.text.trim();
     if (lastName.isEmpty || lastName.length < 2) {
-      showCustomSnackBar("Last name must be at least 2 characters long.");
+      customSnackbar(message: "Last name must be at least 2 characters long.");
       return false;
     }
 
     final phoneNumber = txtPhoneNumberController.text.trim();
     if (phoneNumber.isEmpty || !RegExp(r'^\d+$').hasMatch(phoneNumber)) {
-      showCustomSnackBar("Please enter a valid phone number.");
+      customSnackbar(
+          message: "Please enter a valid phone number.", icon: Icons.phone);
       return false;
     }
 
     if (!agreeToTerms) {
-      showCustomSnackBar("You must agree to the Terms of Use.");
+      customSnackbar(
+          message: "You must agree to the Terms of Use.",
+          icon: Icons.assignment);
       return false;
     }
 
@@ -175,19 +170,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   }
 
   bool handleUser(BuildContext context) {
-    void showCustomSnackBar(String message,
-        {Color? backgroundColor, IconData? icon}) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        CustomSnackBar.create(
-          message: message,
-          backgroundColor: backgroundColor,
-          icon: icon,
-        ),
-      );
-    }
-
     if (!isAllFilled()) {
-      showCustomSnackBar('All fields are required.');
+      customSnackbar(message: 'All fields are required.');
       return false;
     }
     return true;
