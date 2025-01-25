@@ -155,20 +155,20 @@ class CampConnectRepo {
     }
   }
 
-  Future<void> addCampToTeacher({
-    required String teacherId,
-    required String campId,
-    required String teachingCamps,
-  }) async {
-    try {
-      final teacherRef = teachersRef.doc(teacherId);
-      await teacherRef.update({
-        teachingCamps: FieldValue.arrayUnion([campId]),
-      });
-    } catch (e) {
-      throw Exception("Failed to update $teachingCamps for teacher: $e");
-    }
-  }
+  // Future<void> addCampToTeacher({
+  //   required String teacherId,
+  //   required String campId,
+  //   required String teachingCamps,
+  // }) async {
+  //   try {
+  //     final teacherRef = teachersRef.doc(teacherId);
+  //     await teacherRef.update({
+  //       teachingCamps: FieldValue.arrayUnion([campId]),
+  //     });
+  //   } catch (e) {
+  //     throw Exception("Failed to update $teachingCamps for teacher: $e");
+  //   }
+  // }
 
   Future<void> addTeacher(Teacher teacher) async {
     final docId = teachersRef.doc().id;

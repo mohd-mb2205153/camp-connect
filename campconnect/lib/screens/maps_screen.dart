@@ -991,7 +991,7 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
     final campNotifer = ref.read(campProviderNotifier.notifier);
 
     if (loggedInUser is Student) {
-      final studentNotifier = ref.read(loggedInUserNotifierProvider.notifier);
+      final studentNotifier = ref.read(studentProviderNotifier.notifier);
 
       setState(() {
         isSaved = !isSaved;
@@ -1015,7 +1015,7 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
         );
       }
     } else if (loggedInUser is Teacher) {
-      final teacherNotifier = ref.read(loggedInUserNotifierProvider.notifier);
+      final teacherNotifier = ref.read(teacherProviderNotifier.notifier);
 
       setState(() {
         isTeaching = !isTeaching;

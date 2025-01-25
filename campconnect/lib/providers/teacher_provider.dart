@@ -1,5 +1,6 @@
 import 'package:campconnect/models/camp.dart';
 import 'package:campconnect/models/teacher.dart';
+import 'package:campconnect/providers/loggedinuser_provider.dart';
 import 'package:campconnect/providers/repo_provider.dart';
 import 'package:campconnect/repositories/camp_connect_repo.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -41,18 +42,21 @@ class TeacherProvider extends AsyncNotifier<List<Teacher>> {
 
   void updateTeacher(Teacher teacher) async {
     await _repo.updateTeacher(teacher);
+    ref.read(loggedInUserNotifierProvider.notifier).setTeacher(teacher);
     state = AsyncData(List<Teacher>.from(state.value ?? [])
       ..removeWhere((t) => t.id == teacher.id)
       ..add(teacher));
   }
 
-  Future<void> addCampToTeacher(String teacherId, String campId) async {
+  Future<void> addCampToTeacher(Teacher teacher, Camp camp) async {
     try {
-      await _repo.addCampToTeacher(
-        teacherId: teacherId,
-        campId: campId,
-        teachingCamps: 'teachingCamps',
-      );
+      // await _repo.addCampToTeacher(
+      //   teacherId: teacher.id!,
+      //   campId: camp.id!,
+      //   teachingCamps: 'teachingCamps',
+      // );
+      teacher.teachingCamps.add(camp.id!);
+      updateTeacher(teacher);
     } catch (e) {
       state = AsyncError(e, StackTrace.current);
     }

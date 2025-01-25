@@ -35,21 +35,21 @@ class LoggedInUserNotifier extends Notifier<User?> {
 
   String? get userId => state?.id;
 
-  void updateStudent(Student student) {
-    if (student.id == null) {
-      throw Exception("Student ID is required to update.");
-    }
-    ref.read(studentProviderNotifier.notifier).updateStudent(student);
-    state = student;
-  }
+  // void updateStudent(Student student) {
+  //   if (student.id == null) {
+  //     throw Exception("Student ID is required to update.");
+  //   }
+  //   ref.read(studentProviderNotifier.notifier).updateStudent(student);
+  //   state = student;
+  // }
 
-  void updateTeacher(Teacher teacher) {
-    if (teacher.id == null) {
-      throw Exception("Teacher ID is required to update.");
-    }
-    ref.read(teacherProviderNotifier.notifier).updateTeacher(teacher);
-    state = teacher;
-  }
+  // void updateTeacher(Teacher teacher) {
+  //   if (teacher.id == null) {
+  //     throw Exception("Teacher ID is required to update.");
+  //   }
+  //   ref.read(teacherProviderNotifier.notifier).updateTeacher(teacher);
+  //   state = teacher;
+  // }
 
   String? getLoggedInUserId() {
     return userId;

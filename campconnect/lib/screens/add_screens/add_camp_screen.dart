@@ -120,7 +120,7 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
     }
   }
 
-  void addCamp() async {
+  void addCamp() {
     final newCamp = Camp(
       name: nameController.text,
       educationLevel: selectedEducationalLevels,
@@ -133,20 +133,12 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
     );
 
     try {
-      final teacherId = loggedUser.id;
-
-      final campId = await ref
-          .read(campProviderNotifier.notifier)
-          .addCamp(newCamp, teacherId);
+      ref.read(campProviderNotifier.notifier).addCamp(newCamp, loggedUser.id);
 
       if (loggedUser != null) {
-        final teacherId = loggedUser.id;
-        await ref
-            .read(teacherProviderNotifier.notifier)
-            .addCampToTeacher(teacherId, campId);
         ref
-            .read(loggedInUserNotifierProvider.notifier)
-            .updateTeacher(loggedUser);
+            .read(teacherProviderNotifier.notifier)
+            .addCampToTeacher(loggedUser, newCamp);
       }
     } catch (e) {
       showCustomSnackBar("Failed to add camp $e", icon: Icons.error);
