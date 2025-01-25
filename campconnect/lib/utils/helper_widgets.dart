@@ -216,6 +216,72 @@ SnackBar customSnackbar(
   );
 }
 
+class ConfirmationDialog extends StatelessWidget {
+  final String type;
+  final String title;
+  final String content;
+  final VoidCallback onConfirm;
+
+  const ConfirmationDialog({
+    super.key,
+    required this.type,
+    required this.title,
+    required this.content,
+    required this.onConfirm,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: const Color.fromARGB(255, 0, 36, 39).withOpacity(0.7),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      title: Text(
+        title,
+        style: getTextStyle(
+          "mediumBold",
+          color: Colors.white,
+        ),
+      ),
+      content: Text(
+        content,
+        style: getTextStyle(
+          "small",
+          color: Colors.white70,
+        ),
+      ),
+      actions: [
+        TextButton(
+          child: Text(
+            'Cancel',
+            style: getTextStyle("smallBold", color: AppColors.lightTeal),
+          ),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        TextButton(
+          child: Text(
+            'Confirm',
+            style: getTextStyle("smallBold", color: AppColors.lightTeal),
+          ),
+          onPressed: () {
+            onConfirm();
+            Navigator.of(context).pop();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('$type details have been updated.'),
+                duration: const Duration(seconds: 3),
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+}
+
 class Assets {
   static const _imagesBasePath = "assets/images/";
   static String image(String fileName) => '$_imagesBasePath$fileName';

@@ -100,8 +100,22 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       child: Column(
                         children: [
                           LoginButton(
-                              onLoginPressed: () => context
-                                  .pushReplacementNamed(AppRouter.login.name)),
+                            onLoginPressed: () {
+                              // showDialog(
+                              //   context: context,
+                              //   builder: (BuildContext context) {
+                              //     return ConfirmationDialog(
+                              //       type: 'Login',
+                              //       title: 'Login user',
+                              //       content:
+                              //           'Are you sure you want to login an account?',
+                              //       onConfirm: () {},
+                              //     );
+                              //   },
+                              // );
+                              context.pushNamed(AppRouter.login.name);
+                            },
+                          ),
                           addVerticalSpace(20),
                           RegisterButton(
                               onRegisterPressed: () =>
