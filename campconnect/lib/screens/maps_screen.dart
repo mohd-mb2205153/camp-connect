@@ -988,6 +988,7 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
 
   void toggleCamp() {
     final loggedInUser = ref.read(loggedInUserNotifierProvider);
+    final campNotifer = ref.read(campProviderNotifier.notifier);
 
     if (loggedInUser is Student) {
       final studentNotifier = ref.read(loggedInUserNotifierProvider.notifier);
@@ -1003,6 +1004,7 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
           loggedInUser.savedCamps.remove(widget.camp.id!);
         }
 
+        campNotifer.updateCamp(widget.camp);
         studentNotifier.updateStudent(loggedInUser);
       } catch (e) {
         setState(() {
@@ -1014,7 +1016,6 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
       }
     } else if (loggedInUser is Teacher) {
       final teacherNotifier = ref.read(loggedInUserNotifierProvider.notifier);
-      final campNotifer = ref.read(campProviderNotifier.notifier);
 
       setState(() {
         isTeaching = !isTeaching;

@@ -143,12 +143,15 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
         final teacherId = loggedUser.id;
         await ref
             .read(teacherProviderNotifier.notifier)
-            .addTeachingCamp(teacherId, campId);
+            .addCampToTeacher(teacherId, campId);
+        ref
+            .read(loggedInUserNotifierProvider.notifier)
+            .updateTeacher(loggedUser);
       }
-
-      ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(true);
     } catch (e) {
       showCustomSnackBar("Failed to add camp $e", icon: Icons.error);
+    } finally {
+      context.goNamed(AppRouter.map.name);
     }
   }
 
@@ -302,7 +305,6 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
                               descriptionController.text.isNotEmpty &&
                               selectedEducationalLevels.isNotEmpty) {
                             addCamp();
-                            context.goNamed(AppRouter.map.name);
                             ref
                                 .read(showNavBarNotifierProvider.notifier)
                                 .showBottomNavBar(true);
