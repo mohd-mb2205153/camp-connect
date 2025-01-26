@@ -593,13 +593,18 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
                                               filteredList.add(list[index]);
                                             }
 
-                                            if (title ==
-                                                'Filter Educational Level') {
-                                              ref
-                                                  .read(campProviderNotifier
-                                                      .notifier)
-                                                  .filterByEducationLevel(
-                                                      filteredList);
+                                            if (title == 'Filter Educational Level') {
+                                              setModalState(() {
+                                                ref
+                                                    .read(campProviderNotifier.notifier)
+                                                    .filterByEducationLevel(filteredList);
+                                                markers.clear(); // Clear existing markers
+                                              ref.watch(campProviderNotifier).when(
+                                                data: (data) => _buildMapScreen(context, data),
+                                                error: (err, stack) => _buildErrorScreen(err),
+                                                loading: () => _buildLoadingScreen(),
+                                              );
+                                              });
                                             }
                                           });
                                           Navigator.pop(context);
@@ -679,12 +684,20 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
   }
 
   void handleClearFilter() {
+    setState(() {
     ref.read(campProviderNotifier.notifier).initializeCamps();
     filteredAdditional = [];
     filteredEduLevels = [];
     filteredLanguages = [];
     filteredSubjects = [];
     areaRadiusController.text = '';
+    markers.clear(); // Clear markers
+    ref.watch(campProviderNotifier).when(
+          data: (data) => _buildMapScreen(context, data),
+          error: (err, stack) => _buildErrorScreen(err),
+          loading: () => _buildLoadingScreen(),
+        );
+    });
   }
 
   ElevatedButton _buildClearAllFilters(StateSetter setModalState) {
