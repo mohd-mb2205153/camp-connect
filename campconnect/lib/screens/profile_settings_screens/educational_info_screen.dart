@@ -3,7 +3,6 @@ import 'package:campconnect/models/teacher.dart';
 import 'package:campconnect/models/user.dart';
 import 'package:campconnect/providers/json_provider.dart';
 import 'package:campconnect/providers/loggedinuser_provider.dart';
-import 'package:campconnect/providers/show_nav_bar_provider.dart';
 import 'package:campconnect/providers/student_provider.dart';
 import 'package:campconnect/providers/teacher_provider.dart';
 import 'package:campconnect/theme/frosted_glass.dart';
@@ -89,8 +88,9 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
         if (!didPop) {
-          ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(true);
-          Navigator.of(context).pop(result);
+          ref
+              .read(loggedInUserNotifierProvider.notifier)
+              .handleDiscardUpdate(isEditing: isEditing, context: context);
         }
         return;
       },
@@ -110,9 +110,8 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
             icon: const Icon(Icons.arrow_back),
             onPressed: () {
               ref
-                  .read(showNavBarNotifierProvider.notifier)
-                  .showBottomNavBar(true);
-              Navigator.of(context).pop();
+                  .read(loggedInUserNotifierProvider.notifier)
+                  .handleDiscardUpdate(isEditing: isEditing, context: context);
             },
           ),
           actions: [
@@ -122,10 +121,12 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
                 setState(() {
                   if (isEditing) {
                     handleUpdate(user);
-                    customSnackbar(
-                        message: "Educational Details Updated",
-                        backgroundColor: AppColors.lightTeal,
-                        icon: Icons.task_alt);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      customSnackbar(
+                          message: "Educational Details Updated",
+                          backgroundColor: AppColors.lightTeal,
+                          icon: Icons.task_alt),
+                    );
                   }
                   isEditing = !isEditing;
                   if (isEditing) {

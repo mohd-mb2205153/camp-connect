@@ -1,6 +1,8 @@
-import 'package:campconnect/providers/student_provider.dart';
-import 'package:campconnect/providers/teacher_provider.dart';
+import 'package:campconnect/providers/show_nav_bar_provider.dart';
+import 'package:campconnect/utils/helper_widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../models/student.dart';
 import '../models/teacher.dart';
 import '../models/user.dart';
@@ -34,6 +36,35 @@ class LoggedInUserNotifier extends Notifier<User?> {
   bool get isLoggedIn => state != null;
 
   String? get userId => state?.id;
+
+  void handleDiscardUpdate(
+      {required bool isEditing, required BuildContext context}) async {
+    bool exit = false;
+    if (isEditing) {
+      await showDialog(
+        context: context,
+        builder: (context) {
+          return ConfirmationDialog(
+            showSnackBar: false,
+            type: 'Discard',
+            title: 'Discard Update?',
+            content:
+                'Any current changes that has been made to the profile will not be saved!',
+            onConfirm: () {
+              exit = true;
+              ref
+                  .read(showNavBarNotifierProvider.notifier)
+                  .showBottomNavBar(true);
+            },
+          );
+        },
+      );
+    } else {
+      exit = true;
+      ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(true);
+    }
+    exit ? context.pop() : null;
+  }
 
   // void updateStudent(Student student) {
   //   if (student.id == null) {

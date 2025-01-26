@@ -143,8 +143,9 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
         if (!didPop) {
-          ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(true);
-          Navigator.of(context).pop(result);
+          ref
+              .read(loggedInUserNotifierProvider.notifier)
+              .handleDiscardUpdate(isEditing: isEditing, context: context);
         }
         return;
       },
@@ -164,9 +165,8 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
             icon: const Icon(Icons.arrow_back),
             onPressed: () {
               ref
-                  .read(showNavBarNotifierProvider.notifier)
-                  .showBottomNavBar(true);
-              Navigator.of(context).pop();
+                  .read(loggedInUserNotifierProvider.notifier)
+                  .handleDiscardUpdate(isEditing: isEditing, context: context);
             },
           ),
           actions: [
@@ -176,10 +176,11 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                 setState(() {
                   if (isEditing) {
                     handleUpdate(user);
-                    customSnackbar(
-                      message: 'Personal Details Updated',
-                      backgroundColor: AppColors.lightTeal,
-                      icon: Icons.task_alt,
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      customSnackbar(
+                          message: "Personal Details Updated",
+                          backgroundColor: AppColors.lightTeal,
+                          icon: Icons.task_alt),
                     );
                   }
                   isEditing = !isEditing;

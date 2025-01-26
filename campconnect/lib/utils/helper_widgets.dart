@@ -221,6 +221,7 @@ class ConfirmationDialog extends StatelessWidget {
   final String title;
   final String content;
   final VoidCallback onConfirm;
+  final bool showSnackBar;
 
   const ConfirmationDialog({
     super.key,
@@ -228,6 +229,7 @@ class ConfirmationDialog extends StatelessWidget {
     required this.title,
     required this.content,
     required this.onConfirm,
+    this.showSnackBar = true,
   });
 
   @override
@@ -269,12 +271,14 @@ class ConfirmationDialog extends StatelessWidget {
           onPressed: () {
             onConfirm();
             Navigator.of(context).pop();
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('$type details have been updated.'),
-                duration: const Duration(seconds: 3),
-              ),
-            );
+            showSnackBar
+                ? ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('$type details have been updated.'),
+                      duration: const Duration(seconds: 3),
+                    ),
+                  )
+                : null;
           },
         ),
       ],

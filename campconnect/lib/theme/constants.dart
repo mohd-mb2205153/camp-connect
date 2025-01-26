@@ -86,3 +86,4 @@ TextStyle getTextStyle(String size, {Color? color}) {
   //       return Colors.red;
   //   }
   // }
+
