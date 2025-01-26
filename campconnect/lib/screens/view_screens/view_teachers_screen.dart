@@ -81,136 +81,66 @@ class TeacherList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final teachersAsync = ref.watch(teachersByCampIdProvider(campId));
-    debugPrint(teachersAsync.toString());
-
-    return teachersAsync.when(
-      data: (teacherList) {
-        return teacherList.isEmpty
-            ? const EmptyScreen()
-            : ListView.builder(
-                itemCount: teacherList.length,
-                itemBuilder: (context, index) {
-                  final teacher = teacherList[index];
-                  return Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Card(
-                      color: AppColors.darkTeal,
-                      child: Stack(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      width: 30,
-                                      height: 30,
-                                      decoration: const BoxDecoration(
-                                        color: AppColors.lightTeal,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: const Icon(
-                                        Icons.person_2_rounded,
-                                        color: Colors.white,
-                                        size: 24,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 20),
-                                    Expanded(
-                                      child: Text(
-                                        '${teacher.firstName} ${teacher.lastName}',
-                                        style: getTextStyle('mediumBold',
-                                            color: Colors.white),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                addVerticalSpace(15),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Text(
-                                              'Experience: ',
-                                              style: getTextStyle("smallBold",
-                                                  color: Colors.white),
-                                            ),
-                                            Text(
-                                              '${teacher.teachingExperience} years',
-                                              style: getTextStyle("small",
-                                                  color: Colors.white),
-                                            ),
-                                          ],
+    return FutureBuilder(
+      future: ref
+          .read(teacherProviderNotifier.notifier)
+          .getTeachersByCampId(campId),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return errorWidget(snapshot);
+        }
+        if (snapshot.hasData) {
+          return snapshot.data!.isEmpty
+              ? const EmptyScreen()
+              : ListView.builder(
+                  itemCount: snapshot.data!.length,
+                  itemBuilder: (context, index) {
+                    final teacher = snapshot.data![index];
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Card(
+                        color: AppColors.darkTeal,
+                        child: Stack(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        width: 30,
+                                        height: 30,
+                                        decoration: const BoxDecoration(
+                                          color: AppColors.lightTeal,
+                                          shape: BoxShape.circle,
                                         ),
-                                        Row(
-                                          children: [
-                                            Text(
-                                              'Mobile: ',
-                                              style: getTextStyle("smallBold",
-                                                  color: Colors.white),
-                                            ),
-                                            Text(
-                                              '${teacher.phoneCode} ${teacher.mobileNumber}',
-                                              style: getTextStyle("small",
-                                                  color: Colors.white),
-                                            ),
-                                          ],
+                                        child: const Icon(
+                                          Icons.person_2_rounded,
+                                          color: Colors.white,
+                                          size: 24,
                                         ),
-                                      ],
-                                    ),
-                                    addVerticalSpace(10),
-                                    Row(
-                                      children: [
-                                        Text(
-                                          'Availability: ',
-                                          style: getTextStyle("smallBold",
+                                      ),
+                                      const SizedBox(width: 20),
+                                      Expanded(
+                                        child: Text(
+                                          '${teacher.firstName} ${teacher.lastName}',
+                                          style: getTextStyle('mediumBold',
                                               color: Colors.white),
                                         ),
-                                        Expanded(
-                                          child: Text(
-                                            teacher.availabilitySchedule,
-                                            style: getTextStyle("small",
-                                                color: Colors.white),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    addVerticalSpace(10),
-                                    Text(
-                                      'Area of Expertise:',
-                                      style: getTextStyle("smallBold",
-                                          color: Colors.white),
-                                    ),
-                                    addVerticalSpace(10),
-                                    buildChips(teacher.areasOfExpertise),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          Positioned(
-                            top: 12,
-                            right: 16,
-                            child: GestureDetector(
-                              onTap: () {
-                                showModalBottomSheet(
-                                  backgroundColor: AppColors.darkTeal,
-                                  context: context,
-                                  builder: (context) {
-                                    return Container(
-                                      height: 150,
-                                      padding: const EdgeInsets.all(16.0),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
+                                      ),
+                                    ],
+                                  ),
+                                  addVerticalSpace(15),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
                                           ListTile(
                                             leading: const Icon(
@@ -239,25 +169,83 @@ class TeacherList extends ConsumerWidget {
                                           ),
                                         ],
                                       ),
-                                    );
-                                  },
-                                );
-                              },
-                              child: const Icon(
-                                Icons.more_horiz,
-                                color: Colors.white,
+                                      addVerticalSpace(10),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            'Availability: ',
+                                            style: getTextStyle("smallBold",
+                                                color: Colors.white),
+                                          ),
+                                          Expanded(
+                                            child: Text(
+                                              teacher.availabilitySchedule,
+                                              style: getTextStyle("small",
+                                                  color: Colors.white),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      addVerticalSpace(10),
+                                      Text(
+                                        'Area of Expertise:',
+                                        style: getTextStyle("smallBold",
+                                            color: Colors.white),
+                                      ),
+                                      addVerticalSpace(10),
+                                      buildChips(teacher.areasOfExpertise),
+                                    ],
+                                  ),
+                                ],
                               ),
                             ),
-                          ),
-                        ],
+                            Positioned(
+                              top: 12,
+                              right: 16,
+                              child: GestureDetector(
+                                onTap: () {
+                                  showModalBottomSheet(
+                                    backgroundColor: AppColors.darkTeal,
+                                    context: context,
+                                    builder: (context) {
+                                      return Container(
+                                        height: 150,
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            ListTile(
+                                              leading: const Icon(
+                                                Icons.delete,
+                                                color: Colors.white,
+                                              ),
+                                              title: Text('Remove Teacher',
+                                                  style: getTextStyle(
+                                                      "mediumBold",
+                                                      color: Colors.white)),
+                                              onTap: () {},
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                                child: const Icon(
+                                  Icons.more_horiz,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-                },
-              );
+                    );
+                  },
+                );
+        }
+        return loadingWidget(snapshot: snapshot, label: 'Teachers');
       },
-      error: (err, stack) => Text('Error: $err'),
-      loading: () => const CircularProgressIndicator(),
     );
   }
 

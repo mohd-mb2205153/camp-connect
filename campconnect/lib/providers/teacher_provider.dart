@@ -75,11 +75,11 @@ final teacherProviderNotifier =
     AsyncNotifierProvider<TeacherProvider, List<Teacher>>(
         () => TeacherProvider());
 
-final teachersByCampIdProvider =
-    FutureProvider.family<List<Teacher>, String>((ref, campId) async {
-  final repo = await ref.watch(repoProvider.future);
-  return repo.getTeachersByCampId(campId);
-});
+// final teachersByCampIdProvider =
+//     FutureProvider.family<List<Teacher>, String>((ref, campId) async {
+//   final repo = await ref.watch(repoProvider.future);
+//   return repo.getTeachersByCampId(campId);
+// });
 
 // final teachingCampsProvider =
 //     FutureProvider.family<List<Camp>, String>((ref, teacherId) async {

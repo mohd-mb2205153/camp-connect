@@ -293,3 +293,23 @@ class Assets {
 double screenHeight(BuildContext context) => MediaQuery.of(context).size.height;
 
 double screenWidth(BuildContext context) => MediaQuery.of(context).size.width;
+
+Widget errorWidget(AsyncSnapshot<dynamic> snapshot) {
+  return Text(
+    '${snapshot.error.toString()} - Refresh Page.',
+    style: getTextStyle(
+      'medium',
+      color: AppColors.white,
+    ),
+  );
+}
+
+Widget loadingWidget(
+    {required AsyncSnapshot<dynamic> snapshot, required String label}) {
+  return Center(
+    child: Text(
+      'Loading $label...',
+      style: getTextStyle('medium', color: AppColors.white),
+    ),
+  );
+}
