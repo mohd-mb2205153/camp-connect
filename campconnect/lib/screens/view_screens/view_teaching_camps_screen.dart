@@ -79,17 +79,6 @@ class _ViewTeachingCampsScreenState
   }
 }
 
-Widget buildBackground(String imageName) {
-  return Container(
-    decoration: BoxDecoration(
-      image: DecorationImage(
-        image: AssetImage("assets/images/$imageName.png"),
-        fit: BoxFit.cover,
-      ),
-    ),
-  );
-}
-
 class TeachingCampListView extends ConsumerWidget {
   final String userId;
   const TeachingCampListView({super.key, required this.userId});

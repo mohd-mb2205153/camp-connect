@@ -63,7 +63,9 @@ class _ViewTeachersScreenState extends ConsumerState<ViewTeachersScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: Column(
                   children: [
-                    Expanded(child: TeacherList(campId: widget.campId)),
+                    Expanded(
+                      child: TeacherList(campId: widget.campId),
+                    ),
                   ],
                 ),
               ),
@@ -100,6 +102,9 @@ class TeacherList extends ConsumerWidget {
                       padding: const EdgeInsets.only(top: 8.0),
                       child: Card(
                         color: AppColors.darkTeal,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         child: Stack(
                           children: [
                             Container(

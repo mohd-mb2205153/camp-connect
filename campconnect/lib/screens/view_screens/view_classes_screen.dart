@@ -347,15 +347,4 @@ class _ViewClassesScreenState extends ConsumerState<ViewClassesScreen> {
       ),
     );
   }
-
-  Widget buildBackground(String imageName) {
-    return Container(
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage("assets/images/$imageName.png"),
-          fit: BoxFit.cover,
-        ),
-      ),
-    );
-  }
 }
