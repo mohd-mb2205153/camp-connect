@@ -3,7 +3,6 @@ import 'package:campconnect/models/teacher.dart';
 import 'package:campconnect/models/user.dart';
 import 'package:campconnect/providers/json_provider.dart';
 import 'package:campconnect/providers/loggedinuser_provider.dart';
-import 'package:campconnect/providers/show_nav_bar_provider.dart';
 import 'package:campconnect/providers/student_provider.dart';
 import 'package:campconnect/providers/teacher_provider.dart';
 import 'package:campconnect/theme/frosted_glass.dart';
