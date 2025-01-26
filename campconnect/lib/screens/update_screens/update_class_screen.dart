@@ -11,6 +11,6 @@ class UpdateClassScreen extends ConsumerStatefulWidget {
 class _UpdateClassScreenState extends ConsumerState<UpdateClassScreen> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold();
   }
 }

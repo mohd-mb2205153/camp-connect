@@ -1,6 +1,7 @@
 import 'package:campconnect/models/user.dart';
 import 'package:campconnect/screens/add_screens/add_camp_location_screen.dart';
 import 'package:campconnect/screens/add_screens/add_camp_screen.dart';
+import 'package:campconnect/screens/admin_screens/admin_dashboard_screen.dart';
 import 'package:campconnect/screens/home_screen.dart';
 import 'package:campconnect/screens/onboarding_screens/educator_onboarding_screen.dart';
 import 'package:campconnect/screens/onboarding_screens/login_screen.dart';
@@ -19,6 +20,7 @@ import 'package:go_router/go_router.dart';
 import '../screens/add_screens/add_class_screen.dart';
 import '../screens/onboarding_screens/register_screen.dart';
 import '../screens/onboarding_screens/student_onboarding_screen.dart';
+import '../screens/update_screens/update_camp_screen.dart';
 import '../screens/view_screens/view_saved_camps_screen.dart';
 import '../screens/view_screens/view_teaching_camps_screen.dart';
 
@@ -38,6 +40,10 @@ class AppRouter {
   static const map = (name: 'maps', path: '/maps');
   static const profile = (name: 'profile', path: '/profile');
   static const notifications = (name: 'notifications', path: '/notifications');
+
+  // Admin Screen Routes
+  static const adminDashboard =
+      (name: 'adminDashboard', path: '/adminDashboard');
 
   // Viewing Routes
   static const viewSavedCamps =
@@ -111,6 +117,12 @@ class AppRouter {
         ],
       ),
 
+      GoRoute(
+        path: adminDashboard.path,
+        name: adminDashboard.name,
+        builder: (context, state) => const AdminDashboardScreen(),
+      ),
+
       // Main Screens with ShellRoute
       ShellRoute(
         builder: (context, state, child) =>
@@ -133,15 +145,14 @@ class AppRouter {
                       name: updateCampLocation.name,
                       path: updateCampLocation.path,
                       builder: (context, state) =>
-                          const AddCampLocationScreen(),
+                          const UpdateCampLocationScreen(),
                       routes: [
                         GoRoute(
                           name: updateCamp.name,
                           path: updateCamp.path,
                           builder: (context, state) {
                             final location = state.pathParameters['location'];
-                            return UpdateCampLocationScreen(
-                                location: location!);
+                            return UpdateCampScreen(location: location!);
                           },
                         ),
                       ],
