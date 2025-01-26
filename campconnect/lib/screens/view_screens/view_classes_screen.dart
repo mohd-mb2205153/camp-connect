@@ -28,7 +28,6 @@ class _ViewClassesScreenState extends ConsumerState<ViewClassesScreen> {
   void initState() {
     super.initState();
     initializeUserDetails();
-    ref.read(classProviderNotifier);
     debugPrint(widget.campId);
     Future.microtask(() {
       ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(false);
@@ -57,8 +56,6 @@ class _ViewClassesScreenState extends ConsumerState<ViewClassesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final classesAsync = ref.watch(classProviderNotifier);
-
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
@@ -111,228 +108,234 @@ class _ViewClassesScreenState extends ConsumerState<ViewClassesScreen> {
                 child: Column(
                   children: [
                     Expanded(
-                      child: classesAsync.when(
-                        data: (classes) {
-                          final campClasses = classes
-                              .where((c) => c.teacher.teachingCamps
-                                  .contains(widget.campId))
-                              .toList();
-
-                          return campClasses.isEmpty
-                              ? const EmptyScreen()
-                              : ListView.builder(
-                                  itemCount: campClasses.length,
-                                  itemBuilder: (context, index) {
-                                    final classItem = campClasses[index];
-                                    return Padding(
-                                      padding: const EdgeInsets.only(top: 8.0),
-                                      child: Card(
-                                        color: AppColors.darkTeal,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                        ),
-                                        child: Stack(
-                                          children: [
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.all(16.0),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  Row(
-                                                    children: [
-                                                      Icon(
-                                                        Icons.library_books,
-                                                        color: Colors.white,
-                                                        size: 24,
-                                                      ),
-                                                      const SizedBox(width: 8),
-                                                      Text(
-                                                        classItem.subject,
-                                                        style: getTextStyle(
-                                                            'mediumBold',
-                                                            color:
-                                                                Colors.white),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  const SizedBox(height: 12),
-                                                  Row(
-                                                    children: [
-                                                      Text(
-                                                        'Subtopic: ',
-                                                        style: getTextStyle(
-                                                            'smallBold',
-                                                            color:
-                                                                Colors.white),
-                                                      ),
-                                                      Expanded(
-                                                        child: Text(
-                                                          classItem.subtitle,
-                                                          style: getTextStyle(
-                                                              'small',
-                                                              color: Colors
-                                                                  .white70),
+                      child: FutureBuilder(
+                        future: ref
+                            .read(classProviderNotifier.notifier)
+                            .getClassByCampId(widget.campId),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasError) {
+                            return errorWidget(snapshot);
+                          }
+                          if (snapshot.hasData) {
+                            return snapshot.data!.isEmpty
+                                ? const EmptyScreen()
+                                : ListView.builder(
+                                    itemCount: snapshot.data!.length,
+                                    itemBuilder: (context, index) {
+                                      final classItem = snapshot.data![index];
+                                      return Padding(
+                                        padding:
+                                            const EdgeInsets.only(top: 8.0),
+                                        child: Card(
+                                          color: AppColors.darkTeal,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                          ),
+                                          child: Stack(
+                                            children: [
+                                              Container(
+                                                padding:
+                                                    const EdgeInsets.all(16.0),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Row(
+                                                      children: [
+                                                        Icon(
+                                                          Icons.library_books,
+                                                          color: Colors.white,
+                                                          size: 24,
                                                         ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  const SizedBox(height: 12),
-                                                  Row(
-                                                    children: [
-                                                      Text(
-                                                        'Teacher: ',
-                                                        style: getTextStyle(
-                                                            'smallBold',
-                                                            color:
-                                                                Colors.white),
-                                                      ),
-                                                      Expanded(
-                                                        child: Text(
-                                                          "${classItem.teacher.firstName} ${classItem.teacher.lastName}",
+                                                        const SizedBox(
+                                                            width: 8),
+                                                        Text(
+                                                          classItem.subject,
                                                           style: getTextStyle(
-                                                              'small',
+                                                              'mediumBold',
                                                               color:
                                                                   Colors.white),
                                                         ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  const SizedBox(height: 10),
-                                                  Text(
-                                                    'Description:',
-                                                    style: getTextStyle(
-                                                        'smallBold',
-                                                        color: Colors.white),
-                                                  ),
-                                                  const SizedBox(height: 4),
-                                                  Text(
-                                                    classItem.description,
-                                                    style: getTextStyle('small',
-                                                        color: Colors.white70),
-                                                  ),
-                                                  const SizedBox(height: 10),
-                                                  Row(
-                                                    children: [
-                                                      Text(
-                                                        'Time: ',
-                                                        style: getTextStyle(
-                                                            'smallBold',
-                                                            color:
-                                                                Colors.white),
-                                                      ),
-                                                      Expanded(
-                                                        child: Text(
-                                                          '${classItem.timeFrom} - ${classItem.timeTo}',
+                                                      ],
+                                                    ),
+                                                    const SizedBox(height: 12),
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                          'Subtopic: ',
                                                           style: getTextStyle(
-                                                              'small',
+                                                              'smallBold',
                                                               color:
                                                                   Colors.white),
                                                         ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
+                                                        Expanded(
+                                                          child: Text(
+                                                            classItem.subtitle,
+                                                            style: getTextStyle(
+                                                                'small',
+                                                                color: Colors
+                                                                    .white70),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    const SizedBox(height: 12),
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                          'Teacher: ',
+                                                          style: getTextStyle(
+                                                              'smallBold',
+                                                              color:
+                                                                  Colors.white),
+                                                        ),
+                                                        Expanded(
+                                                          child: Text(
+                                                            "${classItem.teacher.firstName} ${classItem.teacher.lastName}",
+                                                            style: getTextStyle(
+                                                                'small',
+                                                                color: Colors
+                                                                    .white),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    const SizedBox(height: 10),
+                                                    Text(
+                                                      'Description:',
+                                                      style: getTextStyle(
+                                                          'smallBold',
+                                                          color: Colors.white),
+                                                    ),
+                                                    const SizedBox(height: 4),
+                                                    Text(
+                                                      classItem.description,
+                                                      style: getTextStyle(
+                                                          'small',
+                                                          color:
+                                                              Colors.white70),
+                                                    ),
+                                                    const SizedBox(height: 10),
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                          'Time: ',
+                                                          style: getTextStyle(
+                                                              'smallBold',
+                                                              color:
+                                                                  Colors.white),
+                                                        ),
+                                                        Expanded(
+                                                          child: Text(
+                                                            '${classItem.timeFrom} - ${classItem.timeTo}',
+                                                            style: getTextStyle(
+                                                                'small',
+                                                                color: Colors
+                                                                    .white),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
-                                            ),
-                                            if (isTeacher)
-                                              Positioned(
-                                                top: 12,
-                                                right: 16,
-                                                child: GestureDetector(
-                                                  onTap: () {
-                                                    showModalBottomSheet(
-                                                      backgroundColor:
-                                                          AppColors.darkTeal,
-                                                      context: context,
-                                                      builder: (context) {
-                                                        return Container(
-                                                          height: 150,
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(16.0),
-                                                          child: Column(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .min,
-                                                            children: [
-                                                              ListTile(
-                                                                leading:
-                                                                    const Icon(
-                                                                  Icons.edit,
-                                                                  color: Colors
-                                                                      .white,
-                                                                ),
-                                                                title: Text(
-                                                                  'Edit Class',
-                                                                  style: getTextStyle(
-                                                                      "mediumBold",
-                                                                      color: Colors
-                                                                          .white),
-                                                                ),
-                                                                onTap: () {},
-                                                              ),
-                                                              ListTile(
-                                                                leading:
-                                                                    const Icon(
-                                                                  Icons.delete,
-                                                                  color: Colors
-                                                                      .white,
-                                                                ),
-                                                                title: Text(
-                                                                    'Delete Class',
+                                              if (isTeacher)
+                                                Positioned(
+                                                  top: 12,
+                                                  right: 16,
+                                                  child: GestureDetector(
+                                                    onTap: () {
+                                                      showModalBottomSheet(
+                                                        backgroundColor:
+                                                            AppColors.darkTeal,
+                                                        context: context,
+                                                        builder: (context) {
+                                                          return Container(
+                                                            height: 150,
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(16.0),
+                                                            child: Column(
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .min,
+                                                              children: [
+                                                                ListTile(
+                                                                  leading:
+                                                                      const Icon(
+                                                                    Icons.edit,
+                                                                    color: Colors
+                                                                        .white,
+                                                                  ),
+                                                                  title: Text(
+                                                                    'Edit Class',
                                                                     style: getTextStyle(
                                                                         "mediumBold",
                                                                         color: Colors
-                                                                            .white)),
-                                                                onTap: () {
-                                                                  showDialog(
-                                                                    context:
-                                                                        context,
-                                                                    builder:
-                                                                        (BuildContext
-                                                                            context) {
-                                                                      return ConfirmationDialog(
-                                                                        type:
-                                                                            'Delete',
-                                                                        title:
-                                                                            'Delete a Class Schedule',
-                                                                        content:
-                                                                            'Are you sure you want to delete this class?',
-                                                                        onConfirm:
-                                                                            () {},
-                                                                      );
-                                                                    },
-                                                                  );
-                                                                },
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        );
-                                                      },
-                                                    );
-                                                  },
-                                                  child: const Icon(
-                                                    Icons.more_horiz,
-                                                    color: Colors.white,
+                                                                            .white),
+                                                                  ),
+                                                                  onTap: () {},
+                                                                ),
+                                                                ListTile(
+                                                                  leading:
+                                                                      const Icon(
+                                                                    Icons
+                                                                        .delete,
+                                                                    color: Colors
+                                                                        .white,
+                                                                  ),
+                                                                  title: Text(
+                                                                      'Delete Class',
+                                                                      style: getTextStyle(
+                                                                          "mediumBold",
+                                                                          color:
+                                                                              Colors.white)),
+                                                                  onTap: () {
+                                                                    showDialog(
+                                                                      context:
+                                                                          context,
+                                                                      builder:
+                                                                          (BuildContext
+                                                                              context) {
+                                                                        return ConfirmationDialog(
+                                                                          type:
+                                                                              'Delete',
+                                                                          title:
+                                                                              'Delete a Class Schedule',
+                                                                          content:
+                                                                              'Are you sure you want to delete this class?',
+                                                                          onConfirm:
+                                                                              () {},
+                                                                        );
+                                                                      },
+                                                                    );
+                                                                  },
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          );
+                                                        },
+                                                      );
+                                                    },
+                                                    child: const Icon(
+                                                      Icons.more_horiz,
+                                                      color: Colors.white,
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                    );
-                                  },
-                                );
+                                      );
+                                    },
+                                  );
+                          }
+                          return loadingWidget(
+                              snapshot: snapshot, label: "Classes");
                         },
-                        loading: () =>
-                            const Center(child: CircularProgressIndicator()),
-                        error: (err, stack) =>
-                            Center(child: Text('Error: $err')),
                       ),
                     ),
                   ],

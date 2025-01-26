@@ -20,14 +20,6 @@ class ProfileScreen extends ConsumerStatefulWidget {
 
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   @override
-  void initState() {
-    super.initState();
-    //To avoid missing/late instatiation of CampConncetRepo in these providers.
-    ref.read(studentProviderNotifier);
-    ref.read(teacherProviderNotifier);
-  }
-
-  @override
   Widget build(BuildContext context) {
     final loggedInUser = ref.watch(loggedInUserNotifierProvider);
 

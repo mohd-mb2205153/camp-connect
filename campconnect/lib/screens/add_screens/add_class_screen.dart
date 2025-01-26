@@ -45,9 +45,6 @@ class _AddClassScreenState extends ConsumerState<AddClassScreen> {
   void initState() {
     super.initState();
     final loggedUser = ref.read(loggedInUserNotifierProvider);
-    ref.read(classProviderNotifier.notifier);
-    ref.read(campProviderNotifier.notifier);
-
     if (loggedUser is Teacher) {
       teacherController.text = '${loggedUser.firstName} ${loggedUser.lastName}';
     }

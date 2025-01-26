@@ -63,8 +63,6 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
     loadEducationalLevels();
     loadLanguages();
     initializeUserDetails();
-    ref.read(campProviderNotifier.notifier);
-    ref.read(teacherProviderNotifier.notifier);
     Future.microtask(() {
       ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(false);
     });

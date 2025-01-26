@@ -45,11 +45,9 @@ class CampConnectRepo {
 
   Future<List<Camp>> getTeachingCampsByTeacherId(String teacherId) async {
     try {
-      final teacherSnapshot = await teachersRef.doc(teacherId).get();
-      final teacherData = teacherSnapshot.data() as Map<String, dynamic>;
+      Teacher? teacher = await getTeacherById(teacherId);
 
-      final teachingCampIds =
-          List<String>.from(teacherData['teachingCamps'] ?? []);
+      final teachingCampIds = teacher?.teachingCamps ?? [];
 
       if (teachingCampIds.isEmpty) return [];
 
@@ -67,10 +65,9 @@ class CampConnectRepo {
 
   Future<List<Camp>> getSavedCampsByStudentId(String studentId) async {
     try {
-      final studentSnapshot = await studentsRef.doc(studentId).get();
-      final studentData = studentSnapshot.data() as Map<String, dynamic>;
+      Student? student = await getStudentById(studentId);
 
-      final savedCampIds = List<String>.from(studentData['savedCamps'] ?? []);
+      final savedCampIds = student?.savedCamps ?? [];
 
       if (savedCampIds.isEmpty) return [];
 
@@ -228,4 +225,23 @@ class CampConnectRepo {
 
   Future<void> deleteClass(Class classData) =>
       classesRef.doc(classData.id).delete();
+
+  Future<List<Class>> getClassByCampId(String campId) async {
+    try {
+      Camp? camp = await getCampById(campId);
+
+      final classIds = camp?.classId ?? [];
+
+      if (classIds.isEmpty) return [];
+
+      final querySnapshot =
+          await classesRef.where(FieldPath.documentId, whereIn: classIds).get();
+
+      return querySnapshot.docs
+          .map((doc) => Class.fromJson(doc.data() as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      throw Exception('Error fetching Camp ID($campId) classes: $e');
+    }
+  }
 }

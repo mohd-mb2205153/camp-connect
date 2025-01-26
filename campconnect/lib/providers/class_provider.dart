@@ -35,13 +35,12 @@ class ClassProvider extends AsyncNotifier<List<Class>> {
     }
   }
 
-  void deleteClass(Class classData) {
-    _repo.deleteClass(classData);
-  }
+  void deleteClass(Class classData) => _repo.deleteClass(classData);
 
-  void updateClass(Class classData) {
-    _repo.updateClass(classData);
-  }
+  void updateClass(Class classData) => _repo.updateClass(classData);
+
+  Future<List<Class>> getClassByCampId(String campId) =>
+      _repo.getClassByCampId(campId);
 }
 
 final classProviderNotifier =

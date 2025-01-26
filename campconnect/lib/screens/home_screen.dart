@@ -1,4 +1,7 @@
+import 'package:campconnect/providers/camp_provider.dart';
+import 'package:campconnect/providers/class_provider.dart';
 import 'package:campconnect/providers/show_nav_bar_provider.dart';
+import 'package:campconnect/providers/student_provider.dart';
 import 'package:campconnect/providers/teacher_provider.dart';
 import 'package:campconnect/routes/app_router.dart';
 import 'package:campconnect/theme/constants.dart';
@@ -26,7 +29,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void initState() {
     super.initState();
     initializeUserDetails();
+    initializeAllProviders();
+  }
+
+  void initializeAllProviders() {
     ref.read(teacherProviderNotifier);
+    ref.read(studentProviderNotifier);
+    ref.read(campProviderNotifier);
+    ref.read(classProviderNotifier);
   }
 
   void initializeUserDetails() {
