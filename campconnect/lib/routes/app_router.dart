@@ -11,6 +11,7 @@ import 'package:campconnect/screens/profile_settings_screens/personal_info_scree
 import 'package:campconnect/screens/profile_settings_screens/profile_screen.dart';
 import 'package:campconnect/screens/onboarding_screens/register_role_screen.dart';
 import 'package:campconnect/screens/shell_screen.dart';
+import 'package:campconnect/screens/update_screens/update_camp_location_screen.dart';
 import 'package:campconnect/screens/view_screens/view_classes_screen.dart';
 import 'package:campconnect/screens/view_screens/view_teachers_screen.dart';
 import 'package:go_router/go_router.dart';
@@ -46,13 +47,17 @@ class AppRouter {
   static const viewTeachers = (name: 'viewTeachers', path: '/viewTeachers');
   static const viewClasses = (name: 'viewClasses', path: '/viewClasses');
 
-  // Add Camp Routes
+  // Add Objects
   static const addCampLocation =
       (name: 'addCampLocation', path: 'addCampLocation');
   static const addCamp = (name: 'addCamp', path: 'addCamp:location');
-
-  // Add Class Route
   static const addClass = (name: 'addClass', path: 'addClass');
+
+  // Update Objects
+  static const updateCampLocation =
+      (name: 'updateCampLocation', path: 'updateCampLocation');
+  static const updateCamp = (name: 'updateCamp', path: 'updateCamp:location');
+  static const updateClass = (name: 'updateClass', path: 'updateClass');
 
   // Profile Settings Routes
   static const personal = (name: 'personal', path: 'personal');
@@ -117,13 +122,31 @@ class AppRouter {
             builder: (context, state) => const HomeScreen(),
             routes: [
               GoRoute(
-                name: viewTeachingCamps.name,
-                path: viewTeachingCamps.path,
-                builder: (context, state) {
-                  final userId = state.extra as String;
-                  return ViewTeachingCampsScreen(userId: userId);
-                },
-              ),
+                  name: viewTeachingCamps.name,
+                  path: viewTeachingCamps.path,
+                  builder: (context, state) {
+                    final userId = state.extra as String;
+                    return ViewTeachingCampsScreen(userId: userId);
+                  },
+                  routes: [
+                    GoRoute(
+                      name: updateCampLocation.name,
+                      path: updateCampLocation.path,
+                      builder: (context, state) =>
+                          const AddCampLocationScreen(),
+                      routes: [
+                        GoRoute(
+                          name: updateCamp.name,
+                          path: updateCamp.path,
+                          builder: (context, state) {
+                            final location = state.pathParameters['location'];
+                            return UpdateCampLocationScreen(
+                                location: location!);
+                          },
+                        ),
+                      ],
+                    ),
+                  ]),
               GoRoute(
                 name: viewSavedCamps.name,
                 path: viewSavedCamps.path,
