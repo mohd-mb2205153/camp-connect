@@ -5,7 +5,6 @@ import 'package:campconnect/theme/constants.dart';
 
 import '../../providers/show_nav_bar_provider.dart';
 import '../../providers/camp_provider.dart';
-import '../../providers/student_provider.dart';
 import '../../widgets/empty_screen.dart';
 
 class ViewSavedCampsScreen extends ConsumerStatefulWidget {
@@ -29,7 +28,6 @@ class _ViewSavedCampsScreenState extends ConsumerState<ViewSavedCampsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final studentAsync = ref.watch(studentProviderNotifier);
     return Scaffold(
       appBar: AppBar(
         scrolledUnderElevation: 0.0,
@@ -53,24 +51,21 @@ class _ViewSavedCampsScreenState extends ConsumerState<ViewSavedCampsScreen> {
         child: Stack(
           children: [
             buildBackground("bg12"),
-            studentAsync.when(
-              data: (students) {
-                final student = students.firstWhere(
-                  (s) => s.id == widget.userId,
-                );
-                final savedCamps = ref.watch(campProviderNotifier).whenData(
-                      (camps) => camps
-                          .where((camp) => student.savedCamps.contains(camp.id))
-                          .toList(),
-                    );
-
-                return savedCamps.when(
-                  data: (camps) => camps.isEmpty
+            FutureBuilder(
+              future: ref
+                  .read(campProviderNotifier.notifier)
+                  .getSavedCampsByStudentId(widget.userId),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return errorWidget(snapshot);
+                }
+                if (snapshot.hasData) {
+                  return snapshot.data!.isEmpty
                       ? const EmptyScreen()
                       : ListView.builder(
-                          itemCount: camps.length,
+                          itemCount: snapshot.data!.length,
                           itemBuilder: (context, index) {
-                            final camp = camps[index];
+                            final camp = snapshot.data![index];
                             return Padding(
                               padding: const EdgeInsets.only(top: 8.0),
                               child: Card(
@@ -185,14 +180,10 @@ class _ViewSavedCampsScreenState extends ConsumerState<ViewSavedCampsScreen> {
                               ),
                             );
                           },
-                        ),
-                  error: (err, _) => Center(child: Text('Error: $err')),
-                  loading: () =>
-                      const Center(child: CircularProgressIndicator()),
-                );
+                        );
+                }
+                return loadingWidget(snapshot: snapshot, label: 'Saved Camps');
               },
-              error: (err, _) => Center(child: Text('Error: $err')),
-              loading: () => const Center(child: CircularProgressIndicator()),
             ),
           ],
         ),

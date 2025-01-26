@@ -1,3 +1,4 @@
+import 'package:campconnect/models/camp.dart';
 import 'package:campconnect/models/student.dart';
 import 'package:campconnect/providers/loggedinuser_provider.dart';
 import 'package:campconnect/providers/repo_provider.dart';

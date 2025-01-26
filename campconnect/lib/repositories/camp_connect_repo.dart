@@ -65,6 +65,27 @@ class CampConnectRepo {
     }
   }
 
+  Future<List<Camp>> getSavedCampsByStudentId(String studentId) async {
+    try {
+      final studentSnapshot = await studentsRef.doc(studentId).get();
+      final studentData = studentSnapshot.data() as Map<String, dynamic>;
+
+      final savedCampIds = List<String>.from(studentData['savedCamps'] ?? []);
+
+      if (savedCampIds.isEmpty) return [];
+
+      final querySnapshot = await campsRef
+          .where(FieldPath.documentId, whereIn: savedCampIds)
+          .get();
+
+      return querySnapshot.docs
+          .map((doc) => Camp.fromJson(doc.data() as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      throw Exception('Error fetching saved camps: $e');
+    }
+  }
+
   Stream<List<Camp>> filterCampByEducationLevel(List<String> levels) => campsRef
       .where("educationLevel", arrayContainsAny: levels)
       .snapshots()

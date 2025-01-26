@@ -62,10 +62,6 @@ class TeacherProvider extends AsyncNotifier<List<Teacher>> {
     }
   }
 
-  Future<List<Camp>> getTeachingCampsByTeacherId(String teacherId) {
-    return _repo.getTeachingCampsByTeacherId(teacherId);
-  }
-
   bool isTeachingCamp(Teacher teacher, String campId) {
     return teacher.teachingCamps.contains(campId);
   }

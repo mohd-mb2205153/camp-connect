@@ -1,10 +1,10 @@
+import 'package:campconnect/providers/camp_provider.dart';
 import 'package:campconnect/providers/show_nav_bar_provider.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
 import 'package:campconnect/widgets/empty_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../providers/teacher_provider.dart';
 import '../../theme/constants.dart';
 
 class ViewTeachingCampsScreen extends ConsumerStatefulWidget {
@@ -98,7 +98,7 @@ class TeachingCampListView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return FutureBuilder(
       future: ref
-          .read(teacherProviderNotifier.notifier)
+          .read(campProviderNotifier.notifier)
           .getTeachingCampsByTeacherId(userId),
       builder: (context, snapshot) {
         if (snapshot.hasError) {

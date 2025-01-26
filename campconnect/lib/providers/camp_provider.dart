@@ -50,30 +50,37 @@ class CampProvider extends AsyncNotifier<List<Camp>> {
     _repo.updateCamp(camp);
   }
 
+  Future<List<Camp>> getTeachingCampsByTeacherId(String teacherId) {
+    return _repo.getTeachingCampsByTeacherId(teacherId);
+  }
+
+  Future<List<Camp>> getSavedCampsByStudentId(String studentId) {
+    return _repo.getSavedCampsByStudentId(studentId);
+  }
+
   filterByEducationLevel(List<String> level) {
-  _repo.filterCampByEducationLevel(level).listen((camp) {
-    state = AsyncData(camp);
-  }).onError((error) => print(error));
+    _repo.filterCampByEducationLevel(level).listen((camp) {
+      state = AsyncData(camp);
+    }).onError((error) => print(error));
   }
 
   filterByAdditionalSupport(List<String> supports) {
-  _repo.filterCampByAdditionalSupport(supports).listen((camp) {
-    state = AsyncData(camp);
-  }).onError((error) => print(error));
+    _repo.filterCampByAdditionalSupport(supports).listen((camp) {
+      state = AsyncData(camp);
+    }).onError((error) => print(error));
   }
 
   filterByLanguages(List<String> languages) {
-  _repo.filterCampByLanguage(languages).listen((camp) {
-    state = AsyncData(camp);
-  }).onError((error) => print(error));
+    _repo.filterCampByLanguage(languages).listen((camp) {
+      state = AsyncData(camp);
+    }).onError((error) => print(error));
   }
 
   filterByRange(double userLat, double userLng, double rangeInKm) {
     _repo.filterCampsByRange(userLat, userLng, rangeInKm).listen((camp) {
       state = AsyncData(camp);
-  }).onError((error) => print(error));
+    }).onError((error) => print(error));
   }
-
 }
 
 final campProviderNotifier =
