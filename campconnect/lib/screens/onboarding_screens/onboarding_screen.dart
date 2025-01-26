@@ -101,18 +101,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         children: [
                           LoginButton(
                             onLoginPressed: () {
-                              // showDialog(
-                              //   context: context,
-                              //   builder: (BuildContext context) {
-                              //     return ConfirmationDialog(
-                              //       type: 'Login',
-                              //       title: 'Login user',
-                              //       content:
-                              //           'Are you sure you want to login an account?',
-                              //       onConfirm: () {},
-                              //     );
-                              //   },
-                              // );
                               context.pushNamed(AppRouter.login.name);
                             },
                           ),

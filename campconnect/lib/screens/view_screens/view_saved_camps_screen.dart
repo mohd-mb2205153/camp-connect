@@ -1,3 +1,4 @@
+import 'package:campconnect/utils/helper_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:campconnect/theme/constants.dart';
@@ -150,7 +151,22 @@ class _ViewSavedCampsScreenState extends ConsumerState<ViewSavedCampsScreen> {
                                                               "mediumBold",
                                                               color: Colors
                                                                   .white)),
-                                                      onTap: () {},
+                                                      onTap: () {
+                                                        showDialog(
+                                                          context: context,
+                                                          builder: (BuildContext
+                                                              context) {
+                                                            return ConfirmationDialog(
+                                                              type: 'Remove',
+                                                              title:
+                                                                  'Remove a Camp',
+                                                              content:
+                                                                  'Are you sure you want to remove this saved camp?',
+                                                              onConfirm: () {},
+                                                            );
+                                                          },
+                                                        );
+                                                      },
                                                     ),
                                                   ],
                                                 ),

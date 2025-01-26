@@ -1,3 +1,4 @@
+import 'package:campconnect/utils/helper_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -288,7 +289,26 @@ class _ViewClassesScreenState extends ConsumerState<ViewClassesScreen> {
                                                                         "mediumBold",
                                                                         color: Colors
                                                                             .white)),
-                                                                onTap: () {},
+                                                                onTap: () {
+                                                                  showDialog(
+                                                                    context:
+                                                                        context,
+                                                                    builder:
+                                                                        (BuildContext
+                                                                            context) {
+                                                                      return ConfirmationDialog(
+                                                                        type:
+                                                                            'Delete',
+                                                                        title:
+                                                                            'Delete a Class Schedule',
+                                                                        content:
+                                                                            'Are you sure you want to delete this class?',
+                                                                        onConfirm:
+                                                                            () {},
+                                                                      );
+                                                                    },
+                                                                  );
+                                                                },
                                                               ),
                                                             ],
                                                           ),

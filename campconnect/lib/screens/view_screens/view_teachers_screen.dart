@@ -221,7 +221,21 @@ class TeacherList extends ConsumerWidget {
                                                 style: getTextStyle(
                                                     "mediumBold",
                                                     color: Colors.white)),
-                                            onTap: () {},
+                                            onTap: () {
+                                              showDialog(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return ConfirmationDialog(
+                                                    type: 'Remove',
+                                                    title: 'Remove a Teacher',
+                                                    content:
+                                                        'Are you sure you want to remove this teacher?',
+                                                    onConfirm: () {},
+                                                  );
+                                                },
+                                              );
+                                            },
                                           ),
                                         ],
                                       ),
