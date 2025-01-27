@@ -143,37 +143,6 @@ class TeacherList extends ConsumerWidget {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          ListTile(
-                                            leading: const Icon(
-                                              Icons.delete,
-                                              color: Colors.white,
-                                            ),
-                                            title: Text('Remove Teacher',
-                                                style: getTextStyle(
-                                                    "mediumBold",
-                                                    color: Colors.white)),
-                                            onTap: () {
-                                              showDialog(
-                                                context: context,
-                                                builder:
-                                                    (BuildContext context) {
-                                                  return ConfirmationDialog(
-                                                    type: 'Remove',
-                                                    title: 'Remove a Teacher',
-                                                    content:
-                                                        'Are you sure you want to remove this teacher?',
-                                                    onConfirm: () {},
-                                                  );
-                                                },
-                                              );
-                                            },
-                                          ),
-                                        ],
-                                      ),
                                       addVerticalSpace(10),
                                       Row(
                                         children: [
@@ -228,7 +197,21 @@ class TeacherList extends ConsumerWidget {
                                                   style: getTextStyle(
                                                       "mediumBold",
                                                       color: Colors.white)),
-                                              onTap: () {},
+                                              onTap: () {
+                                                showDialog(
+                                                  context: context,
+                                                  builder:
+                                                      (BuildContext context) {
+                                                    return ConfirmationDialog(
+                                                      type: 'Remove',
+                                                      title: 'Remove a Teacher',
+                                                      content:
+                                                          'Are you sure you want to remove this teacher?',
+                                                      onConfirm: () {},
+                                                    );
+                                                  },
+                                                );
+                                              },
                                             ),
                                           ],
                                         ),

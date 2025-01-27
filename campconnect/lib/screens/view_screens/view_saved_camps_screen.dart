@@ -85,6 +85,10 @@ class _ViewSavedCampsScreenState extends ConsumerState<ViewSavedCampsScreen> {
                                             const EdgeInsets.only(top: 8.0),
                                         child: Card(
                                           color: AppColors.darkTeal,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                          ),
                                           child: Stack(
                                             children: [
                                               Container(
