@@ -120,20 +120,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         _ => "An unexpected error occurred during login. Please try again.",
       };
 
-      customSnackbar(
-        message: errorMessage,
-        icon: Icons.error,
+      ScaffoldMessenger.of(context).showSnackBar(
+        customSnackbar(
+          message: errorMessage,
+          icon: Icons.error,
+        ),
       );
     } on FirebaseException catch (e) {
-      customSnackbar(
-        message: "Database error: ${e.message ?? 'Unknown error occurred'}",
-        icon: Icons.error,
+      ScaffoldMessenger.of(context).showSnackBar(
+        customSnackbar(
+          message: "Database error: ${e.message ?? 'Unknown error occurred'}",
+          icon: Icons.error,
+        ),
       );
     } catch (e) {
       debugPrint("Error during login: $e");
-      customSnackbar(
-        message: "Something went wrong. Please try again later.",
-        icon: Icons.error,
+      ScaffoldMessenger.of(context).showSnackBar(
+        customSnackbar(
+          message: "Something went wrong. Please try again later.",
+          icon: Icons.error,
+        ),
       );
     }
   }

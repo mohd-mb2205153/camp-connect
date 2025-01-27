@@ -158,7 +158,7 @@ class TeachingCampListView extends ConsumerWidget {
                                     context: context,
                                     builder: (context) {
                                       return Container(
-                                        height: 150,
+                                        height: screenHeight(context) * .24,
                                         padding: const EdgeInsets.all(16.0),
                                         child: Column(
                                           mainAxisSize: MainAxisSize.min,
