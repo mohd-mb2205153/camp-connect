@@ -143,6 +143,45 @@ class TeacherList extends ConsumerWidget {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
+                                      Text(
+                                        'Contact Information:',
+                                        style: getTextStyle(
+                                          'smallBold',
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      addVerticalSpace(10),
+                                      Row(
+                                        children: [
+                                          Icon(
+                                            Icons.call,
+                                            color: AppColors.white,
+                                          ),
+                                          addHorizontalSpace(5),
+                                          Text(
+                                            '${teacher.phoneCode} ${teacher.mobileNumber}',
+                                            style: getTextStyle(
+                                              'small',
+                                              color: AppColors.white,
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: SizedBox(),
+                                          ),
+                                          Icon(
+                                            Icons.email,
+                                            color: AppColors.white,
+                                          ),
+                                          addHorizontalSpace(5),
+                                          Text(
+                                            teacher.email,
+                                            style: getTextStyle(
+                                              'small',
+                                              color: AppColors.white,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                       addVerticalSpace(10),
                                       Row(
                                         children: [
