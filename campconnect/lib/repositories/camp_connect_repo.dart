@@ -105,8 +105,9 @@ class CampConnectRepo {
           .map((doc) => Camp.fromJson(doc.data() as Map<String, dynamic>))
           .toList());
 
-  Stream<List<Camp>> filterCampByName(List<String> name) => campsRef
-      .where("name", arrayContainsAny: name)
+  Stream<List<Camp>> filterCampByName(String queryName) => campsRef
+      .where("name", isGreaterThanOrEqualTo: queryName)
+      .where("name", isLessThanOrEqualTo: '${queryName}z')
       .snapshots()
       .map((snapshot) => snapshot.docs
           .map((doc) => Camp.fromJson(doc.data() as Map<String, dynamic>))

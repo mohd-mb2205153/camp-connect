@@ -81,6 +81,12 @@ class CampProvider extends AsyncNotifier<List<Camp>> {
       state = AsyncData(camp);
     }).onError((error) => print(error));
   }
+
+  filterByName(String queryName) {
+    _repo.filterCampByName(queryName).listen((camp) {
+      state = AsyncData(camp);
+    }).onError((error) => print(error));
+  }
 }
 
 final campProviderNotifier =
