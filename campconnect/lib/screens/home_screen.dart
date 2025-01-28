@@ -24,6 +24,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   bool isStudent = false;
   bool isTeacher = false;
   dynamic loggedUser;
+  int? campCount;
 
   @override
   void initState() {
@@ -51,6 +52,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       } else if (isTeacher) {
         loggedUser = userNotifier.teacher;
       }
+
+      campCount = isStudent
+          ? (loggedUser?.savedCamps.length ?? 0)
+          : (loggedUser?.teachingCamps.length ?? 0);
 
       ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(true);
 
@@ -152,11 +157,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         onPressed: () {
           ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(false);
           if (isStudent) {
-            context.pushNamed(AppRouter.viewSavedCamps.name,
-                extra: loggedUser.id);
+            context
+                .pushNamed(AppRouter.viewSavedCamps.name, extra: loggedUser.id)
+                .then((_) => setState(() {
+                      initializeUserDetails();
+                    }));
           } else if (isTeacher) {
-            context.pushNamed(AppRouter.viewTeachingCamps.name,
-                extra: loggedUser.id);
+            context
+                .pushNamed(AppRouter.viewTeachingCamps.name,
+                    extra: loggedUser.id)
+                .then((_) => setState(() {
+                      initializeUserDetails();
+                    }));
           }
         },
         style: ElevatedButton.styleFrom(
@@ -287,10 +299,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Stack buildHomeCard() {
-    final int campCount = isStudent
-        ? (loggedUser?.savedCamps.length ?? 0)
-        : (loggedUser?.teachingCamps.length ?? 0);
-
     return Stack(
       children: [
         Container(
@@ -316,7 +324,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               Text(
                 textAlign: TextAlign.left,
                 wrapText(
-                  "You ${isStudent ? "have saved" : "are teaching"} ${(campCount > 1 || campCount == 0) ? "over" : ""} $campCount camp${campCount == 1 ? "" : "s"}.",
+                  "You ${isStudent ? "have saved" : "are teaching"}  $campCount camp${campCount == 1 ? "" : "s"}.",
                   17,
                 ),
                 style: getTextStyle("mediumBold", color: Colors.white),
