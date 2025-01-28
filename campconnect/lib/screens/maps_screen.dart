@@ -315,7 +315,9 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
     return polyLineCordinates.isEmpty
         ? Row(
             children: [
-              _buildCircleIconButton(Icons.search, () {}),
+              _buildCircleIconButton(Icons.search, () {
+                context.goNamed(AppRouter.searchCamps.name);
+              }),
               const Spacer(),
               _buildFilterButton(context),
               const Spacer(),
@@ -593,17 +595,28 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
                                               filteredList.add(list[index]);
                                             }
 
-                                            if (title == 'Filter Educational Level') {
+                                            if (title ==
+                                                'Filter Educational Level') {
                                               setModalState(() {
                                                 ref
-                                                    .read(campProviderNotifier.notifier)
-                                                    .filterByEducationLevel(filteredList);
-                                                markers.clear(); // Clear existing markers
-                                              ref.watch(campProviderNotifier).when(
-                                                data: (data) => _buildMapScreen(context, data),
-                                                error: (err, stack) => _buildErrorScreen(err),
-                                                loading: () => _buildLoadingScreen(),
-                                              );
+                                                    .read(campProviderNotifier
+                                                        .notifier)
+                                                    .filterByEducationLevel(
+                                                        filteredList);
+                                                markers
+                                                    .clear(); // Clear existing markers
+                                                ref
+                                                    .watch(campProviderNotifier)
+                                                    .when(
+                                                      data: (data) =>
+                                                          _buildMapScreen(
+                                                              context, data),
+                                                      error: (err, stack) =>
+                                                          _buildErrorScreen(
+                                                              err),
+                                                      loading: () =>
+                                                          _buildLoadingScreen(),
+                                                    );
                                               });
                                             }
                                           });
@@ -685,18 +698,18 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
 
   void handleClearFilter() {
     setState(() {
-    ref.read(campProviderNotifier.notifier).initializeCamps();
-    filteredAdditional = [];
-    filteredEduLevels = [];
-    filteredLanguages = [];
-    filteredSubjects = [];
-    areaRadiusController.text = '';
-    markers.clear(); // Clear markers
-    ref.watch(campProviderNotifier).when(
-          data: (data) => _buildMapScreen(context, data),
-          error: (err, stack) => _buildErrorScreen(err),
-          loading: () => _buildLoadingScreen(),
-        );
+      ref.read(campProviderNotifier.notifier).initializeCamps();
+      filteredAdditional = [];
+      filteredEduLevels = [];
+      filteredLanguages = [];
+      filteredSubjects = [];
+      areaRadiusController.text = '';
+      markers.clear(); // Clear markers
+      ref.watch(campProviderNotifier).when(
+            data: (data) => _buildMapScreen(context, data),
+            error: (err, stack) => _buildErrorScreen(err),
+            loading: () => _buildLoadingScreen(),
+          );
     });
   }
 

@@ -11,6 +11,7 @@ import 'package:campconnect/screens/profile_settings_screens/educational_info_sc
 import 'package:campconnect/screens/profile_settings_screens/personal_info_screen.dart';
 import 'package:campconnect/screens/profile_settings_screens/profile_screen.dart';
 import 'package:campconnect/screens/onboarding_screens/register_role_screen.dart';
+import 'package:campconnect/screens/search_camps_screen.dart';
 import 'package:campconnect/screens/shell_screen.dart';
 import 'package:campconnect/screens/update_screens/update_camp_location_screen.dart';
 import 'package:campconnect/screens/update_screens/update_class_screen.dart';
@@ -66,6 +67,9 @@ class AppRouter {
   static const updateCamp =
       (name: 'updateCamp', path: 'updateCamp/:location/:campId');
   static const updateClass = (name: 'updateClass', path: 'updateClass');
+
+  // Search Camps
+  static const searchCamps = (name: 'searchCamps', path: 'searchCamps');
 
   // Profile Settings Routes
   static const personal = (name: 'personal', path: 'personal');
@@ -197,6 +201,11 @@ class AppRouter {
             path: map.path,
             builder: (context, state) => const MapsScreen(),
             routes: [
+              GoRoute(
+                name: searchCamps.name,
+                path: searchCamps.path,
+                builder: (context, state) => const SearchCampsScreen(),
+              ),
               GoRoute(
                 path: viewClasses.path,
                 name: viewClasses.name,
