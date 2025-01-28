@@ -91,7 +91,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       if (studentDoc.docs.isNotEmpty) {
         final student = Student.fromJson(studentDoc.docs.first.data());
         ref.read(loggedInUserNotifierProvider.notifier).setStudent(student);
-
         ref.read(showNavBarNotifierProvider.notifier).setActiveBottomNavBar(0);
         context.replaceNamed(AppRouter.home.name);
         return;
@@ -105,7 +104,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       if (teacherDoc.docs.isNotEmpty) {
         final teacher = Teacher.fromJson(teacherDoc.docs.first.data());
         ref.read(loggedInUserNotifierProvider.notifier).setTeacher(teacher);
-
         ref.read(showNavBarNotifierProvider.notifier).setActiveBottomNavBar(0);
         context.replaceNamed(AppRouter.home.name);
         return;
@@ -113,20 +111,42 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
       throw Exception("User not found in students or teachers collections");
     } on FirebaseAuthException catch (e) {
-      final errorMessage = switch (e.code) {
-        'user-not-found' => "No user found for that email.",
-        'wrong-password' => "Incorrect password. Please try again.",
-        'invalid-email' => "The email address is invalid.",
-        _ => "An unexpected error occurred during login. Please try again.",
-      };
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        customSnackbar(
-          message: errorMessage,
-          icon: Icons.error,
-        ),
-      );
+      // Handle specific Firebase authentication error codes
+      if (e.code == 'user-not-found') {
+        debugPrint("FirebaseAuthException: user-not-found");
+        ScaffoldMessenger.of(context).showSnackBar(
+          customSnackbar(
+            message: "No account found for this email.",
+            icon: Icons.error,
+          ),
+        );
+      } else if (e.code == 'wrong-password') {
+        debugPrint("FirebaseAuthException: wrong-password");
+        ScaffoldMessenger.of(context).showSnackBar(
+          customSnackbar(
+            message: "Incorrect password. Please try again.",
+            icon: Icons.error,
+          ),
+        );
+      } else if (e.code == 'invalid-email') {
+        debugPrint("FirebaseAuthException: invalid-email");
+        ScaffoldMessenger.of(context).showSnackBar(
+          customSnackbar(
+            message: "Invalid email address.",
+            icon: Icons.error,
+          ),
+        );
+      } else {
+        debugPrint("FirebaseAuthException: ${e.code}, message: ${e.message}");
+        ScaffoldMessenger.of(context).showSnackBar(
+          customSnackbar(
+            message: "Authentication error: ${e.message ?? 'Unknown error.'}",
+            icon: Icons.error,
+          ),
+        );
+      }
     } on FirebaseException catch (e) {
+      debugPrint("FirebaseException: ${e.message}");
       ScaffoldMessenger.of(context).showSnackBar(
         customSnackbar(
           message: "Database error: ${e.message ?? 'Unknown error occurred'}",
@@ -134,7 +154,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
       );
     } catch (e) {
-      debugPrint("Error during login: $e");
+      debugPrint("General error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         customSnackbar(
           message: "Something went wrong. Please try again later.",
