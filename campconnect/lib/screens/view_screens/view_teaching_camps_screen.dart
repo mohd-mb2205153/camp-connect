@@ -81,7 +81,10 @@ class _ViewTeachingCampsScreenState
 
 class TeachingCampListView extends ConsumerWidget {
   final String userId;
-  const TeachingCampListView({super.key, required this.userId});
+  const TeachingCampListView({
+    super.key,
+    required this.userId,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -158,7 +161,6 @@ class TeachingCampListView extends ConsumerWidget {
                                     context: context,
                                     builder: (context) {
                                       return Container(
-                                        height: screenHeight(context) * .24,
                                         padding: const EdgeInsets.all(16.0),
                                         child: Column(
                                           mainAxisSize: MainAxisSize.min,
@@ -181,19 +183,6 @@ class TeachingCampListView extends ConsumerWidget {
                                                 Icons.delete,
                                                 color: Colors.white,
                                               ),
-                                              title: Text(
-                                                'Remove from Camps',
-                                                style: getTextStyle(
-                                                    "mediumBold",
-                                                    color: Colors.white),
-                                              ),
-                                              onTap: () {},
-                                            ),
-                                            ListTile(
-                                              leading: const Icon(
-                                                Icons.delete,
-                                                color: Colors.white,
-                                              ),
                                               title: Text('Remove from Camps',
                                                   style: getTextStyle(
                                                       "mediumBold",
@@ -205,7 +194,8 @@ class TeachingCampListView extends ConsumerWidget {
                                                       (BuildContext context) {
                                                     return ConfirmationDialog(
                                                       type: 'Remove',
-                                                      title: 'Remove a Camp',
+                                                      title:
+                                                          'Remove ${camp.name} Camp?',
                                                       content:
                                                           'Are you sure you want to remove this as a teaching camp?',
                                                       onConfirm: () {},

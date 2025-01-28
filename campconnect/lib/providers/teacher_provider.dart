@@ -48,6 +48,8 @@ class TeacherProvider extends AsyncNotifier<List<Teacher>> {
       ..add(teacher));
   }
 
+  
+
   Future<void> addCampToTeacher(Teacher teacher, Camp camp) async {
     try {
       // await _repo.addCampToTeacher(

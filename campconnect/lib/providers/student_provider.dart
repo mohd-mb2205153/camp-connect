@@ -41,6 +41,13 @@ class StudentProvider extends AsyncNotifier<List<Student>> {
   bool isSavedCamp(Student student, String campId) {
     return student.savedCamps.contains(campId);
   }
+
+  Future<void> removedSavedCamps(
+      {required String studentId, required String campId}) async {
+    Student? student = await _repo.getStudentById(studentId);
+    student!.savedCamps.remove(campId);
+    updateStudent(student);
+  }
 }
 
 final studentProviderNotifier =

@@ -1,7 +1,10 @@
+import 'package:campconnect/models/camp.dart';
+import 'package:campconnect/providers/student_provider.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:campconnect/theme/constants.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../providers/show_nav_bar_provider.dart';
 import '../../providers/camp_provider.dart';
@@ -17,6 +20,8 @@ class ViewSavedCampsScreen extends ConsumerStatefulWidget {
 }
 
 class _ViewSavedCampsScreenState extends ConsumerState<ViewSavedCampsScreen> {
+  List<Camp> savedCamps = [];
+
   @override
   void initState() {
     super.initState();
@@ -74,12 +79,14 @@ class _ViewSavedCampsScreenState extends ConsumerState<ViewSavedCampsScreen> {
                             return errorWidget(snapshot);
                           }
                           if (snapshot.hasData) {
-                            return snapshot.data!.isEmpty
+                            savedCamps =
+                                List<Camp>.from(snapshot.data as List<Camp>);
+                            return savedCamps.isEmpty
                                 ? const EmptyScreen()
                                 : ListView.builder(
-                                    itemCount: snapshot.data!.length,
+                                    itemCount: savedCamps.length,
                                     itemBuilder: (context, index) {
-                                      final camp = snapshot.data![index];
+                                      final camp = savedCamps[index];
                                       return Padding(
                                         padding:
                                             const EdgeInsets.only(top: 8.0),
@@ -155,7 +162,9 @@ class _ViewSavedCampsScreenState extends ConsumerState<ViewSavedCampsScreen> {
                                                       context: context,
                                                       builder: (context) {
                                                         return Container(
-                                                          height: 150,
+                                                          height: screenHeight(
+                                                                  context) *
+                                                              0.12,
                                                           padding:
                                                               const EdgeInsets
                                                                   .all(16.0),
@@ -177,8 +186,11 @@ class _ViewSavedCampsScreenState extends ConsumerState<ViewSavedCampsScreen> {
                                                                         "mediumBold",
                                                                         color: Colors
                                                                             .white)),
-                                                                onTap: () {
-                                                                  showDialog(
+                                                                onTap:
+                                                                    () async {
+                                                                  bool exit =
+                                                                      false;
+                                                                  await showDialog(
                                                                     context:
                                                                         context,
                                                                     builder:
@@ -188,14 +200,29 @@ class _ViewSavedCampsScreenState extends ConsumerState<ViewSavedCampsScreen> {
                                                                         type:
                                                                             'Remove',
                                                                         title:
-                                                                            'Remove a Camp',
+                                                                            'Remove ${camp.name} Camp?',
                                                                         content:
                                                                             'Are you sure you want to remove this saved camp?',
                                                                         onConfirm:
-                                                                            () {},
+                                                                            () async {
+                                                                          // Return Stream instead of Future (Update provider)
+                                                                          exit =
+                                                                              true;
+                                                                          await ref.read(studentProviderNotifier.notifier).removedSavedCamps(
+                                                                              studentId: widget.userId,
+                                                                              campId: camp.id!);
+                                                                          setState(
+                                                                              () {
+                                                                            savedCamps.remove(camp);
+                                                                          });
+                                                                        },
                                                                       );
                                                                     },
                                                                   );
+                                                                  exit
+                                                                      ? context
+                                                                          .pop()
+                                                                      : null;
                                                                 },
                                                               ),
                                                             ],
