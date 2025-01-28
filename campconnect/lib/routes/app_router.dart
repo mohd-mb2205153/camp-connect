@@ -13,6 +13,7 @@ import 'package:campconnect/screens/profile_settings_screens/profile_screen.dart
 import 'package:campconnect/screens/onboarding_screens/register_role_screen.dart';
 import 'package:campconnect/screens/shell_screen.dart';
 import 'package:campconnect/screens/update_screens/update_camp_location_screen.dart';
+import 'package:campconnect/screens/update_screens/update_class_screen.dart';
 import 'package:campconnect/screens/view_screens/view_classes_screen.dart';
 import 'package:campconnect/screens/view_screens/view_teachers_screen.dart';
 import 'package:go_router/go_router.dart';
@@ -204,6 +205,14 @@ class AppRouter {
                   return ViewClassesScreen(campId: campId);
                 },
                 routes: [
+                  GoRoute(
+                    path: updateClass.path,
+                    name: updateClass.name,
+                    builder: (context, state) {
+                      final classId = state.extra as String;
+                      return UpdateClassScreen(classId: classId);
+                    },
+                  ),
                   GoRoute(
                     path: addClass.path,
                     name: addClass.name,

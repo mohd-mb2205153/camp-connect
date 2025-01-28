@@ -165,7 +165,7 @@ class _ViewClassesScreenState extends ConsumerState<ViewClassesScreen> {
                                                     Row(
                                                       children: [
                                                         Text(
-                                                          'Subtopic: ',
+                                                          'Subtitle: ',
                                                           style: getTextStyle(
                                                               'smallBold',
                                                               color:
@@ -271,13 +271,22 @@ class _ViewClassesScreenState extends ConsumerState<ViewClassesScreen> {
                                                                         .white,
                                                                   ),
                                                                   title: Text(
-                                                                    'Edit Class',
+                                                                    'Update Class',
                                                                     style: getTextStyle(
                                                                         "mediumBold",
                                                                         color: Colors
                                                                             .white),
                                                                   ),
-                                                                  onTap: () {},
+                                                                  onTap: () {
+                                                                    context
+                                                                        .pop();
+                                                                    context.pushNamed(
+                                                                        AppRouter
+                                                                            .updateClass
+                                                                            .name,
+                                                                        extra: classItem
+                                                                            .id);
+                                                                  },
                                                                 ),
                                                                 ListTile(
                                                                   leading:

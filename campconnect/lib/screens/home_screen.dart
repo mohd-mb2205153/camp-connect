@@ -69,67 +69,78 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      extendBody: true,
-      appBar: AppBar(
-        scrolledUnderElevation: 0.0,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Row(
-          children: [
-            Image.asset(
-              'assets/images/campconnect_whitetextlogo_1500px.png',
-              width: 120,
-            ),
-          ],
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (!didPop) {
+          ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(true);
+          Navigator.of(context).pop(result);
+        }
+        return;
+      },
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
+        extendBody: true,
+        appBar: AppBar(
+          scrolledUnderElevation: 0.0,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          title: Row(
+            children: [
+              Image.asset(
+                'assets/images/campconnect_whitetextlogo_1500px.png',
+                width: 120,
+              ),
+            ],
+          ),
         ),
-      ),
-      body: SizedBox.expand(
-        child: Stack(
-          children: [
-            buildBackground("bg12"),
-            SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 120),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Hello there, ${loggedUser?.firstName ?? "Guest"}",
-                          style: getTextStyle("largeBold", color: Colors.white),
-                        ),
-                        addVerticalSpace(8),
-                        Text(
-                          "Ready to connect and ${isStudent ? "learn" : "teach"} today?",
-                          style: getTextStyle("small", color: Colors.white),
-                        ),
-                      ],
-                    ),
-                    addVerticalSpace(66),
-                    SizedBox(
-                      height: 420,
-                      child: Column(
+        body: SizedBox.expand(
+          child: Stack(
+            children: [
+              buildBackground("bg12"),
+              SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 120),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          buildHomeCard(),
-                          addVerticalSpace(12),
-                          buildHomeButtons(context),
-                          addVerticalSpace(12),
-                          buildLatestNotices(),
+                          Text(
+                            "Hello there, ${loggedUser?.firstName ?? "Guest"}",
+                            style:
+                                getTextStyle("largeBold", color: Colors.white),
+                          ),
+                          addVerticalSpace(8),
+                          Text(
+                            "Ready to connect and ${isStudent ? "learn" : "teach"} today?",
+                            style: getTextStyle("small", color: Colors.white),
+                          ),
                         ],
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                  ],
+                      addVerticalSpace(66),
+                      SizedBox(
+                        height: 420,
+                        child: Column(
+                          children: [
+                            buildHomeCard(),
+                            addVerticalSpace(12),
+                            buildHomeButtons(context),
+                            addVerticalSpace(12),
+                            buildLatestNotices(),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

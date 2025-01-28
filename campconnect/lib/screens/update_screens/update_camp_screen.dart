@@ -188,9 +188,6 @@ class _UpdateCampScreenState extends ConsumerState<UpdateCampScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            ref
-                .read(showNavBarNotifierProvider.notifier)
-                .showBottomNavBar(true);
             context.pop();
           },
         ),

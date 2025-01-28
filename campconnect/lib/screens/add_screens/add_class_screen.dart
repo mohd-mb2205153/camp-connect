@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:campconnect/providers/loggedinuser_provider.dart';
+import 'package:campconnect/providers/show_nav_bar_provider.dart';
 import 'package:campconnect/routes/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -71,6 +72,60 @@ class _AddClassScreenState extends ConsumerState<AddClassScreen> {
     super.dispose();
   }
 
+  Future<void> addClass() async {
+    if (teacherController.text.isNotEmpty &&
+        selectedSubject.isNotEmpty &&
+        subtitleController.text.isNotEmpty &&
+        descriptionController.text.isNotEmpty &&
+        (toTime.hour > fromTime.hour ||
+            (toTime.hour == fromTime.hour &&
+                toTime.minute > fromTime.minute))) {
+      try {
+        final loggedUser = ref.read(loggedInUserNotifierProvider);
+        if (loggedUser is Teacher) {
+          final newClass = Class(
+            id: '',
+            teacher: loggedUser,
+            description: descriptionController.text,
+            subject: selectedSubject,
+            subtitle: subtitleController.text,
+            timeFrom: '${fromTime.hour.toString().padLeft(2, '0')}:00',
+            timeTo: '${toTime.hour.toString().padLeft(2, '0')}:00',
+          );
+
+          final classProvider = ref.read(classProviderNotifier.notifier);
+          final classId = await classProvider.addClass(newClass);
+
+          final campProvider = ref.read(campProviderNotifier.notifier);
+          final camp = await campProvider.getCampById(widget.campId);
+
+          if (camp != null) {
+            camp.addClass(classId);
+            campProvider.updateCamp(camp);
+          }
+
+          ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(true);
+          ref
+              .read(showNavBarNotifierProvider.notifier)
+              .setActiveBottomNavBar(1);
+
+          context.goNamed(AppRouter.map.name);
+        }
+      } catch (error) {
+        customSnackbar(message: "$error", icon: Icons.error);
+      }
+    } else {
+      String errorMessage = "Please fill all fields";
+
+      if (toTime.hour < fromTime.hour ||
+          (toTime.hour == fromTime.hour && toTime.minute <= fromTime.minute)) {
+        errorMessage = "End time must be after start time.";
+      }
+
+      customSnackbar(message: errorMessage, icon: Icons.error);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -92,6 +147,12 @@ class _AddClassScreenState extends ConsumerState<AddClassScreen> {
             backgroundColor: Colors.transparent,
             scrolledUnderElevation: 0,
             elevation: 0,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: AppColors.teal),
+              onPressed: () {
+                context.pop();
+              },
+            ),
             title: Text("Add a Class",
                 style: getTextStyle("mediumBold", color: AppColors.teal)),
           ),
@@ -145,62 +206,7 @@ class _AddClassScreenState extends ConsumerState<AddClassScreen> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () async {
-                        if (teacherController.text.isNotEmpty &&
-                            selectedSubject.isNotEmpty &&
-                            subtitleController.text.isNotEmpty &&
-                            descriptionController.text.isNotEmpty &&
-                            (toTime.hour > fromTime.hour ||
-                                (toTime.hour == fromTime.hour &&
-                                    toTime.minute > fromTime.minute))) {
-                          try {
-                            final loggedUser =
-                                ref.read(loggedInUserNotifierProvider);
-                            if (loggedUser is Teacher) {
-                              final newClass = Class(
-                                id: '',
-                                teacher: loggedUser,
-                                description: descriptionController.text,
-                                subject: selectedSubject,
-                                subtitle: subtitleController.text,
-                                timeFrom:
-                                    '${fromTime.hour.toString().padLeft(2, '0')}:00',
-                                timeTo:
-                                    '${toTime.hour.toString().padLeft(2, '0')}:00',
-                              );
-
-                              final classProvider =
-                                  ref.read(classProviderNotifier.notifier);
-                              final classId =
-                                  await classProvider.addClass(newClass);
-
-                              final campProvider =
-                                  ref.read(campProviderNotifier.notifier);
-                              final camp =
-                                  await campProvider.getCampById(widget.campId);
-
-                              if (camp != null) {
-                                camp.addClass(classId);
-                                campProvider.updateCamp(camp);
-                              }
-
-                              context.goNamed(AppRouter.map.name);
-                            }
-                          } catch (error) {
-                            customSnackbar(
-                                message: "$error", icon: Icons.error);
-                          }
-                        } else {
-                          String errorMessage = "Please fill all fields";
-
-                          if (toTime.hour < fromTime.hour ||
-                              (toTime.hour == fromTime.hour &&
-                                  toTime.minute <= fromTime.minute)) {
-                            errorMessage = "End time must be after start time.";
-                          }
-
-                          customSnackbar(
-                              message: errorMessage, icon: Icons.error);
-                        }
+                        addClass();
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.lightTeal,
