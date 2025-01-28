@@ -2,6 +2,7 @@ import 'package:campconnect/models/class.dart';
 import 'package:campconnect/providers/class_provider.dart';
 import 'package:campconnect/providers/repo_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geolocator/geolocator.dart';
 
 import '../models/camp.dart';
 import '../repositories/camp_connect_repo.dart';
@@ -96,9 +97,29 @@ class CampProvider extends AsyncNotifier<List<Camp>> {
   }
 
   filterByRange(double userLat, double userLng, double rangeInKm) {
-    _repo.filterCampsByRange(userLat, userLng, rangeInKm).listen((camp) {
-      state = AsyncData(camp);
-    }).onError((error) => print(error));
+     try {
+      if (state.value == null || state.value!.isEmpty) {
+        throw Exception("Camps not initialized. Call initializeCamps first.");
+      }
+      final allCamps = state.value!;
+      
+      final filteredCamps = allCamps.where((camp) {
+        double distanceInMeters = Geolocator.distanceBetween(
+          userLat,
+          userLng,
+          camp.latitude!,
+          camp.longitude!,
+        );
+
+        double distanceInKm = distanceInMeters / 1000; // Convert to km
+        return distanceInKm <= rangeInKm;
+      }).toList();
+
+      // Update state with filtered camps
+      state = AsyncValue.data(filteredCamps);
+    } catch (e) {
+      print("Error: $e");
+    }
   }
 
   filterByName(String queryName) {

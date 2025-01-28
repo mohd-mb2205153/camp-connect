@@ -427,12 +427,12 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  'Filter Area Radius :',
+                                  'Filter Area Radius (Km):',
                                   style: getTextStyle('medium',
                                       color: AppColors.teal),
                                 ),
                                 SizedBox(
-                                  width: 180,
+                                  width: 150,
                                   child: EditScreenTextField(
                                     label: 'Radius',
                                     controller: areaRadiusController,
@@ -447,6 +447,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
                                 if (areaRadiusController.text.isEmpty) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
+                                      backgroundColor: Colors.orange,
                                       content: Text(
                                           'Please enter a radius value (KM)'),
                                     ),

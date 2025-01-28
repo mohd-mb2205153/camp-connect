@@ -113,23 +113,6 @@ class CampConnectRepo {
           .map((doc) => Camp.fromJson(doc.data() as Map<String, dynamic>))
           .toList());
 
-  Stream<List<Camp>> filterCampsByRange(
-      double userLat, double userLng, double rangeInKm) {
-    return campsRef
-        .where((camp) {
-          double campLat = camp['latitude'];
-          double campLng = camp['longitude'];
-
-          double distance =
-              Geolocator.distanceBetween(userLat, userLng, campLat, campLng) /
-                  1000; // Convert to km
-          return distance <= rangeInKm;
-        })
-        .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => Camp.fromJson(doc.data() as Map<String, dynamic>))
-            .toList());
-  }
 
   // (*) Student Repository ===================================================================
   Stream<List<Student>> observeStudents() => studentsRef.snapshots().map(
