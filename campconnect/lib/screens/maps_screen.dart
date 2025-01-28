@@ -427,16 +427,98 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  'Filter Area Radius:',
+                                  'Filter Area Radius :',
                                   style: getTextStyle('medium',
                                       color: AppColors.teal),
                                 ),
-                                EditScreenTextField(
-                                  label: 'Filter Area Radius',
-                                  controller: areaRadiusController,
-                                  type: TextInputType.number,
+                                SizedBox(
+                                  width: 180,
+                                  child: EditScreenTextField(
+                                    label: 'Radius',
+                                    controller: areaRadiusController,
+                                    type: TextInputType.number,
+                                  ),
                                 ),
                               ],
+                            ),
+                            addVerticalSpace(12),
+                            ElevatedButton(
+                              onPressed: () async {
+                                if (areaRadiusController.text.isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                          'Please enter a radius value (KM)'),
+                                    ),
+                                  );
+                                  return;
+                                }
+                                try {
+                                  //Get current location
+                                  Position position =
+                                      await Geolocator.getCurrentPosition(
+                                    desiredAccuracy: LocationAccuracy.high,
+                                  );
+
+                                  double radius =
+                                      double.parse(areaRadiusController.text);
+
+                                  setModalState(() {
+                                    ref
+                                        .read(campProviderNotifier.notifier)
+                                        .filterByRange(
+                                          position.latitude,
+                                          position.longitude,
+                                          radius,
+                                        );
+
+                                    markers.clear();
+                                    // Rebuilding the map
+                                    ref.watch(campProviderNotifier).when(
+                                          data: (data) =>
+                                              _buildMapScreen(context, data),
+                                          error: (err, stack) =>
+                                              _buildErrorScreen(err),
+                                          loading: () => _buildLoadingScreen(),
+                                        );
+
+                                    // Pan the camera to users location
+                                    if (_googleMapController != null) {
+                                      _googleMapController!.animateCamera(
+                                        CameraUpdate.newLatLngZoom(
+                                          LatLng(position.latitude,
+                                              position.longitude),
+                                          12,
+                                        ),
+                                      );
+                                    }
+                                  });
+                                  Navigator.pop(context);
+                                } catch (e) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Error: ${e.toString()}'),
+                                    ),
+                                  );
+                                  print(e);
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                elevation: 2,
+                                backgroundColor: AppColors.teal,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 2,
+                                  horizontal: 70,
+                                ),
+                              ),
+                              child: Text(
+                                "Apply Filter",
+                                style: getTextStyle("smallBold",
+                                    color: AppColors.white),
+                              ),
                             ),
                           ],
                         )
