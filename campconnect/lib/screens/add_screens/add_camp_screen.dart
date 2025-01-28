@@ -119,29 +119,39 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
   }
 
   void addCamp() {
-    final newCamp = Camp(
-      name: nameController.text,
-      educationLevel: selectedEducationalLevels,
-      description: descriptionController.text,
-      latitude: latitude!,
-      longitude: longitude!,
-      statusOfResources: statusOfResourcesController.text,
-      additionalSupport: selectedAdditionalSupports,
-      languages: selectedLanguages,
-    );
+    if (nameController.text.isNotEmpty &&
+        descriptionController.text.isNotEmpty &&
+        selectedEducationalLevels.isNotEmpty) {
+      final newCamp = Camp(
+        name: nameController.text,
+        educationLevel: selectedEducationalLevels,
+        description: descriptionController.text,
+        latitude: latitude!,
+        longitude: longitude!,
+        statusOfResources: statusOfResourcesController.text,
+        additionalSupport: selectedAdditionalSupports,
+        languages: selectedLanguages,
+      );
 
-    try {
-      ref.read(campProviderNotifier.notifier).addCamp(newCamp, loggedUser.id);
+      try {
+        ref.read(campProviderNotifier.notifier).addCamp(newCamp, loggedUser.id);
 
-      if (loggedUser != null) {
-        ref
-            .read(teacherProviderNotifier.notifier)
-            .addCampToTeacher(loggedUser, newCamp);
+        if (loggedUser != null) {
+          ref
+              .read(teacherProviderNotifier.notifier)
+              .addCampToTeacher(loggedUser, newCamp);
+        }
+
+        ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(true);
+        ref.read(showNavBarNotifierProvider.notifier).setActiveBottomNavBar(1);
+
+        context.goNamed(AppRouter.map.name);
+      } catch (e) {
+        customSnackbar(message: "Failed to add camp: $e", icon: Icons.error);
       }
-    } catch (e) {
-      customSnackbar(message: "Failed to add camp $e", icon: Icons.error);
-    } finally {
-      context.goNamed(AppRouter.map.name);
+    } else {
+      customSnackbar(
+          message: "Please fill in all required fields.", icon: Icons.error);
     }
   }
 
@@ -273,7 +283,7 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
                 buildAdditionalSupportPicker(),
                 addVerticalSpace(12),
                 buildLanguages(),
-                const SizedBox(height: 16),
+                addVerticalSpace(16),
                 Padding(
                   padding: const EdgeInsets.only(bottom: 60),
                   child: SizedBox(

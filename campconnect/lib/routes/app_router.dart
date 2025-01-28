@@ -62,7 +62,8 @@ class AppRouter {
   // Update Objects
   static const updateCampLocation =
       (name: 'updateCampLocation', path: 'updateCampLocation');
-  static const updateCamp = (name: 'updateCamp', path: 'updateCamp:location');
+  static const updateCamp =
+      (name: 'updateCamp', path: 'updateCamp/:location/:campId');
   static const updateClass = (name: 'updateClass', path: 'updateClass');
 
   // Profile Settings Routes
@@ -144,15 +145,22 @@ class AppRouter {
                     GoRoute(
                       name: updateCampLocation.name,
                       path: updateCampLocation.path,
-                      builder: (context, state) =>
-                          const UpdateCampLocationScreen(),
+                      builder: (context, state) {
+                        final campId = state.extra as String;
+                        return UpdateCampLocationScreen(campId: campId);
+                      },
                       routes: [
                         GoRoute(
                           name: updateCamp.name,
                           path: updateCamp.path,
                           builder: (context, state) {
                             final location = state.pathParameters['location'];
-                            return UpdateCampScreen(location: location!);
+                            final campId = state
+                                .pathParameters['campId']; // Extract campId
+                            return UpdateCampScreen(
+                              location: location!,
+                              campId: campId!,
+                            );
                           },
                         ),
                       ],

@@ -1,5 +1,6 @@
 import 'package:campconnect/providers/camp_provider.dart';
 import 'package:campconnect/providers/show_nav_bar_provider.dart';
+import 'package:campconnect/routes/app_router.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
 import 'package:campconnect/widgets/empty_screen.dart';
 import 'package:flutter/material.dart';
@@ -176,7 +177,13 @@ class TeachingCampListView extends ConsumerWidget {
                                                     "mediumBold",
                                                     color: Colors.white),
                                               ),
-                                              onTap: () {},
+                                              onTap: () {
+                                                context.pop();
+                                                context.pushNamed(
+                                                    AppRouter.updateCampLocation
+                                                        .name,
+                                                    extra: camp.id);
+                                              },
                                             ),
                                             ListTile(
                                               leading: const Icon(
