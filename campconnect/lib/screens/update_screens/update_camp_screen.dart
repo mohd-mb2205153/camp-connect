@@ -140,25 +140,34 @@ class _UpdateCampScreenState extends ConsumerState<UpdateCampScreen> {
   }
 
   void updateCamp() {
-    final updatedCamp = Camp(
-      id: widget.campId,
-      name: nameController.text,
-      educationLevel: selectedEducationalLevels,
-      description: descriptionController.text,
-      latitude: latitude!,
-      longitude: longitude!,
-      statusOfResources: statusOfResourcesController.text,
-      additionalSupport: selectedAdditionalSupports,
-      languages: selectedLanguages,
-    );
+    if (nameController.text.isNotEmpty &&
+        descriptionController.text.isNotEmpty &&
+        selectedEducationalLevels.isNotEmpty) {
+      final updatedCamp = Camp(
+        id: widget.campId,
+        name: nameController.text,
+        educationLevel: selectedEducationalLevels,
+        description: descriptionController.text,
+        latitude: latitude!,
+        longitude: longitude!,
+        statusOfResources: statusOfResourcesController.text,
+        additionalSupport: selectedAdditionalSupports,
+        languages: selectedLanguages,
+      );
 
-    try {
-      ref.read(campProviderNotifier.notifier).updateCamp(updatedCamp);
-      customSnackbar(message: "Camp updated successfully", icon: Icons.check);
-    } catch (e) {
-      customSnackbar(message: "Failed to update camp: $e", icon: Icons.error);
-    } finally {
-      context.goNamed(AppRouter.map.name);
+      try {
+        ref.read(campProviderNotifier.notifier).updateCamp(updatedCamp);
+        customSnackbar(message: "Camp updated successfully", icon: Icons.check);
+      } catch (e) {
+        customSnackbar(message: "Failed to update camp: $e", icon: Icons.error);
+      } finally {
+        ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(true);
+        ref.read(showNavBarNotifierProvider.notifier).setActiveBottomNavBar(1);
+        context.goNamed(AppRouter.map.name);
+      }
+    } else {
+      customSnackbar(
+          message: "Please fill in all required fields.", icon: Icons.error);
     }
   }
 
@@ -173,7 +182,18 @@ class _UpdateCampScreenState extends ConsumerState<UpdateCampScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        scrolledUnderElevation: 0.0,
         backgroundColor: AppColors.lightTeal,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            ref
+                .read(showNavBarNotifierProvider.notifier)
+                .showBottomNavBar(true);
+            context.pop();
+          },
+        ),
         title: Text(
           'Update Camp Details',
           style: getTextStyle("mediumBold", color: Colors.white),
