@@ -172,45 +172,9 @@ class _ViewSavedCampsScreenState extends ConsumerState<ViewSavedCampsScreen> {
                                                                       "mediumBold",
                                                                       color: Colors
                                                                           .white)),
-                                                              onTap: () async {
-                                                                bool exit =
-                                                                    false;
-                                                                await showDialog(
-                                                                  context:
-                                                                      context,
-                                                                  builder:
-                                                                      (BuildContext
-                                                                          context) {
-                                                                    return ConfirmationDialog(
-                                                                      type:
-                                                                          'Remove',
-                                                                      title:
-                                                                          'Remove ${camp.name} Camp?',
-                                                                      content:
-                                                                          'Are you sure you want to remove this saved camp?',
-                                                                      onConfirm:
-                                                                          () async {
-                                                                        // Return Stream instead of Future (Update provider)
-                                                                        exit =
-                                                                            true;
-                                                                        await ref.read(studentProviderNotifier.notifier).removedSavedCamps(
-                                                                            studentId:
-                                                                                widget.userId,
-                                                                            campId: camp.id!);
-                                                                        setState(
-                                                                            () {
-                                                                          savedCamps
-                                                                              .remove(camp);
-                                                                        });
-                                                                      },
-                                                                    );
-                                                                  },
-                                                                );
-                                                                exit
-                                                                    ? context
-                                                                        .pop()
-                                                                    : null;
-                                                              },
+                                                              onTap: () =>
+                                                                  handleDeleteSavedCamps(
+                                                                      camp),
                                                             ),
                                                           ],
                                                         ),
@@ -243,6 +207,31 @@ class _ViewSavedCampsScreenState extends ConsumerState<ViewSavedCampsScreen> {
         ),
       ),
     );
+  }
+
+  void handleDeleteSavedCamps(Camp camp) async {
+    bool exit = false;
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ConfirmationDialog(
+          type: 'Remove',
+          title: 'Remove ${camp.name} Camp?',
+          content: 'Are you sure you want to remove this saved camp?',
+          onConfirm: () async {
+            // Return Stream instead of Future (Update provider)
+            exit = true;
+            await ref
+                .read(studentProviderNotifier.notifier)
+                .removedSavedCamps(studentId: widget.userId, campId: camp.id!);
+            setState(() {
+              savedCamps.remove(camp);
+            });
+          },
+        );
+      },
+    );
+    exit ? context.pop() : null;
   }
 
   Widget buildBackground(String imageName) {

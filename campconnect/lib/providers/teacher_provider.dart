@@ -23,6 +23,9 @@ class TeacherProvider extends AsyncNotifier<List<Teacher>> {
     }).onError((error) => state = AsyncError(error, StackTrace.current));
   }
 
+  Future<Teacher?> getTeachersById(String teacherId) =>
+      _repo.getTeacherById(teacherId);
+
   Future<List<Teacher>> getTeachersByCampId(String campId) async {
     try {
       return await _repo.getTeachersByCampId(campId);
@@ -48,8 +51,6 @@ class TeacherProvider extends AsyncNotifier<List<Teacher>> {
       ..add(teacher));
   }
 
-  
-
   Future<void> addCampToTeacher(Teacher teacher, Camp camp) async {
     try {
       // await _repo.addCampToTeacher(
@@ -66,6 +67,13 @@ class TeacherProvider extends AsyncNotifier<List<Teacher>> {
 
   bool isTeachingCamp(Teacher teacher, String campId) {
     return teacher.teachingCamps.contains(campId);
+  }
+
+  void removeTeachingCamps(
+      {required String teacherId, required String campId}) async {
+    Teacher? teacher = await getTeachersById(teacherId);
+    teacher!.teachingCamps.remove(campId);
+    updateTeacher(teacher);
   }
 }
 

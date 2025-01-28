@@ -41,6 +41,12 @@ class ClassProvider extends AsyncNotifier<List<Class>> {
 
   Future<List<Class>> getClassByCampId(String campId) =>
       _repo.getClassByCampId(campId);
+
+  void deleteClasses(List<Class> classes) {
+    for (var c in classes) {
+      deleteClass(c);
+    }
+  }
 }
 
 final classProviderNotifier =
