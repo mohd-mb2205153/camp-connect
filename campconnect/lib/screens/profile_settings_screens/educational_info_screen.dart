@@ -67,19 +67,28 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
     }
   }
 
-  void handleUpdate(User user) {
-    if (user is Student) {
+  bool handleUpdate(User user) {
+    if (user is Student &&
+        learningGoalsController.text.isNotEmpty &&
+        selectedSubjects.isNotEmpty &&
+        selectedEducationLevel != null) {
       user.learningGoals = learningGoalsController.text;
       user.preferredSubjects = List<String>.from(selectedSubjects);
       user.currentEducationLevel = selectedEducationLevel!;
       ref.read(studentProviderNotifier.notifier).updateStudent(user);
-    } else if (user is Teacher) {
+      return true;
+    } else if (user is Teacher &&
+        teachingExpController.text.isNotEmpty &&
+        selectedAreasOfExpertise.isNotEmpty &&
+        selectedEducationLevel != null) {
       user.teachingExperience = int.parse(teachingExpController.text);
       user.highestEducationLevel = selectedEducationLevel!;
       user.certifications = List<String>.from(selectedCertifications);
       user.areasOfExpertise = List<String>.from(selectedAreasOfExpertise);
       ref.read(teacherProviderNotifier.notifier).updateTeacher(user);
+      return true;
     }
+    return false;
   }
 
   @override
@@ -120,7 +129,15 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
               onPressed: () {
                 setState(() {
                   if (isEditing) {
-                    handleUpdate(user);
+                    bool isUpdated = handleUpdate(user);
+                    if (!isUpdated) {
+                      showCustomSnackBar(
+                          message:
+                              "Please ensure all required fields are filled",
+                          backgroundColor: AppColors.orange,
+                          context: context);
+                      return;
+                    }
                     showCustomSnackBar(
                         message: "Educational Details Updated",
                         backgroundColor: AppColors.lightTeal,
@@ -364,7 +381,7 @@ class _EducationalInfoState extends ConsumerState<EducationalInfoScreen> {
                 user: user,
                 textField: buildTextField(
                   controller: txtCertificationsController,
-                  hintText: "Add Certification",
+                  hintText: "Add Certification (Optional)",
                   keyboardType: TextInputType.text,
                   focusNode: certificationFocus,
                   suffixIcon: IconButton(

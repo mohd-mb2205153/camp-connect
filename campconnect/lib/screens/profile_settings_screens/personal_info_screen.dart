@@ -117,7 +117,17 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
     );
   }
 
-  void handleUpdate(User user) {
+  bool handleUpdate(User user) {
+    if (firstNameController.text.isEmpty ||
+        lastNameController.text.isEmpty ||
+        emailController.text.isEmpty ||
+        mobileController.text.isEmpty ||
+        selectedLanguages.isEmpty ||
+        dateOfBirth == null ||
+        selectedCountry == null ||
+        userPhoneCode == null) {
+      return false;
+    }
     user.firstName = firstNameController.text;
     user.lastName = lastNameController.text;
     user.nationality = selectedCountry!;
@@ -127,6 +137,11 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
     user.phoneCode = userPhoneCode!;
     user.primaryLanguages = List<String>.from(selectedLanguages);
     if (user is Student) {
+      if (guardianMobileController.text.isEmpty ||
+          specialNeedsController.text.isEmpty ||
+          guardianPhoneCode == null) {
+        return false;
+      }
       user.guardianPhoneCode = guardianPhoneCode!;
       user.guardianContact = guardianMobileController.text;
       user.specialNeeds = specialNeedsController.text;
@@ -134,6 +149,7 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
     } else if (user is Teacher) {
       ref.read(teacherProviderNotifier.notifier).updateTeacher(user);
     }
+    return true;
   }
 
   @override
@@ -174,7 +190,15 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
               onPressed: () {
                 setState(() {
                   if (isEditing) {
-                    handleUpdate(user);
+                    bool isUpdated = handleUpdate(user);
+                    if (!isUpdated) {
+                      showCustomSnackBar(
+                          message: "Please ensure all fields are not empty",
+                          backgroundColor: AppColors.orange,
+                          icon: Icons.task_alt,
+                          context: context);
+                      return;
+                    }
                     showCustomSnackBar(
                         message: "Personal Details Updated",
                         backgroundColor: AppColors.lightTeal,
