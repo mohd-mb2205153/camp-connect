@@ -47,6 +47,8 @@ class _UpdateCampScreenState extends ConsumerState<UpdateCampScreen> {
   List<String> selectedEducationalLevels = [];
   late List<String> languageOptions = [];
   List<String> selectedLanguages = [];
+  List<String> classesIds = [];
+  List<String> teacherIds = [];
 
   @override
   void initState() {
@@ -84,9 +86,9 @@ class _UpdateCampScreenState extends ConsumerState<UpdateCampScreen> {
           selectedEducationalLevels = List.from(camp.educationLevel);
           selectedAdditionalSupports = camp.additionalSupport ?? [];
           selectedLanguages = camp.languages ?? [];
+          classesIds = camp.classId!;
+          teacherIds = camp.teacherId!;
 
-          latitude = camp.latitude;
-          longitude = camp.longitude;
           location = LatLng(latitude!, longitude!);
         });
       }
@@ -151,6 +153,8 @@ class _UpdateCampScreenState extends ConsumerState<UpdateCampScreen> {
         statusOfResources: statusOfResourcesController.text,
         additionalSupport: selectedAdditionalSupports,
         languages: selectedLanguages,
+        teacherId: teacherIds,
+        classId: classesIds,
       );
 
       try {
