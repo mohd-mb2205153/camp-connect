@@ -195,7 +195,6 @@ class _PersonalInfoScreenState extends ConsumerState<PersonalInfoScreen> {
                       showCustomSnackBar(
                           message: "Please ensure all fields are not empty",
                           backgroundColor: AppColors.orange,
-                          icon: Icons.task_alt,
                           context: context);
                       return;
                     }

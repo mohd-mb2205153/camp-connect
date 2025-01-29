@@ -279,8 +279,12 @@ class ConfirmationDialog extends StatelessWidget {
             showSnackBar
                 ? ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('$type details have been updated.'),
+                      content: Text(
+                        '$type details have been updated.',
+                        style: getTextStyle('small', color: AppColors.white),
+                      ),
                       duration: const Duration(seconds: 3),
+                      backgroundColor: AppColors.teal,
                     ),
                   )
                 : null;

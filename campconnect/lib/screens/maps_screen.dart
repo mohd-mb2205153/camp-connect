@@ -866,7 +866,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
     return Positioned(
       bottom: 5,
       child: SizedBox(
-        width: 150,
+        width: isTeacher ? 100 : 50,
         height: 50.0,
         child: DecoratedBox(
           decoration: BoxDecoration(
@@ -891,27 +891,17 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
                   height: 24,
                 ),
               ),
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.directions, color: Colors.white),
-              ),
-              IconButton(
-                onPressed: () {
-                  isStudent
-                      ? null
-                      : context.pushNamed(AppRouter.addCampLocation.name);
-                },
-                icon: isStudent
-                    ? Icon(
-                        Icons.bookmark,
-                        color: Colors.white,
-                      )
-                    : Image.asset(
-                        "assets/images/add_icon.png",
-                        fit: BoxFit.contain,
-                        height: 24,
-                      ),
-              ),
+              if (isTeacher)
+                IconButton(
+                  onPressed: () {
+                    context.pushNamed(AppRouter.addCampLocation.name);
+                  },
+                  icon: Image.asset(
+                    "assets/images/add_icon.png",
+                    fit: BoxFit.contain,
+                    height: 24,
+                  ),
+                ),
             ],
           ),
         ),

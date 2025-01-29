@@ -53,111 +53,113 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Stack(
-                  children: [
-                    const CircleAvatar(
-                      radius: 50,
-                      backgroundColor: AppColors.darkTeal,
-                      child: Icon(
-                        Icons.person,
-                        size: 40,
-                        color: Colors.white,
-                      ), // Will change to images later..
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      left: 60,
-                      child: CircleAvatar(
-                        child: IconButton(
-                          onPressed: () {},
-                          icon: const Icon(
-                            Icons.edit,
-                            color: Colors.white,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Stack(
+                    children: [
+                      const CircleAvatar(
+                        radius: 50,
+                        backgroundColor: AppColors.darkTeal,
+                        child: Icon(
+                          Icons.person,
+                          size: 40,
+                          color: Colors.white,
+                        ), // Will change to images later..
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        left: 60,
+                        child: CircleAvatar(
+                          child: IconButton(
+                            onPressed: () {},
+                            icon: const Icon(
+                              Icons.edit,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(width: 30),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      wrapText(
-                          '${loggedInUser.firstName} ${loggedInUser.lastName}',
-                          24),
-                      style: getTextStyle("mediumBold",
-                          color: AppColors.lightTeal),
-                    ),
-                    Text(
-                      loggedInUser.email,
-                      style: getTextStyle("smallBold", color: Colors.grey),
-                    ),
-                    addVerticalSpace(12),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 4.0, horizontal: 8.0),
-                      decoration: BoxDecoration(
-                        color: AppColors.teal,
-                        borderRadius: BorderRadius.circular(20.0),
+                    ],
+                  ),
+                  const SizedBox(width: 30),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        wrapText(
+                            '${loggedInUser.firstName} ${loggedInUser.lastName}',
+                            24),
+                        style: getTextStyle("mediumBold",
+                            color: AppColors.lightTeal),
                       ),
-                      child: Text(
-                        loggedInUser.role.toUpperCase(),
-                        style: getTextStyle(
-                          "smallBold",
-                          color: Colors.white, // Text color
+                      Text(
+                        loggedInUser.email,
+                        style: getTextStyle("smallBold", color: Colors.grey),
+                      ),
+                      addVerticalSpace(12),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 4.0, horizontal: 8.0),
+                        decoration: BoxDecoration(
+                          color: AppColors.teal,
+                          borderRadius: BorderRadius.circular(20.0),
                         ),
-                      ),
-                    )
-                  ],
-                ),
-              ],
-            ),
-            addVerticalSpace(12),
-            const Divider(
-              thickness: 2,
-              color: AppColors.teal,
-            ),
-            addVerticalSpace(12),
-            buildMenuItem(
-              Icons.person,
-              'Personal Information',
-              () {
-                context.pushNamed(AppRouter.personal.name).then((_) {
+                        child: Text(
+                          loggedInUser.role.toUpperCase(),
+                          style: getTextStyle(
+                            "smallBold",
+                            color: Colors.white, // Text color
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ],
+              ),
+              addVerticalSpace(12),
+              const Divider(
+                thickness: 2,
+                color: AppColors.teal,
+              ),
+              addVerticalSpace(12),
+              buildMenuItem(
+                Icons.person,
+                'Personal Information',
+                () {
+                  context.pushNamed(AppRouter.personal.name).then((_) {
+                    setState(() {
+                      ref.watch(loggedInUserNotifierProvider);
+                    });
+                  });
+
+                  ref
+                      .read(showNavBarNotifierProvider.notifier)
+                      .showBottomNavBar(false);
+                },
+              ),
+              buildMenuItem(Icons.menu_book_rounded, 'Educational Information',
+                  () {
+                context.pushNamed(AppRouter.educational.name).then((_) {
                   setState(() {
                     ref.watch(loggedInUserNotifierProvider);
                   });
                 });
-
                 ref
                     .read(showNavBarNotifierProvider.notifier)
                     .showBottomNavBar(false);
-              },
-            ),
-            buildMenuItem(Icons.menu_book_rounded, 'Educational Information',
-                () {
-              context.pushNamed(AppRouter.educational.name).then((_) {
-                setState(() {
-                  ref.watch(loggedInUserNotifierProvider);
-                });
-              });
-              ref
-                  .read(showNavBarNotifierProvider.notifier)
-                  .showBottomNavBar(false);
-            }),
-            buildMenuItem(Icons.tune, 'Preferences'),
-            buildMenuItem(Icons.language, 'Language'),
-            buildMenuItem(Icons.power_settings_new, 'Logout', () async {
-              await AuthService().signout(context: context);
-              ref.read(loggedInUserNotifierProvider.notifier).clearUser();
-              context.go(AppRouter.onboarding.path);
-            }),
-          ],
+              }),
+              buildMenuItem(Icons.tune, 'Preferences'),
+              buildMenuItem(Icons.language, 'Language'),
+              buildMenuItem(Icons.power_settings_new, 'Logout', () async {
+                await AuthService().signout(context: context);
+                ref.read(loggedInUserNotifierProvider.notifier).clearUser();
+                context.go(AppRouter.onboarding.path);
+              }),
+            ],
+          ),
         ),
       ),
     );
