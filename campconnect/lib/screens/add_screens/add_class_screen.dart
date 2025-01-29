@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:campconnect/providers/loggedinuser_provider.dart';
 import 'package:campconnect/providers/show_nav_bar_provider.dart';
+import 'package:campconnect/routes/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/cupertino.dart';
@@ -108,7 +109,7 @@ class _AddClassScreenState extends ConsumerState<AddClassScreen> {
               .read(showNavBarNotifierProvider.notifier)
               .setActiveBottomNavBar(1);
 
-          context.pop();
+          context.goNamed(AppRouter.map.name);
         }
       } catch (error) {
         showCustomSnackBar(

@@ -57,7 +57,7 @@ class _ViewTeachingCampsScreenState
             },
           ),
           title: Text(
-            'View Your Teaching Camps',
+            'View Teaching Camps',
             style: getTextStyle("mediumBold", color: Colors.white),
           ),
         ),

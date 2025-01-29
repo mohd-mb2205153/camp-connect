@@ -1,8 +1,11 @@
 import 'dart:convert';
 
 import 'package:campconnect/models/class.dart';
+import 'package:campconnect/models/teacher.dart';
 import 'package:campconnect/providers/class_provider.dart';
+import 'package:campconnect/providers/loggedinuser_provider.dart';
 import 'package:campconnect/providers/show_nav_bar_provider.dart';
+import 'package:campconnect/routes/app_router.dart';
 import 'package:campconnect/theme/constants.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
 import 'package:flutter/cupertino.dart';
@@ -120,7 +123,7 @@ class _UpdateClassScreenState extends ConsumerState<UpdateClassScreen> {
         ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(true);
         ref.read(showNavBarNotifierProvider.notifier).setActiveBottomNavBar(1);
 
-        context.pop();
+        context.goNamed(AppRouter.map.name);
       } catch (e) {
         showCustomSnackBar(
             message: "Failed to update class: $e",
