@@ -57,6 +57,16 @@ class _ViewClassesScreenState extends ConsumerState<ViewClassesScreen> {
     });
   }
 
+  //Used after popping from update and add class screen.
+  void refreshClassList() {
+    setState(() {
+      ref
+          .read(classProviderNotifier.notifier)
+          .getClassByCampId(widget.campId)
+          .then((list) => classes = list);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -87,12 +97,12 @@ class _ViewClassesScreenState extends ConsumerState<ViewClassesScreen> {
                 ? IconButton(
                     icon: const Icon(Icons.note_add, color: Colors.white),
                     onPressed: () {
-                      ref
-                          .read(showNavBarNotifierProvider.notifier)
-                          .showBottomNavBar(false);
-
-                      context.goNamed(AppRouter.addClass.name,
-                          extra: widget.campId);
+                      context
+                          .pushNamed(AppRouter.addClass.name,
+                              extra: widget.campId)
+                          .then((_) {
+                        refreshClassList();
+                      });
                     },
                   )
                 : Text(""),
@@ -285,12 +295,14 @@ class _ViewClassesScreenState extends ConsumerState<ViewClassesScreen> {
                                                                   onTap: () {
                                                                     context
                                                                         .pop();
-                                                                    context.pushNamed(
-                                                                        AppRouter
-                                                                            .updateClass
-                                                                            .name,
-                                                                        extra: classItem
-                                                                            .id);
+                                                                    context
+                                                                        .pushNamed(
+                                                                            AppRouter
+                                                                                .updateClass.name,
+                                                                            extra: classItem
+                                                                                .id)
+                                                                        .then((_) =>
+                                                                            refreshClassList());
                                                                   },
                                                                 ),
                                                                 ListTile(

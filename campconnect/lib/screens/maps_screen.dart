@@ -1073,6 +1073,10 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
   @override
   void initState() {
     super.initState();
+    initializeBoolState();
+  }
+
+  void initializeBoolState() {
     User? user = ref.read(loggedInUserNotifierProvider);
     if (user is Student) {
       isSaved = ref.read(studentProviderNotifier.notifier).isSavedCamp(
@@ -1265,7 +1269,9 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
         "icon": Icons.person,
         "onPressed": () {
           print(campId);
-          context.goNamed(AppRouter.viewTeachers.name, extra: campId);
+          context
+              .pushNamed(AppRouter.viewTeachers.name, extra: campId)
+              .then((_) => initializeBoolState());
         },
       },
       {
