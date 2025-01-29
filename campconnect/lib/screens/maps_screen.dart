@@ -1113,7 +1113,6 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
           loggedInUser.savedCamps.remove(widget.camp.id!);
         }
 
-        campNotifer.updateCamp(widget.camp);
         studentNotifier.updateStudent(loggedInUser);
       } catch (e) {
         setState(() {
@@ -1134,13 +1133,14 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
         if (isTeaching) {
           loggedInUser.teachingCamps.add(widget.camp.id!);
           widget.camp.teacherId?.add(loggedInUser.id!);
+          campNotifer.updateCamp(widget.camp);
+          teacherNotifier.updateTeacher(loggedInUser);
         } else {
-          loggedInUser.teachingCamps.remove(widget.camp.id!);
-          widget.camp.teacherId?.remove(loggedInUser.id!);
+          teacherNotifier.removeTeachingCamps(
+              teacherId: loggedInUser.id!, campId: widget.camp.id!);
+          campNotifer.removeCampsClass(
+              targetTeacherId: loggedInUser.id!, campId: widget.camp.id!);
         }
-
-        campNotifer.updateCamp(widget.camp);
-        teacherNotifier.updateTeacher(loggedInUser);
       } catch (e) {
         setState(() {
           isTeaching = !isTeaching;

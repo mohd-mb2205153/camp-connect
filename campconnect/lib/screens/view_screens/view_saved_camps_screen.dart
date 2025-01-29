@@ -219,7 +219,6 @@ class _ViewSavedCampsScreenState extends ConsumerState<ViewSavedCampsScreen> {
           title: 'Remove ${camp.name} Camp?',
           content: 'Are you sure you want to remove this saved camp?',
           onConfirm: () async {
-            // Return Stream instead of Future (Update provider)
             exit = true;
             await ref
                 .read(studentProviderNotifier.notifier)
