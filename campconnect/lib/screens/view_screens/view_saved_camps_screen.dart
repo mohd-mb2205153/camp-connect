@@ -187,7 +187,7 @@ class _ViewSavedCampsScreenState extends ConsumerState<ViewSavedCampsScreen> {
                                                                         color: Colors
                                                                             .white)),
                                                                 onTap: () =>
-                                                                    handleDeleteSavedCamps(
+                                                                    handleRemoveSavedCamps(
                                                                         camp),
                                                               ),
                                                             ],
@@ -224,7 +224,7 @@ class _ViewSavedCampsScreenState extends ConsumerState<ViewSavedCampsScreen> {
     );
   }
 
-  void handleDeleteSavedCamps(Camp camp) async {
+  void handleRemoveSavedCamps(Camp camp) async {
     bool exit = false;
     await showDialog(
       context: context,

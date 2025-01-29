@@ -202,7 +202,7 @@ class _ViewTeachingCampsScreenState
                                                                         color: Colors
                                                                             .white)),
                                                                 onTap: () =>
-                                                                    handleDeleteTeachingCamps(
+                                                                    handleRemoveTeachingCamps(
                                                                         camp),
                                                               ),
                                                             ],
@@ -239,7 +239,7 @@ class _ViewTeachingCampsScreenState
     );
   }
 
-  void handleDeleteTeachingCamps(Camp camp) async {
+  void handleRemoveTeachingCamps(Camp camp) async {
     bool exit = false;
     await showDialog(
       context: context,
@@ -250,8 +250,10 @@ class _ViewTeachingCampsScreenState
           content: 'Are you sure you want to remove this as a teaching camp?',
           onConfirm: () async {
             exit = true;
-            ref.read(teacherProviderNotifier.notifier).removeTeachingCamps(
-                teacherId: widget.userId, campId: camp.id!);
+            ref
+                .read(teacherProviderNotifier.notifier)
+                .removeTeachingCampFromTeacher(
+                    teacherId: widget.userId, campId: camp.id!);
             await ref.read(campProviderNotifier.notifier).removeCampsClass(
                 targetTeacherId: widget.userId, campId: camp.id!);
             setState(() {

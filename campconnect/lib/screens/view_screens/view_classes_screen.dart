@@ -1,3 +1,5 @@
+import 'package:campconnect/models/class.dart';
+import 'package:campconnect/providers/camp_provider.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,6 +25,7 @@ class _ViewClassesScreenState extends ConsumerState<ViewClassesScreen> {
   bool isStudent = false;
   bool isTeacher = false;
   dynamic loggedUser;
+  List<Class> classes = [];
 
   @override
   void initState() {
@@ -117,12 +120,14 @@ class _ViewClassesScreenState extends ConsumerState<ViewClassesScreen> {
                             return errorWidget(snapshot);
                           }
                           if (snapshot.hasData) {
-                            return snapshot.data!.isEmpty
+                            classes =
+                                List<Class>.from(snapshot.data as List<Class>);
+                            return classes.isEmpty
                                 ? const EmptyScreen()
                                 : ListView.builder(
-                                    itemCount: snapshot.data!.length,
+                                    itemCount: classes.length,
                                     itemBuilder: (context, index) {
-                                      final classItem = snapshot.data![index];
+                                      final classItem = classes[index];
                                       return Padding(
                                         padding:
                                             const EdgeInsets.only(top: 8.0),
@@ -303,24 +308,8 @@ class _ViewClassesScreenState extends ConsumerState<ViewClassesScreen> {
                                                                           color:
                                                                               Colors.white)),
                                                                   onTap: () {
-                                                                    showDialog(
-                                                                      context:
-                                                                          context,
-                                                                      builder:
-                                                                          (BuildContext
-                                                                              context) {
-                                                                        return ConfirmationDialog(
-                                                                          type:
-                                                                              'Delete',
-                                                                          title:
-                                                                              'Delete a Class Schedule',
-                                                                          content:
-                                                                              'Are you sure you want to delete this class?',
-                                                                          onConfirm:
-                                                                              () {},
-                                                                        );
-                                                                      },
-                                                                    );
+                                                                    handleRemoveClass(
+                                                                        classItem);
                                                                   },
                                                                 ),
                                                               ],
@@ -355,5 +344,30 @@ class _ViewClassesScreenState extends ConsumerState<ViewClassesScreen> {
         ),
       ),
     );
+  }
+
+  void handleRemoveClass(Class c) async {
+    bool exit = false;
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ConfirmationDialog(
+          type: 'Remove',
+          title: 'Remove Class?',
+          content: 'Are you sure you want to remove this Class?',
+          onConfirm: () async {
+            exit = true;
+            ref.read(classProviderNotifier.notifier).deleteClass(c);
+            await ref
+                .read(campProviderNotifier.notifier)
+                .removeClassFromCamp(campId: widget.campId, classId: c.id);
+            setState(() {
+              classes.remove(c);
+            });
+          },
+        );
+      },
+    );
+    exit ? context.pop() : null;
   }
 }

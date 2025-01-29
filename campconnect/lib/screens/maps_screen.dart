@@ -1126,7 +1126,7 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
           campNotifer.updateCamp(widget.camp);
           teacherNotifier.updateTeacher(loggedInUser);
         } else {
-          teacherNotifier.removeTeachingCamps(
+          teacherNotifier.removeTeachingCampFromTeacher(
               teacherId: loggedInUser.id!, campId: widget.camp.id!);
           campNotifer.removeCampsClass(
               targetTeacherId: loggedInUser.id!, campId: widget.camp.id!);

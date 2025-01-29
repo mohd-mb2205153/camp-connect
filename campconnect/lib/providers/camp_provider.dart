@@ -78,6 +78,13 @@ class CampProvider extends AsyncNotifier<List<Camp>> {
     ref.read(classProviderNotifier.notifier).deleteClasses(classesByTeacherId);
   }
 
+  Future<void> removeClassFromCamp(
+      {required String campId, required String classId}) async {
+    Camp? camp = await getCampById(campId);
+    camp!.classId!.remove(classId);
+    updateCamp(camp);
+  }
+
   filterByEducationLevel(List<String> level) {
     _repo.filterCampByEducationLevel(level).listen((camp) {
       state = AsyncData(camp);
@@ -97,18 +104,18 @@ class CampProvider extends AsyncNotifier<List<Camp>> {
   }
 
   filterByRange(double userLat, double userLng, double rangeInKm) {
-     try {
+    try {
       if (state.value == null || state.value!.isEmpty) {
         throw Exception("Camps not initialized. Call initializeCamps first.");
       }
       final allCamps = state.value!;
-      
+
       final filteredCamps = allCamps.where((camp) {
         double distanceInMeters = Geolocator.distanceBetween(
           userLat,
           userLng,
-          camp.latitude!,
-          camp.longitude!,
+          camp.latitude,
+          camp.longitude,
         );
 
         double distanceInKm = distanceInMeters / 1000; // Convert to km

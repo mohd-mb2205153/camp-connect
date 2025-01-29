@@ -69,7 +69,7 @@ class TeacherProvider extends AsyncNotifier<List<Teacher>> {
     return teacher.teachingCamps.contains(campId);
   }
 
-  void removeTeachingCamps(
+  void removeTeachingCampFromTeacher(
       {required String teacherId, required String campId}) async {
     Teacher? teacher = await getTeachersById(teacherId);
     teacher!.teachingCamps.remove(campId);
