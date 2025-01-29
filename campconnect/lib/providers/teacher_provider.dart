@@ -1,4 +1,3 @@
-import 'package:campconnect/models/camp.dart';
 import 'package:campconnect/models/teacher.dart';
 import 'package:campconnect/providers/loggedinuser_provider.dart';
 import 'package:campconnect/providers/repo_provider.dart';
@@ -45,20 +44,19 @@ class TeacherProvider extends AsyncNotifier<List<Teacher>> {
 
   void updateTeacher(Teacher teacher) async {
     await _repo.updateTeacher(teacher);
-    ref.read(loggedInUserNotifierProvider.notifier).setTeacher(teacher);
+    if (teacher.id == ref.read(loggedInUserNotifierProvider)!.id) {
+      ref.read(loggedInUserNotifierProvider.notifier).setTeacher(teacher);
+    }
     state = AsyncData(List<Teacher>.from(state.value ?? [])
       ..removeWhere((t) => t.id == teacher.id)
       ..add(teacher));
   }
 
-  Future<void> addCampToTeacher(Teacher teacher, Camp camp) async {
+  Future<void> addCampToTeacher(
+      {required String teacherId, required String campId}) async {
     try {
-      // await _repo.addCampToTeacher(
-      //   teacherId: teacher.id!,
-      //   campId: camp.id!,
-      //   teachingCamps: 'teachingCamps',
-      // );
-      teacher.teachingCamps.add(camp.id!);
+      Teacher? teacher = await getTeachersById(teacherId);
+      teacher!.teachingCamps.add(campId);
       updateTeacher(teacher);
     } catch (e) {
       state = AsyncError(e, StackTrace.current);
@@ -80,15 +78,3 @@ class TeacherProvider extends AsyncNotifier<List<Teacher>> {
 final teacherProviderNotifier =
     AsyncNotifierProvider<TeacherProvider, List<Teacher>>(
         () => TeacherProvider());
-
-// final teachersByCampIdProvider =
-//     FutureProvider.family<List<Teacher>, String>((ref, campId) async {
-//   final repo = await ref.watch(repoProvider.future);
-//   return repo.getTeachersByCampId(campId);
-// });
-
-// final teachingCampsProvider =
-//     FutureProvider.family<List<Camp>, String>((ref, teacherId) async {
-//   final repo = await ref.watch(repoProvider.future);
-//   return repo.getTeachingCampsByTeacherId(teacherId);
-// });

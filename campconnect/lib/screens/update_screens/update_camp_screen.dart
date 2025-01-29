@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:campconnect/models/camp.dart';
 import 'package:campconnect/providers/camp_provider.dart';
-import 'package:campconnect/providers/teacher_provider.dart';
 import 'package:campconnect/routes/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,7 +10,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:campconnect/theme/constants.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
 
-import '../../providers/loggedinuser_provider.dart';
 import '../../providers/show_nav_bar_provider.dart';
 
 class UpdateCampScreen extends ConsumerStatefulWidget {

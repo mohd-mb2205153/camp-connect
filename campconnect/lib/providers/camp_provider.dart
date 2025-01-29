@@ -85,6 +85,13 @@ class CampProvider extends AsyncNotifier<List<Camp>> {
     updateCamp(camp);
   }
 
+  void addTeacherToCamp(
+      {required String teacherId, required String campId}) async {
+    Camp? camp = await getCampById(campId);
+    camp!.teacherId!.add(teacherId);
+    updateCamp(camp);
+  }
+
   filterByEducationLevel(List<String> level) {
     _repo.filterCampByEducationLevel(level).listen((camp) {
       state = AsyncData(camp);

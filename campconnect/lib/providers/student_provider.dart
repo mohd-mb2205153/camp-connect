@@ -32,7 +32,9 @@ class StudentProvider extends AsyncNotifier<List<Student>> {
 
   void updateStudent(Student student) async {
     await _repo.updateStudent(student);
-    ref.read(loggedInUserNotifierProvider.notifier).setStudent(student);
+    if (student.id == ref.read(loggedInUserNotifierProvider)!.id) {
+      ref.read(loggedInUserNotifierProvider.notifier).setStudent(student);
+    }
     state = AsyncData(List<Student>.from(state.value ?? [])
       ..removeWhere((s) => s.id == student.id)
       ..add(student));

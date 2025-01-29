@@ -139,7 +139,7 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
         if (loggedUser != null) {
           ref
               .read(teacherProviderNotifier.notifier)
-              .addCampToTeacher(loggedUser, newCamp);
+              .addCampToTeacher(teacherId: loggedUser.id, campId: newCamp.id!);
         }
 
         ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(true);
