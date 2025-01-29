@@ -147,11 +147,16 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
 
         context.goNamed(AppRouter.map.name);
       } catch (e) {
-        customSnackbar(message: "Failed to add camp: $e", icon: Icons.error);
+        showCustomSnackBar(
+            message: "Failed to add camp: $e",
+            icon: Icons.error,
+            context: context);
       }
     } else {
-      customSnackbar(
-          message: "Please fill in all required fields.", icon: Icons.error);
+      showCustomSnackBar(
+          message: "Please fill in all required fields.",
+          icon: Icons.error,
+          context: context);
     }
   }
 
@@ -301,9 +306,10 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
                                 .read(showNavBarNotifierProvider.notifier)
                                 .setActiveBottomNavBar(1);
                           } else {
-                            customSnackbar(
+                            showCustomSnackBar(
                                 message: "Please fill in all required fields.",
-                                icon: Icons.error);
+                                icon: Icons.error,
+                                context: context);
                           }
                         },
                         style: ElevatedButton.styleFrom(

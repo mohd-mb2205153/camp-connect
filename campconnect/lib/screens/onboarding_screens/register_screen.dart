@@ -89,49 +89,62 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   bool validateFields(BuildContext context) {
     if (!isAllFilled()) {
-      customSnackbar(message: "All fields are required.", icon: Icons.error);
+      showCustomSnackBar(
+          message: "All fields are required.",
+          icon: Icons.error,
+          context: context);
       return false;
     }
 
     final email = txtEmailController.text.trim();
     final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
     if (!emailRegex.hasMatch(email)) {
-      customSnackbar(
-          message: "Please enter a valid email address.", icon: Icons.email);
+      showCustomSnackBar(
+          message: "Please enter a valid email address.",
+          icon: Icons.email,
+          context: context);
       return false;
     }
 
     final password = txtPasswordController.text.trim();
     if (password.length < 6) {
-      customSnackbar(
+      showCustomSnackBar(
           message: "Password must be at least 6 characters long.",
-          icon: Icons.password);
+          icon: Icons.password,
+          context: context);
       return false;
     }
 
     final firstName = txtFirstNameController.text.trim();
     if (firstName.isEmpty || firstName.length < 2) {
-      customSnackbar(message: "First name must be at least 2 characters long.");
+      showCustomSnackBar(
+          message: "First name must be at least 2 characters long.",
+          context: context);
       return false;
     }
 
     final lastName = txtLastNameController.text.trim();
     if (lastName.isEmpty || lastName.length < 2) {
-      customSnackbar(message: "Last name must be at least 2 characters long.");
+      showCustomSnackBar(
+          message: "Last name must be at least 2 characters long.",
+          context: context);
       return false;
     }
 
     final phoneNumber = txtPhoneNumberController.text.trim();
     if (phoneNumber.isEmpty || !RegExp(r'^\d+$').hasMatch(phoneNumber)) {
-      customSnackbar(
-          message: "Please enter a valid phone number.", icon: Icons.phone);
+      showCustomSnackBar(
+          message: "Please enter a valid phone number.",
+          icon: Icons.phone,
+          context: context);
       return false;
     }
 
     if (!agreeToTerms) {
-      customSnackbar(
+      showCustomSnackBar(
           message: "You must agree to the Terms of Use.",
-          icon: Icons.assignment);
+          icon: Icons.assignment,
+          context: context);
       return false;
     }
 
@@ -171,7 +184,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   bool handleUser(BuildContext context) {
     if (!isAllFilled()) {
-      customSnackbar(message: 'All fields are required.');
+      showCustomSnackBar(message: 'All fields are required.', context: context);
       return false;
     }
     return true;

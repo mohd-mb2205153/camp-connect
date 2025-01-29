@@ -192,27 +192,32 @@ Widget buildBackground(String background) {
   );
 }
 
-SnackBar customSnackbar(
-    {required String message, Color? backgroundColor, IconData? icon}) {
-  return SnackBar(
-    content: Row(
-      children: [
-        if (icon != null) ...[
-          Icon(icon, color: Colors.white),
-          const SizedBox(width: 12),
-        ],
-        Expanded(
-          child: Text(
-            message,
-            style: getTextStyle(
-              "small",
-              color: Colors.white,
+void showCustomSnackBar(
+    {required String message,
+    Color? backgroundColor,
+    IconData? icon,
+    required BuildContext context}) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Row(
+        children: [
+          if (icon != null) ...[
+            Icon(icon, color: Colors.white),
+            const SizedBox(width: 12),
+          ],
+          Expanded(
+            child: Text(
+              message,
+              style: getTextStyle(
+                "small",
+                color: Colors.white,
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
+      backgroundColor: backgroundColor ?? Colors.orange,
     ),
-    backgroundColor: backgroundColor ?? Colors.orange,
   );
 }
 

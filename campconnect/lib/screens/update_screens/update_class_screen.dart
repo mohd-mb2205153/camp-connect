@@ -115,16 +115,20 @@ class _UpdateClassScreenState extends ConsumerState<UpdateClassScreen> {
         );
 
         ref.read(classProviderNotifier.notifier).updateClass(updatedClass);
-        customSnackbar(
-            message: "Class updated successfully", icon: Icons.check);
+        showCustomSnackBar(
+            message: "Class updated successfully",
+            icon: Icons.check,
+            context: context);
 
         ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(true);
         ref.read(showNavBarNotifierProvider.notifier).setActiveBottomNavBar(1);
 
         context.goNamed(AppRouter.map.name);
       } catch (e) {
-        customSnackbar(
-            message: "Failed to update class: $e", icon: Icons.error);
+        showCustomSnackBar(
+            message: "Failed to update class: $e",
+            icon: Icons.error,
+            context: context);
       }
     } else {
       String errorMessage = "Please fill all fields";
@@ -132,7 +136,8 @@ class _UpdateClassScreenState extends ConsumerState<UpdateClassScreen> {
           (toTime.hour == fromTime.hour && toTime.minute <= fromTime.minute)) {
         errorMessage = "End time must be after start time.";
       }
-      customSnackbar(message: errorMessage, icon: Icons.error);
+      showCustomSnackBar(
+          message: errorMessage, icon: Icons.error, context: context);
     }
   }
 

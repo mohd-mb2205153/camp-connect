@@ -112,7 +112,8 @@ class _AddClassScreenState extends ConsumerState<AddClassScreen> {
           context.goNamed(AppRouter.map.name);
         }
       } catch (error) {
-        customSnackbar(message: "$error", icon: Icons.error);
+        showCustomSnackBar(
+            message: "$error", icon: Icons.error, context: context);
       }
     } else {
       String errorMessage = "Please fill all fields";
@@ -122,7 +123,8 @@ class _AddClassScreenState extends ConsumerState<AddClassScreen> {
         errorMessage = "End time must be after start time.";
       }
 
-      customSnackbar(message: errorMessage, icon: Icons.error);
+      showCustomSnackBar(
+          message: errorMessage, icon: Icons.error, context: context);
     }
   }
 

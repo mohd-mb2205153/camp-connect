@@ -157,17 +157,25 @@ class _UpdateCampScreenState extends ConsumerState<UpdateCampScreen> {
 
       try {
         ref.read(campProviderNotifier.notifier).updateCamp(updatedCamp);
-        customSnackbar(message: "Camp updated successfully", icon: Icons.check);
+        showCustomSnackBar(
+            message: "Camp updated successfully",
+            icon: Icons.check,
+            context: context);
       } catch (e) {
-        customSnackbar(message: "Failed to update camp: $e", icon: Icons.error);
+        showCustomSnackBar(
+            message: "Failed to update camp: $e",
+            icon: Icons.error,
+            context: context);
       } finally {
         ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(true);
         ref.read(showNavBarNotifierProvider.notifier).setActiveBottomNavBar(1);
         context.goNamed(AppRouter.map.name);
       }
     } else {
-      customSnackbar(
-          message: "Please fill in all required fields.", icon: Icons.error);
+      showCustomSnackBar(
+          message: "Please fill in all required fields.",
+          icon: Icons.error,
+          context: context);
     }
   }
 

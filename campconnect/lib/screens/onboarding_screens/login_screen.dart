@@ -73,10 +73,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final password = txtPasswordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(customSnackbar(
-        message: "Please fill in all fields",
-        icon: Icons.error,
-      ));
+      showCustomSnackBar(
+          message: "Please fill in all fields",
+          icon: Icons.error,
+          context: context);
       return;
     }
 
@@ -114,53 +114,47 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       // Handle specific Firebase authentication error codes
       if (e.code == 'user-not-found') {
         debugPrint("FirebaseAuthException: user-not-found");
-        ScaffoldMessenger.of(context).showSnackBar(
-          customSnackbar(
+
+        showCustomSnackBar(
             message: "No account found for this email.",
             icon: Icons.error,
-          ),
-        );
+            context: context);
       } else if (e.code == 'wrong-password') {
         debugPrint("FirebaseAuthException: wrong-password");
-        ScaffoldMessenger.of(context).showSnackBar(
-          customSnackbar(
+
+        showCustomSnackBar(
             message: "Incorrect password. Please try again.",
             icon: Icons.error,
-          ),
-        );
+            context: context);
       } else if (e.code == 'invalid-email') {
         debugPrint("FirebaseAuthException: invalid-email");
-        ScaffoldMessenger.of(context).showSnackBar(
-          customSnackbar(
+
+        showCustomSnackBar(
             message: "Invalid email address.",
             icon: Icons.error,
-          ),
-        );
+            context: context);
       } else {
         debugPrint("FirebaseAuthException: ${e.code}, message: ${e.message}");
-        ScaffoldMessenger.of(context).showSnackBar(
-          customSnackbar(
+
+        showCustomSnackBar(
             message: "Authentication error: ${e.message ?? 'Unknown error.'}",
             icon: Icons.error,
-          ),
-        );
+            context: context);
       }
     } on FirebaseException catch (e) {
       debugPrint("FirebaseException: ${e.message}");
-      ScaffoldMessenger.of(context).showSnackBar(
-        customSnackbar(
+
+      showCustomSnackBar(
           message: "Database error: ${e.message ?? 'Unknown error occurred'}",
           icon: Icons.error,
-        ),
-      );
+          context: context);
     } catch (e) {
       debugPrint("General error: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        customSnackbar(
+
+      showCustomSnackBar(
           message: "Something went wrong. Please try again later.",
           icon: Icons.error,
-        ),
-      );
+          context: context);
     }
   }
 
