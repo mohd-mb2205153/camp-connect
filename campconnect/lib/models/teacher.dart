@@ -9,6 +9,7 @@ class Teacher extends User {
   String availabilitySchedule; // times available
   String preferredCampDuration; // e.g., "Short-term"
   List<String> teachingCamps; // List of teaching camps
+  String verificationStatus; // NEW: Can be "Pending", "Rejected", "Existing"
 
   Teacher({
     super.id,
@@ -27,8 +28,8 @@ class Teacher extends User {
     required this.willingnessToTravel,
     required this.availabilitySchedule,
     required this.preferredCampDuration,
-    List<String>? createdCamps,
     List<String>? teachingCamps,
+    required this.verificationStatus, // NEW field required
   })  : certifications = certifications ?? [],
         teachingCamps = teachingCamps ?? [],
         super(role: 'teacher');
@@ -54,11 +55,13 @@ Teacher(
   availabilitySchedule: $availabilitySchedule,
   preferredCampDuration: $preferredCampDuration,
   teachingCamps: $teachingCamps,
+  verificationStatus: $verificationStatus, // NEW
   role: $role
 )
 ''';
   }
 
+  /// Factory method to create a Teacher object from a JSON map.
   factory Teacher.fromJson(Map<String, dynamic> json) {
     return Teacher(
       id: json['id'],
@@ -82,9 +85,12 @@ Teacher(
       teachingCamps: json['teachingCamps'] != null
           ? List<String>.from(json['teachingCamps'])
           : [],
+      verificationStatus:
+          json['verificationStatus'] ?? 'Pending', // Default to "Pending"
     );
   }
 
+  /// Converts the Teacher object to a JSON map.
   @override
   Map<String, dynamic> toJson() {
     return super.toJson()
@@ -97,9 +103,11 @@ Teacher(
         'availabilitySchedule': availabilitySchedule,
         'preferredCampDuration': preferredCampDuration,
         'teachingCamps': teachingCamps,
+        'verificationStatus': verificationStatus, // NEW
       });
   }
 
+  /// Creates a copy of the current object with optional overrides.
   Teacher copyWith({
     String? id,
     String? firstName,
@@ -118,6 +126,7 @@ Teacher(
     String? availabilitySchedule,
     String? preferredCampDuration,
     List<String>? teachingCamps,
+    String? verificationStatus, // NEW
   }) {
     return Teacher(
       id: id ?? this.id,
@@ -139,6 +148,7 @@ Teacher(
       preferredCampDuration:
           preferredCampDuration ?? this.preferredCampDuration,
       teachingCamps: teachingCamps ?? this.teachingCamps,
+      verificationStatus: verificationStatus ?? this.verificationStatus, // NEW
     );
   }
 }

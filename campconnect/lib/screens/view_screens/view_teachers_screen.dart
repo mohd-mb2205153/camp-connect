@@ -1,5 +1,6 @@
 import 'package:campconnect/models/teacher.dart';
 import 'package:campconnect/providers/camp_provider.dart';
+import 'package:campconnect/providers/loggedinuser_provider.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -228,58 +229,71 @@ class _ViewTeachersScreenState extends ConsumerState<ViewTeachersScreen> {
                                                   ],
                                                 ),
                                               ),
-                                              Positioned(
-                                                top: 12,
-                                                right: 16,
-                                                child: GestureDetector(
-                                                  onTap: () {
-                                                    showModalBottomSheet(
-                                                      backgroundColor:
-                                                          AppColors.darkTeal,
-                                                      context: context,
-                                                      builder: (context) {
-                                                        return Container(
-                                                          height: screenHeight(
-                                                                  context) *
-                                                              .13,
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(16.0),
-                                                          child: Column(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .min,
-                                                            children: [
-                                                              ListTile(
-                                                                leading:
-                                                                    const Icon(
-                                                                  Icons.delete,
-                                                                  color: Colors
-                                                                      .white,
+                                              if (ref.read(
+                                                          loggedInUserNotifierProvider)
+                                                      is Teacher &&
+                                                  ref
+                                                      .read(
+                                                          teacherProviderNotifier
+                                                              .notifier)
+                                                      .isTeachingCamp(
+                                                          ref.read(
+                                                                  loggedInUserNotifierProvider)
+                                                              as Teacher,
+                                                          widget.campId))
+                                                Positioned(
+                                                  top: 12,
+                                                  right: 16,
+                                                  child: GestureDetector(
+                                                    onTap: () {
+                                                      showModalBottomSheet(
+                                                        backgroundColor:
+                                                            AppColors.darkTeal,
+                                                        context: context,
+                                                        builder: (context) {
+                                                          return Container(
+                                                            height: screenHeight(
+                                                                    context) *
+                                                                .13,
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(16.0),
+                                                            child: Column(
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .min,
+                                                              children: [
+                                                                ListTile(
+                                                                  leading:
+                                                                      const Icon(
+                                                                    Icons
+                                                                        .delete,
+                                                                    color: Colors
+                                                                        .white,
+                                                                  ),
+                                                                  title: Text(
+                                                                      'Remove Teacher',
+                                                                      style: getTextStyle(
+                                                                          "mediumBold",
+                                                                          color:
+                                                                              Colors.white)),
+                                                                  onTap: () {
+                                                                    handleRemoveTeacher(
+                                                                        teacher);
+                                                                  },
                                                                 ),
-                                                                title: Text(
-                                                                    'Remove Teacher',
-                                                                    style: getTextStyle(
-                                                                        "mediumBold",
-                                                                        color: Colors
-                                                                            .white)),
-                                                                onTap: () {
-                                                                  handleRemoveTeacher(
-                                                                      teacher);
-                                                                },
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        );
-                                                      },
-                                                    );
-                                                  },
-                                                  child: const Icon(
-                                                    Icons.more_horiz,
-                                                    color: Colors.white,
+                                                              ],
+                                                            ),
+                                                          );
+                                                        },
+                                                      );
+                                                    },
+                                                    child: const Icon(
+                                                      Icons.more_horiz,
+                                                      color: Colors.white,
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
                                             ],
                                           ),
                                         ),

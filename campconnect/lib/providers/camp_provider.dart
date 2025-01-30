@@ -149,3 +149,4 @@ First index latidude, Second index longitude.
 */
 final selectedCampLocationProvider =
     StateProvider<List<double>?>((ref) => null);
+

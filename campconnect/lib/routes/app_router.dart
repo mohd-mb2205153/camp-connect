@@ -1,4 +1,4 @@
-import 'package:campconnect/models/user.dart';
+import 'package:campconnect/models/user.dart' as userModel;
 import 'package:campconnect/screens/add_screens/add_camp_location_screen.dart';
 import 'package:campconnect/screens/add_screens/add_camp_screen.dart';
 import 'package:campconnect/screens/admin_screens/admin_dashboard_screen.dart';
@@ -19,7 +19,9 @@ import 'package:campconnect/screens/update_screens/update_camp_location_screen.d
 import 'package:campconnect/screens/update_screens/update_class_screen.dart';
 import 'package:campconnect/screens/view_screens/view_classes_screen.dart';
 import 'package:campconnect/screens/view_screens/view_teachers_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../screens/add_screens/add_class_screen.dart';
 import '../screens/onboarding_screens/register_screen.dart';
@@ -79,203 +81,222 @@ class AppRouter {
   static const personal = (name: 'personal', path: 'personal');
   static const educational = (name: 'educational', path: 'educational');
 
-  static final router = GoRouter(
-    initialLocation: onboarding.path,
-    routes: [
-      // Onboarding Routes
-      GoRoute(
-        path: onboarding.path,
-        name: onboarding.name,
-        builder: (context, state) => const OnboardingScreen(),
-        routes: [
-          GoRoute(
-            path: login.path,
-            name: login.name,
-            builder: (context, state) => const LoginScreen(),
-          ),
-          GoRoute(
-            path: register.path,
-            name: register.name,
-            builder: (context, state) => const RegisterScreen(),
-            routes: [
-              GoRoute(
-                path: role.path,
-                name: role.name,
-                builder: (context, state) {
-                  final user = state.extra as User;
-                  return RoleScreen(user: user);
-                },
-                routes: [
-                  GoRoute(
-                      path: studentOnboarding.path,
-                      name: studentOnboarding.name,
-                      builder: (context, state) {
-                        final user = state.extra as User;
-                        return StudentOnboardingScreen(user: user);
-                      }),
-                  GoRoute(
-                      path: educatorOnboarding.path,
-                      name: educatorOnboarding.name,
-                      builder: (context, state) {
-                        final user = state.extra as User;
-                        return EducatorOnboardingScreen(user: user);
-                      }),
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
-      // Admin Screens with ShellRoute
-      ShellRoute(
-        builder: (context, state, child) =>
-            AdminShellScreen(state: state, child: child),
-        routes: [
-          GoRoute(
-            path: adminDashboard.path,
-            name: adminDashboard.name,
-            builder: (context, state) => const AdminDashboardScreen(),
-          ),
-          GoRoute(
-            path: adminTeacherVerification.path,
-            name: adminTeacherVerification.name,
-            builder: (context, state) => const AdminTeacherVerificationScreen(),
-          ),
-        ],
-      ),
+  // //This method will decide if the user is directed to login screen or home screen
+  static Future<String> _getInitialRoute() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('jwt_token');
+    User? user = FirebaseAuth.instance.currentUser;
 
-      // Main Screens with ShellRoute
-      ShellRoute(
-        builder: (context, state, child) =>
-            ShellScreen(state: state, child: child),
-        routes: [
-          GoRoute(
-            name: home.name,
-            path: home.path,
-            builder: (context, state) => const HomeScreen(),
-            routes: [
-              GoRoute(
-                  name: viewTeachingCamps.name,
-                  path: viewTeachingCamps.path,
+    if (token != null && user != null) {
+      return home.path; // User is remembered, go to home
+    } else {
+      return login.path; // Otherwise, go to login
+    }
+  }
+
+  static final Future<GoRouter> router = _initializeRouter();
+
+  static Future<GoRouter> _initializeRouter() async {
+    String initialRoute = await _getInitialRoute();
+    return GoRouter(
+      initialLocation: onboarding.path,
+      routes: [
+        // Onboarding Routes
+        GoRoute(
+          path: onboarding.path,
+          name: onboarding.name,
+          builder: (context, state) => const OnboardingScreen(),
+          routes: [
+            GoRoute(
+              path: login.path,
+              name: login.name,
+              builder: (context, state) => const LoginScreen(),
+            ),
+            GoRoute(
+              path: register.path,
+              name: register.name,
+              builder: (context, state) => const RegisterScreen(),
+              routes: [
+                GoRoute(
+                  path: role.path,
+                  name: role.name,
                   builder: (context, state) {
-                    final userId = state.extra as String;
-                    return ViewTeachingCampsScreen(userId: userId);
+                    final user = state.extra as userModel.User;
+                    return RoleScreen(user: user);
                   },
                   routes: [
                     GoRoute(
-                      name: updateCampLocation.name,
-                      path: updateCampLocation.path,
+                        path: studentOnboarding.path,
+                        name: studentOnboarding.name,
+                        builder: (context, state) {
+                          final user = state.extra as userModel.User;
+                          return StudentOnboardingScreen(user: user);
+                        }),
+                    GoRoute(
+                        path: educatorOnboarding.path,
+                        name: educatorOnboarding.name,
+                        builder: (context, state) {
+                          final user = state.extra as userModel.User;
+                          return EducatorOnboardingScreen(user: user);
+                        }),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+        // Admin Screens with ShellRoute
+        ShellRoute(
+          builder: (context, state, child) =>
+              AdminShellScreen(state: state, child: child),
+          routes: [
+            GoRoute(
+              path: adminDashboard.path,
+              name: adminDashboard.name,
+              builder: (context, state) => const AdminDashboardScreen(),
+            ),
+            GoRoute(
+              path: adminTeacherVerification.path,
+              name: adminTeacherVerification.name,
+              builder: (context, state) =>
+                  const AdminTeacherVerificationScreen(),
+            ),
+          ],
+        ),
+
+        // Main Screens with ShellRoute
+        ShellRoute(
+          builder: (context, state, child) =>
+              ShellScreen(state: state, child: child),
+          routes: [
+            GoRoute(
+              name: home.name,
+              path: home.path,
+              builder: (context, state) => const HomeScreen(),
+              routes: [
+                GoRoute(
+                    name: viewTeachingCamps.name,
+                    path: viewTeachingCamps.path,
+                    builder: (context, state) {
+                      final userId = state.extra as String;
+                      return ViewTeachingCampsScreen(userId: userId);
+                    },
+                    routes: [
+                      GoRoute(
+                        name: updateCampLocation.name,
+                        path: updateCampLocation.path,
+                        builder: (context, state) {
+                          final campId = state.extra as String;
+                          return UpdateCampLocationScreen(campId: campId);
+                        },
+                        routes: [
+                          GoRoute(
+                            name: updateCamp.name,
+                            path: updateCamp.path,
+                            builder: (context, state) {
+                              final location = state.pathParameters['location'];
+                              final campId = state
+                                  .pathParameters['campId']; // Extract campId
+                              return UpdateCampScreen(
+                                location: location!,
+                                campId: campId!,
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ]),
+                GoRoute(
+                  name: viewSavedCamps.name,
+                  path: viewSavedCamps.path,
+                  builder: (context, state) {
+                    final userId = state.extra as String;
+                    return ViewSavedCampsScreen(userId: userId);
+                  },
+                ),
+                GoRoute(
+                  name: addCampLocation.name,
+                  path: addCampLocation.path,
+                  builder: (context, state) => const AddCampLocationScreen(),
+                  routes: [
+                    GoRoute(
+                      name: addCamp.name,
+                      path: addCamp.path,
+                      builder: (context, state) {
+                        final location = state.pathParameters['location'];
+                        return AddCampScreen(location: location!);
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            GoRoute(
+              name: map.name,
+              path: map.path,
+              builder: (context, state) => const MapsScreen(),
+              routes: [
+                GoRoute(
+                  name: searchCamps.name,
+                  path: searchCamps.path,
+                  builder: (context, state) => const SearchCampsScreen(),
+                ),
+                GoRoute(
+                  path: viewClasses.path,
+                  name: viewClasses.name,
+                  builder: (context, state) {
+                    final campId = state.extra as String;
+                    return ViewClassesScreen(campId: campId);
+                  },
+                  routes: [
+                    GoRoute(
+                      path: updateClass.path,
+                      name: updateClass.name,
+                      builder: (context, state) {
+                        final classId = state.extra as String;
+                        return UpdateClassScreen(classId: classId);
+                      },
+                    ),
+                    GoRoute(
+                      path: addClass.path,
+                      name: addClass.name,
                       builder: (context, state) {
                         final campId = state.extra as String;
-                        return UpdateCampLocationScreen(campId: campId);
+                        return AddClassScreen(campId: campId);
                       },
-                      routes: [
-                        GoRoute(
-                          name: updateCamp.name,
-                          path: updateCamp.path,
-                          builder: (context, state) {
-                            final location = state.pathParameters['location'];
-                            final campId = state
-                                .pathParameters['campId']; // Extract campId
-                            return UpdateCampScreen(
-                              location: location!,
-                              campId: campId!,
-                            );
-                          },
-                        ),
-                      ],
                     ),
-                  ]),
-              GoRoute(
-                name: viewSavedCamps.name,
-                path: viewSavedCamps.path,
-                builder: (context, state) {
-                  final userId = state.extra as String;
-                  return ViewSavedCampsScreen(userId: userId);
-                },
-              ),
-              GoRoute(
-                name: addCampLocation.name,
-                path: addCampLocation.path,
-                builder: (context, state) => const AddCampLocationScreen(),
-                routes: [
-                  GoRoute(
-                    name: addCamp.name,
-                    path: addCamp.path,
-                    builder: (context, state) {
-                      final location = state.pathParameters['location'];
-                      return AddCampScreen(location: location!);
-                    },
-                  ),
-                ],
-              ),
-            ],
-          ),
-          GoRoute(
-            name: map.name,
-            path: map.path,
-            builder: (context, state) => const MapsScreen(),
-            routes: [
-              GoRoute(
-                name: searchCamps.name,
-                path: searchCamps.path,
-                builder: (context, state) => const SearchCampsScreen(),
-              ),
-              GoRoute(
-                path: viewClasses.path,
-                name: viewClasses.name,
-                builder: (context, state) {
-                  final campId = state.extra as String;
-                  return ViewClassesScreen(campId: campId);
-                },
-                routes: [
-                  GoRoute(
-                    path: updateClass.path,
-                    name: updateClass.name,
-                    builder: (context, state) {
-                      final classId = state.extra as String;
-                      return UpdateClassScreen(classId: classId);
-                    },
-                  ),
-                  GoRoute(
-                    path: addClass.path,
-                    name: addClass.name,
-                    builder: (context, state) {
-                      final campId = state.extra as String;
-                      return AddClassScreen(campId: campId);
-                    },
-                  ),
-                ],
-              ),
-              GoRoute(
-                path: viewTeachers.path,
-                name: viewTeachers.name,
-                builder: (context, state) {
-                  final campId = state.extra as String;
-                  return ViewTeachersScreen(campId: campId);
-                },
-              ),
-            ],
-          ),
-          GoRoute(
-            name: profile.name,
-            path: profile.path,
-            builder: (context, state) => const ProfileScreen(),
-            routes: [
-              GoRoute(
-                path: personal.path,
-                name: personal.name,
-                builder: (context, state) => const PersonalInfoScreen(),
-              ),
-              GoRoute(
-                path: educational.path,
-                name: educational.name,
-                builder: (context, state) => const EducationalInfoScreen(),
-              ),
-            ],
-          ),
-        ],
-      ),
-    ],
-  );
+                  ],
+                ),
+                GoRoute(
+                  path: viewTeachers.path,
+                  name: viewTeachers.name,
+                  builder: (context, state) {
+                    final campId = state.extra as String;
+                    return ViewTeachersScreen(campId: campId);
+                  },
+                ),
+              ],
+            ),
+            GoRoute(
+              name: profile.name,
+              path: profile.path,
+              builder: (context, state) => const ProfileScreen(),
+              routes: [
+                GoRoute(
+                  path: personal.path,
+                  name: personal.name,
+                  builder: (context, state) => const PersonalInfoScreen(),
+                ),
+                GoRoute(
+                  path: educational.path,
+                  name: educational.name,
+                  builder: (context, state) => const EducationalInfoScreen(),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
+    );
+  }
 }

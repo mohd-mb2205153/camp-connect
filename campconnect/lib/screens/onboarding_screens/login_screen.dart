@@ -70,14 +70,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
-  Future<void> saveUserSession() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('rememberMe', true);
-  }
-
-  Future<bool> isRememberMeEnabled() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getBool('rememberMe') ?? false;
+  Future<void> getJwtToken() async {
+    String? token = await FirebaseAuth.instance.currentUser?.getIdToken(); // Firebase JWT token
+    print("This is the user token: $token");
+    if (token != null) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('jwt_token', token); // Store token
+    } 
   }
 
   void handleLogin(BuildContext context) async {
@@ -104,6 +103,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         final student = Student.fromJson(studentDoc.docs.first.data());
         ref.read(loggedInUserNotifierProvider.notifier).setStudent(student);
         ref.read(showNavBarNotifierProvider.notifier).setActiveBottomNavBar(0);
+
+        // await getJwtToken(); 
         context.replaceNamed(AppRouter.home.name);
         return;
       }
@@ -184,6 +185,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           context: context);
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

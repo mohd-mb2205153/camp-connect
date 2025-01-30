@@ -64,23 +64,23 @@ class _EducatorOnboardingScreenState
 
   Teacher initializeTeacher(User user) {
     return Teacher(
-      id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      phoneCode: user.phoneCode,
-      mobileNumber: user.mobileNumber,
-      dateOfBirth: user.dateOfBirth,
-      nationality: user.nationality,
-      highestEducationLevel: '',
-      certifications: [],
-      teachingExperience: 0,
-      areasOfExpertise: [],
-      willingnessToTravel: '',
-      availabilitySchedule: '',
-      preferredCampDuration: '',
-      primaryLanguages: user.primaryLanguages,
-    );
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        phoneCode: user.phoneCode,
+        mobileNumber: user.mobileNumber,
+        dateOfBirth: user.dateOfBirth,
+        nationality: user.nationality,
+        highestEducationLevel: '',
+        certifications: [],
+        teachingExperience: 0,
+        areasOfExpertise: [],
+        willingnessToTravel: '',
+        availabilitySchedule: '',
+        preferredCampDuration: '',
+        primaryLanguages: user.primaryLanguages,
+        verificationStatus: 'pending');
   }
 
   Future<void> loadDropdownData() async {

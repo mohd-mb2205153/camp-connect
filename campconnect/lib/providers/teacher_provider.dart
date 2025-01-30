@@ -1,3 +1,4 @@
+import 'package:campconnect/models/class.dart';
 import 'package:campconnect/models/teacher.dart';
 import 'package:campconnect/providers/loggedinuser_provider.dart';
 import 'package:campconnect/providers/repo_provider.dart';
@@ -63,9 +64,10 @@ class TeacherProvider extends AsyncNotifier<List<Teacher>> {
     }
   }
 
-  bool isTeachingCamp(Teacher teacher, String campId) {
-    return teacher.teachingCamps.contains(campId);
-  }
+  bool isTeachingCamp(Teacher teacher, String campId) =>
+      teacher.teachingCamps.contains(campId);
+
+  bool isTeachingClass(Class c, String teacherId) => c.teacher.id == teacherId;
 
   void removeTeachingCampFromTeacher(
       {required String teacherId, required String campId}) async {
