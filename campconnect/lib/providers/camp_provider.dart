@@ -136,12 +136,16 @@ class CampProvider extends AsyncNotifier<List<Camp>> {
     }
   }
 
-  filterByName(String queryName) {
-    _repo.filterCampByName(queryName).listen((camp) {
-      state = AsyncData(camp);
-    }).onError((error) => print(error));
+  Future<List<Camp>> filterByName(String queryName) {
+    return _repo.filterCampByName(queryName);
   }
 }
 
 final campProviderNotifier =
     AsyncNotifierProvider<CampProvider, List<Camp>>(() => CampProvider());
+
+/*To save latitude and longitude of a selected camp after leaving search camp screen.
+First index latidude, Second index longitude.
+*/
+final selectedCampLocationProvider =
+    StateProvider<List<double>?>((ref) => null);

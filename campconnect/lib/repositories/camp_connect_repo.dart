@@ -2,7 +2,6 @@ import 'package:campconnect/models/class.dart';
 import 'package:campconnect/models/student.dart';
 import 'package:campconnect/models/teacher.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:geolocator/geolocator.dart';
 
 import '../models/camp.dart';
 
@@ -105,14 +104,15 @@ class CampConnectRepo {
           .map((doc) => Camp.fromJson(doc.data() as Map<String, dynamic>))
           .toList());
 
-  Stream<List<Camp>> filterCampByName(String queryName) => campsRef
-      .where("name", isGreaterThanOrEqualTo: queryName)
-      .where("name", isLessThanOrEqualTo: '${queryName}z')
-      .snapshots()
-      .map((snapshot) => snapshot.docs
-          .map((doc) => Camp.fromJson(doc.data() as Map<String, dynamic>))
-          .toList());
-
+  Future<List<Camp>> filterCampByName(String queryName) async {
+    final querySnapshot = await campsRef
+        .where("name", isGreaterThanOrEqualTo: queryName)
+        .where("name", isLessThanOrEqualTo: '${queryName}z')
+        .get();
+    return querySnapshot.docs
+        .map((doc) => Camp.fromJson(doc.data() as Map<String, dynamic>))
+        .toList();
+  }
 
   // (*) Student Repository ===================================================================
   Stream<List<Student>> observeStudents() => studentsRef.snapshots().map(

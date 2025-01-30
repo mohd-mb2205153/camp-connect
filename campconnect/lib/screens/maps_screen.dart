@@ -316,7 +316,23 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
         ? Row(
             children: [
               _buildCircleIconButton(Icons.search, () {
-                context.goNamed(AppRouter.searchCamps.name);
+                context.pushNamed(AppRouter.searchCamps.name).then((_) {
+                  List<double>? selectedCampLocation =
+                      ref.read(selectedCampLocationProvider);
+                  if (selectedCampLocation == null) {
+                    return;
+                  }
+                  setState(() {
+                    _googleMapController?.moveCamera(
+                      CameraUpdate.newCameraPosition(
+                        CameraPosition(
+                            target: LatLng(selectedCampLocation[0],
+                                selectedCampLocation[1]),
+                            zoom: 17.75),
+                      ),
+                    );
+                  });
+                });
                 ref
                     .read(showNavBarNotifierProvider.notifier)
                     .showBottomNavBar(false);
