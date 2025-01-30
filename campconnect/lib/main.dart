@@ -6,20 +6,26 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await FirebaseAuth.instance.setPersistence(Persistence.LOCAL); // Enable persistent login
   debugPrint("Initializing Firebase...");
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
   debugPrint("Firebase initialized. Starting app...");
-  runApp(ProviderScope(child: const MyApp()));
+
+  GoRouter router = await AppRouter.router; // Wait for the router
+  runApp(ProviderScope(
+      child: MyApp(
+    router: router,
+  )));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final GoRouter router;
+  const MyApp({super.key, required this.router});
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +33,7 @@ class MyApp extends StatelessWidget {
         [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      routerConfig: AppRouter.router,
+      routerConfig: router,
       title: 'CampConnect',
       theme: AppTheme.lightTheme, //can switch to dark mode later
     );
