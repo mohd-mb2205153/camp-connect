@@ -1090,7 +1090,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
         },
       ),
     ).whenComplete(() {
-      context.pushNamed(AppRouter.map.name);
+      // context.pushNamed(AppRouter.map.name);
     });
   }
 }

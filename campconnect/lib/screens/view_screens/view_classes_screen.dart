@@ -1,5 +1,6 @@
 import 'package:campconnect/models/class.dart';
 import 'package:campconnect/providers/camp_provider.dart';
+import 'package:campconnect/providers/teacher_provider.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -93,7 +94,10 @@ class _ViewClassesScreenState extends ConsumerState<ViewClassesScreen> {
             },
           ),
           actions: [
-            isTeacher
+            isTeacher &&
+                    ref
+                        .read(teacherProviderNotifier.notifier)
+                        .isTeachingCamp(loggedUser, widget.campId)
                 ? IconButton(
                     icon: const Icon(Icons.note_add, color: Colors.white),
                     onPressed: () {
@@ -130,6 +134,8 @@ class _ViewClassesScreenState extends ConsumerState<ViewClassesScreen> {
                             return errorWidget(snapshot);
                           }
                           if (snapshot.hasData) {
+                            final teacherNotifer =
+                                ref.read(teacherProviderNotifier.notifier);
                             classes =
                                 List<Class>.from(snapshot.data as List<Class>);
                             return classes.isEmpty
@@ -257,7 +263,14 @@ class _ViewClassesScreenState extends ConsumerState<ViewClassesScreen> {
                                                   ],
                                                 ),
                                               ),
-                                              if (isTeacher)
+                                              if (isTeacher &&
+                                                  teacherNotifer.isTeachingCamp(
+                                                      loggedUser,
+                                                      widget.campId) &&
+                                                  teacherNotifer
+                                                      .isTeachingClass(
+                                                          classItem,
+                                                          loggedUser.id))
                                                 Positioned(
                                                   top: 12,
                                                   right: 16,
