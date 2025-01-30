@@ -144,9 +144,9 @@ class CampProvider extends AsyncNotifier<List<Camp>> {
 final campProviderNotifier =
     AsyncNotifierProvider<CampProvider, List<Camp>>(() => CampProvider());
 
-/*To save latitude and longitude of a selected camp after leaving search camp screen.
+/*
+To save latitude and longitude of a selected camp after leaving search camp screen.
 First index latidude, Second index longitude.
 */
 final selectedCampLocationProvider =
     StateProvider<List<double>?>((ref) => null);
-
