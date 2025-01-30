@@ -100,7 +100,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         if (token != null) {
           SharedPreferences prefs = await SharedPreferences.getInstance();
           await prefs.setString('jwt_token', token); // Store token
-
         } 
         context.replaceNamed(AppRouter.home.name);
         return;
