@@ -76,18 +76,11 @@ class _AdminTeacherVerificationScreenState
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: Colors.white,
-            width: 0.7,
-          ),
-          borderRadius: BorderRadius.circular(25),
-        ),
         child: StatefulBuilder(
           builder: (context, setState) {
             return TabBar(
               dividerColor: Colors.transparent,
-              indicatorSize: TabBarIndicatorSize.tab,
+              indicatorSize: TabBarIndicatorSize.label,
               controller: _tabController,
               indicator: BoxDecoration(
                 color: Colors.white, // Selected tab background
@@ -111,21 +104,21 @@ class _AdminTeacherVerificationScreenState
     bool isSelected = _tabController.index == index;
 
     return Tab(
-      child: Container(
-        width: 130, // Set a fixed width for all tabs
-        alignment: Alignment.center,
-        child: Text(
-          text,
-          style: getTextStyle(
-            'smallBold',
-            color: isSelected ? AppColors.lightTeal : Colors.white,
+      child: SizedBox(
+        width: double.infinity,
+        child: Center(
+          child: Text(
+            text,
+            style: getTextStyle(
+              'smallBold',
+              color: isSelected ? AppColors.lightTeal : Colors.white,
+            ),
           ),
         ),
       ),
     );
   }
 
-  /// Generates dummy data
   List<Teacher> _generateDummyTeachers(String status) {
     return [
       Teacher(
@@ -191,7 +184,17 @@ class _AdminTeacherVerificationScreenState
     ];
   }
 
-  /// Builds the teacher list for each tab
+  Color _getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return AppColors.orange;
+      case 'rejected':
+        return Colors.red;
+      default:
+        return AppColors.lightTeal;
+    }
+  }
+
   Widget _buildTeacherList(String status) {
     List<Teacher> teachers = _generateDummyTeachers(status);
 
@@ -208,91 +211,90 @@ class _AdminTeacherVerificationScreenState
 
   Widget _buildTeacherCard(Teacher teacher) {
     return Padding(
-      padding: const EdgeInsets.only(top: 8.0),
+      padding: const EdgeInsets.only(top: 6.0), // Reduce top padding
       child: Card(
         color: AppColors.darkTeal,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            crossAxisAlignment:
-                CrossAxisAlignment.center, // Center items vertically
+          padding: const EdgeInsets.all(20.0), // Reduce padding inside card
+          child: Stack(
             children: [
-              // Teacher Info (Left Side)
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Status Indicator Circle
+                  Container(
+                    height: 8,
+                    width: 8,
+                    decoration: BoxDecoration(
+                      color: _getStatusColor(teacher.verificationStatus),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  addHorizontalSpace(20),
+
+                  // Teacher Info
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min, // Ensures column shrinks
                       children: [
-                        Container(
-                          width: 40,
-                          height: 40,
-                          decoration: const BoxDecoration(
-                            color: AppColors.lightTeal,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.person_2_rounded,
-                            color: Colors.white,
-                            size: 24,
-                          ),
+                        Row(
+                          children: [
+                            Container(
+                              width: 35, // Reduce profile icon size
+                              height: 35,
+                              decoration: const BoxDecoration(
+                                color: AppColors.lightTeal,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.person_2_rounded,
+                                color: Colors.white,
+                                size: 20, // Reduce icon size
+                              ),
+                            ),
+                            const SizedBox(width: 15), // Reduce spacing
+                            Expanded(
+                              child: Text(
+                                '${teacher.firstName} ${teacher.lastName}',
+                                style: getTextStyle('mediumBold',
+                                    color: Colors.white),
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 20),
-                        Expanded(
-                          child: Text(
-                            '${teacher.firstName} ${teacher.lastName}',
-                            style:
-                                getTextStyle('mediumBold', color: Colors.white),
-                          ),
+                        addVerticalSpace(6), // Reduce spacing
+                        Text(
+                          'Contact: ${teacher.phoneCode} ${teacher.mobileNumber}',
+                          style: getTextStyle('small', color: Colors.white),
+                        ),
+                        addVerticalSpace(4), // Reduce spacing
+                        Text(
+                          'Email: ${teacher.email}',
+                          style: getTextStyle('small', color: Colors.white),
                         ),
                       ],
                     ),
-                    addVerticalSpace(10),
-                    Text(
-                      'Contact: ${teacher.phoneCode} ${teacher.mobileNumber}',
-                      style: getTextStyle('small', color: Colors.white),
-                    ),
-                    addVerticalSpace(5),
-                    Text(
-                      'Email: ${teacher.email}',
-                      style: getTextStyle('small', color: Colors.white),
-                    ),
-                    addVerticalSpace(5),
-                    Text(
-                      'Status: ${teacher.verificationStatus}',
-                      style:
-                          getTextStyle('smallBold', color: AppColors.lightTeal),
-                    ),
-                  ],
-                ),
-              ),
-
-              Column(
-                mainAxisAlignment:
-                    MainAxisAlignment.center, // Centers vertically
-                children: [
-                  _buildActionButton(
-                    icon: Icons.visibility,
-                    color: Colors.white, // White icon
-                    tooltip: "View Details",
-                    onTap: () => _showTeacherDetailsDialog(context, teacher),
-                  ),
-                  _buildActionButton(
-                    icon: Icons.edit,
-                    color: Colors.white, // White icon
-                    tooltip: "Change Status",
-                    onTap: () => _showStatusChangeDialog(context, teacher),
-                  ),
-                  _buildActionButton(
-                    icon: Icons.delete,
-                    color: Colors.white, // White icon
-                    tooltip: "Delete",
-                    onTap: () => _deleteTeacher(teacher),
                   ),
                 ],
+              ),
+
+              // More Button (Positioned on Top Right)
+              Positioned(
+                top: 6,
+                right: 8,
+                child: GestureDetector(
+                  onTap: () {
+                    _showTeacherOptionsBottomSheet(context, teacher);
+                  },
+                  child: const Icon(
+                    Icons.more_horiz,
+                    color: Colors.white,
+                  ),
+                ),
               ),
             ],
           ),
@@ -301,7 +303,7 @@ class _AdminTeacherVerificationScreenState
     );
   }
 
-  /// Action Button with White Icons
+  /// Action Button with White Icons (Smaller and Tighter)
   Widget _buildActionButton({
     required IconData icon,
     required Color color,
@@ -309,48 +311,65 @@ class _AdminTeacherVerificationScreenState
     required VoidCallback onTap,
   }) {
     return IconButton(
-      icon: Icon(icon, color: color, size: 20), // White icons
+      icon: Icon(icon, color: color, size: 20),
       tooltip: tooltip,
       onPressed: onTap,
+      padding: EdgeInsets.zero,
+      constraints: BoxConstraints(),
     );
   }
 
-  void _showTeacherDetailsDialog(BuildContext context, Teacher teacher) {
-    showDialog(
+  void _showTeacherOptionsBottomSheet(BuildContext context, Teacher teacher) {
+    showModalBottomSheet(
+      backgroundColor: AppColors.darkTeal,
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('${teacher.firstName} ${teacher.lastName}'),
-          content: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Email: ${teacher.email}'),
-                Text('Phone: ${teacher.phoneCode} ${teacher.mobileNumber}'),
-                Text('Nationality: ${teacher.nationality}'),
-                Text('Education: ${teacher.highestEducationLevel}'),
-                Text(
-                    'Teaching Experience: ${teacher.teachingExperience} years'),
-                Text('Availability: ${teacher.availabilitySchedule}'),
-                Text('Willingness to Travel: ${teacher.willingnessToTravel}'),
-                addVerticalSpace(10),
-                Text('Areas of Expertise:', style: getTextStyle('smallBold')),
-                buildChips(teacher.areasOfExpertise),
-                addVerticalSpace(10),
-                Text('Certifications:', style: getTextStyle('smallBold')),
-                buildChips(teacher.certifications),
-                addVerticalSpace(10),
-                Text('Teaching Camps:', style: getTextStyle('smallBold')),
-                buildChips(teacher.teachingCamps),
-              ],
-            ),
+      builder: (context) {
+        return Container(
+          height: 200, // Increased height to accommodate View option
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // View Details Option
+              ListTile(
+                leading: const Icon(Icons.visibility, color: Colors.white),
+                title: Text(
+                  'View Details',
+                  style: getTextStyle("mediumBold", color: Colors.white),
+                ),
+                onTap: () {
+                  Navigator.pop(context); // Close Bottom Sheet
+                  _showTeacherDetailsDialog(context, teacher);
+                },
+              ),
+
+              // Change Status Option
+              ListTile(
+                leading: const Icon(Icons.edit, color: Colors.white),
+                title: Text(
+                  'Change Status',
+                  style: getTextStyle("mediumBold", color: Colors.white),
+                ),
+                onTap: () {
+                  Navigator.pop(context); // Close Bottom Sheet
+                  _showStatusChangeDialog(context, teacher);
+                },
+              ),
+
+              // Delete Teacher Option
+              ListTile(
+                leading: const Icon(Icons.delete, color: Colors.white),
+                title: Text(
+                  'Delete Teacher',
+                  style: getTextStyle("mediumBold", color: Colors.white),
+                ),
+                onTap: () {
+                  Navigator.pop(context); // Close Bottom Sheet
+                  _deleteTeacher(teacher);
+                },
+              ),
+            ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Close"),
-            ),
-          ],
         );
       },
     );
@@ -394,9 +413,121 @@ class _AdminTeacherVerificationScreenState
     );
   }
 
+  void _showTeacherDetailsDialog(BuildContext context, Teacher teacher) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12), // Reduced radius
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0), // Added padding for spacing
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min, // Ensures dialog wraps content
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Image.asset(Assets.image('educator_icon_teal.png'),
+                          width: 24, height: 24),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${teacher.firstName} ${teacher.lastName}',
+                        style:
+                            getTextStyle('mediumBold', color: AppColors.teal),
+                      ),
+                    ],
+                  ),
+                  addVerticalSpace(10),
+
+                  // Contact Details
+                  _buildDetailRow(Icons.email, 'Email', teacher.email),
+                  _buildDetailRow(Icons.phone, 'Phone',
+                      '${teacher.phoneCode} ${teacher.mobileNumber}'),
+                  _buildDetailRow(
+                      Icons.public, 'Nationality', teacher.nationality),
+                  _buildDetailRow(
+                      Icons.school, 'Education', teacher.highestEducationLevel),
+                  _buildDetailRow(Icons.work, 'Experience',
+                      '${teacher.teachingExperience} years'),
+                  _buildDetailRow(Icons.calendar_today, 'Availability',
+                      teacher.availabilitySchedule),
+                  _buildDetailRow(
+                      Icons.location_on, 'Travel', teacher.willingnessToTravel),
+
+                  addVerticalSpace(16),
+
+                  // Areas of Expertise
+                  _buildSectionHeader(Icons.book, 'Areas of Expertise'),
+                  buildChips(teacher.areasOfExpertise),
+
+                  addVerticalSpace(10),
+
+                  // Certifications
+                  _buildSectionHeader(Icons.badge, 'Certifications'),
+                  buildChips(teacher.certifications),
+
+                  addVerticalSpace(10),
+
+                  // Teaching Camps
+                  _buildSectionHeader(Icons.cottage, 'Teaching Camps'),
+                  buildChips(teacher.teachingCamps),
+
+                  addVerticalSpace(10),
+
+                  // Close Button
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(
+                        "Close",
+                        style: getTextStyle('small', color: AppColors.teal),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildDetailRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.grey, size: 20),
+          const SizedBox(width: 8),
+          Text('$label: ',
+              style: getTextStyle('smallBold', color: Colors.teal)),
+          Expanded(
+            child:
+                Text(value, style: getTextStyle('small', color: Colors.grey)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(IconData icon, String title) {
+    return Row(
+      children: [
+        Icon(icon, color: AppColors.teal, size: 20),
+        const SizedBox(width: 8),
+        Text(title, style: getTextStyle('smallBold', color: AppColors.teal)),
+      ],
+    );
+  }
+
   void _deleteTeacher(Teacher teacher) {
     setState(() {
-      // // Assuming you have a list `teachers` storing the teacher data
+      // Assuming you have a list `teachers` storing the teacher data
       // teachers.removeWhere((t) => t.id == teacher.id);
     });
 
@@ -411,13 +542,13 @@ class _AdminTeacherVerificationScreenState
         return Padding(
           padding: const EdgeInsets.fromLTRB(0, 4, 8, 4),
           child: Chip(
-            backgroundColor: Colors.white,
+            backgroundColor: AppColors.lightTeal,
             label: Text(
               item,
-              style: getTextStyle('xsmall', color: AppColors.darkTeal),
+              style: getTextStyle('xsmall', color: Colors.white),
             ),
             shape: RoundedRectangleBorder(
-              side: const BorderSide(color: Colors.transparent),
+              side: const BorderSide(color: Colors.white),
               borderRadius: BorderRadius.circular(20),
             ),
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
