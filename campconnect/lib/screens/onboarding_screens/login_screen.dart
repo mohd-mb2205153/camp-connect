@@ -268,6 +268,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         LoginButton(onLoginPressed: () {
                           handleLogin(context);
                         }),
+                        addVerticalSpace(20),
+                        GestureDetector(
+                          onTap: () {
+                            print("Report a problem");
+                          },
+                          child: Text(
+                            "Report a problem",
+                            style: getTextStyle('smallBold',
+                                color: AppColors.lightTeal),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -321,17 +332,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           focusNode: passwordFocusNode,
         ),
         addVerticalSpace(12),
-        Align(
-          alignment: Alignment.centerRight,
-          child: GestureDetector(
-            onTap: () {
-              print("Forgot password tapped"); // temporary solution
-            },
-            child: Text(
-              "Forgot password?",
-              style: getTextStyle('smallBold', color: AppColors.lightTeal),
+        Row(
+          children: [
+            Spacer(),
+            GestureDetector(
+              onTap: () {
+                print("Forgot password tapped"); // temporary solution
+              },
+              child: Text(
+                "Forgot password?",
+                style: getTextStyle('smallBold', color: AppColors.lightTeal),
+              ),
             ),
-          ),
+          ],
         ),
       ],
     );
