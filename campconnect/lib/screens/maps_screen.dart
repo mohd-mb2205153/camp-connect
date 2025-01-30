@@ -1067,7 +1067,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
       ),
       builder: (context) => CampDetailsModal(
-        camp: camp,
+        campId: camp.id!,
         isStudent: isStudent,
         onDirectionsPressed: () {
           setState(() {
@@ -1082,20 +1082,20 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
         loggedUser = ref.read(loggedInUserNotifierProvider);
         savedOrTeachingCamps =
             isTeacher ? loggedUser.teachingCamps : loggedUser.savedCamps;
+        markers.clear();
       });
-      markers = {};
     });
   }
 }
 
 class CampDetailsModal extends ConsumerStatefulWidget {
-  final Camp camp;
+  final String campId;
   final VoidCallback onDirectionsPressed;
   final bool isStudent;
 
   const CampDetailsModal({
     super.key,
-    required this.camp,
+    required this.campId,
     required this.onDirectionsPressed,
     required this.isStudent,
   });
@@ -1105,24 +1105,30 @@ class CampDetailsModal extends ConsumerStatefulWidget {
 }
 
 class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
+  Camp? camp;
   late bool isSaved;
   late bool isTeaching;
 
   @override
   void initState() {
     super.initState();
-    initializeBoolState();
+    initializeStates();
   }
 
-  void initializeBoolState() {
+  void initializeStates() {
+    ref
+        .read(campProviderNotifier.notifier)
+        .getCampById(widget.campId)
+        .then((data) => camp = data)
+        .whenComplete(() => setState(() {}));
     User? user = ref.read(loggedInUserNotifierProvider);
     if (user is Student) {
       isSaved = ref.read(studentProviderNotifier.notifier).isSavedCamp(
-          ref.read(loggedInUserNotifierProvider) as Student, widget.camp.id!);
+          ref.read(loggedInUserNotifierProvider) as Student, widget.campId);
       isTeaching = false;
     } else {
       isTeaching = ref.read(teacherProviderNotifier.notifier).isTeachingCamp(
-          ref.read(loggedInUserNotifierProvider) as Teacher, widget.camp.id!);
+          ref.read(loggedInUserNotifierProvider) as Teacher, widget.campId);
       isSaved = false;
     }
   }
@@ -1140,9 +1146,9 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
 
       try {
         if (isSaved) {
-          loggedInUser.savedCamps.add(widget.camp.id!);
+          loggedInUser.savedCamps.add(widget.campId);
         } else {
-          loggedInUser.savedCamps.remove(widget.camp.id!);
+          loggedInUser.savedCamps.remove(widget.campId);
         }
 
         studentNotifier.updateStudent(loggedInUser);
@@ -1164,14 +1170,14 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
       try {
         if (isTeaching) {
           teacherNotifier.addCampToTeacher(
-              teacherId: loggedInUser.id!, campId: widget.camp.id!);
+              teacherId: loggedInUser.id!, campId: widget.campId);
           campNotifer.addTeacherToCamp(
-              teacherId: loggedInUser.id!, campId: widget.camp.id!);
+              teacherId: loggedInUser.id!, campId: widget.campId);
         } else {
           teacherNotifier.removeTeachingCampFromTeacher(
-              teacherId: loggedInUser.id!, campId: widget.camp.id!);
+              teacherId: loggedInUser.id!, campId: widget.campId);
           campNotifer.removeCampsClass(
-              targetTeacherId: loggedInUser.id!, campId: widget.camp.id!);
+              targetTeacherId: loggedInUser.id!, campId: widget.campId);
         }
       } catch (e) {
         setState(() {
@@ -1201,20 +1207,19 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
             addVerticalSpace(12),
             _buildHeader(context),
             addVerticalSpace(12),
-            _buildOptions(context, widget.camp.id),
+            _buildOptions(context, widget.campId),
             addVerticalSpace(12),
             _buildStatusOfResources(),
             addVerticalSpace(12),
             _buildSectionTitle("Offered Educational Levels"),
-            _buildChips(widget.camp.educationLevel, (_) => Icons.school,
-                AppColors.lightTeal),
+            _buildChips(
+                camp?.educationLevel, (_) => Icons.school, AppColors.lightTeal),
             addVerticalSpace(12),
             _buildSectionTitle("Additional Support"),
-            _buildChips(
-                widget.camp.additionalSupport, getIcon, AppColors.lightTeal),
+            _buildChips(camp?.additionalSupport, getIcon, AppColors.lightTeal),
             addVerticalSpace(12),
             _buildSectionTitle("Languages Spoken"),
-            _buildChips(widget.camp.languages, (_) => Icons.language_rounded,
+            _buildChips(camp?.languages, (_) => Icons.language_rounded,
                 AppColors.orange),
             addVerticalSpace(12),
           ],
@@ -1243,7 +1248,7 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
                   ),
                   addHorizontalSpace(12),
                   Text(
-                    wrapText(widget.camp.name, 22),
+                    wrapText(camp?.name ?? '', 22),
                     style: getTextStyle("largeBold", color: AppColors.teal),
                   ),
                 ],
@@ -1253,7 +1258,7 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
                 children: [
                   SizedBox(
                     child: Text(
-                      wrapText(widget.camp.description, 45),
+                      wrapText(camp?.description ?? '', 45),
                       style: getTextStyle("small", color: Colors.black38),
                     ),
                   ),
@@ -1315,7 +1320,7 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
           print(campId);
           context
               .pushNamed(AppRouter.viewTeachers.name, extra: campId)
-              .then((_) => initializeBoolState());
+              .then((_) => initializeStates());
         },
       },
       {
@@ -1403,7 +1408,7 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
                 children: [
                   Expanded(
                     child: Text(
-                      widget.camp.statusOfResources,
+                      camp?.statusOfResources ?? '',
                       style: getTextStyle("small", color: Colors.white),
                     ),
                   ),
