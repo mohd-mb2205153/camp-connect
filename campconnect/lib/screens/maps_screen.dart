@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:campconnect/models/camp.dart';
 import 'package:campconnect/models/teacher.dart';
@@ -13,6 +14,7 @@ import 'package:campconnect/utils/helper_widgets.dart';
 import 'package:campconnect/widgets/edit_screen_fields.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
@@ -50,6 +52,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
   Set<Marker> markers = {};
   BitmapDescriptor customIcon = BitmapDescriptor.defaultMarker;
   BitmapDescriptor liveLocationIcon = BitmapDescriptor.defaultMarker;
+  BitmapDescriptor customIconMarked = BitmapDescriptor.defaultMarker;
 
   late StreamSubscription<Position> _positionStreamSubscription;
   bool _followUserLocation = true;
@@ -57,6 +60,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
   late LatLng currentLocation;
   late LatLng destinationCampLocation;
   List<LatLng> polyLineCordinates = [];
+  List<String> savedOrTeachingCamps = [];
 
   @override
   void initState() {
@@ -92,8 +96,10 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
 
       if (isStudent) {
         loggedUser = userNotifier.student;
+        savedOrTeachingCamps = loggedUser.savedCamps;
       } else if (isTeacher) {
         loggedUser = userNotifier.teacher;
+        savedOrTeachingCamps = loggedUser.teachingCamps;
       }
 
       ref.read(showNavBarNotifierProvider.notifier).showBottomNavBar(true);
@@ -168,6 +174,11 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
       customIcon = icon;
     });
 
+    _loadCustomIcon("assets/images/tent_icon_marked.png", const Size(48, 48),
+        (icon) {
+      customIconMarked = icon;
+    });
+
     _loadCustomIcon(
         "assets/images/current_location_icon.png", const Size(32, 32), (icon) {
       liveLocationIcon = icon;
@@ -232,24 +243,38 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
       );
     }
 
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: _buildAppBar(camp: selectedCamp),
-      body: Stack(
-        children: [
-          _buildGoogleMap(),
-          _buildHeader(context),
-          AnimatedOpacity(
-            opacity: polyLineCordinates.isNotEmpty ? 1.0 : 0.0,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-            child: polyLineCordinates.isNotEmpty
-                ? Stack(children: [_routeCancelButton(context)])
-                : const SizedBox.shrink(),
-          ),
-        ],
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (!didPop) {
+          //Temporary solution to remove screens from navigation stack
+          if (Platform.isAndroid) {
+            SystemNavigator.pop();
+          } else if (Platform.isIOS) {
+            exit(0);
+          }
+        }
+        return;
+      },
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
+        appBar: _buildAppBar(camp: selectedCamp),
+        body: Stack(
+          children: [
+            _buildGoogleMap(),
+            _buildHeader(context),
+            AnimatedOpacity(
+              opacity: polyLineCordinates.isNotEmpty ? 1.0 : 0.0,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              child: polyLineCordinates.isNotEmpty
+                  ? Stack(children: [_routeCancelButton(context)])
+                  : const SizedBox.shrink(),
+            ),
+          ],
+        ),
+        floatingActionButton: _buildFloatingActionButtons(context),
       ),
-      floatingActionButton: _buildFloatingActionButtons(context),
     );
   }
 
@@ -1038,7 +1063,9 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
           title: camp.name,
           snippet: camp.description,
         ),
-        icon: customIcon,
+        icon: savedOrTeachingCamps.contains(camp.id!)
+            ? customIconMarked
+            : customIcon,
         onTap: () {
           polyLineCordinates.isEmpty
               ? _showCampDetailsModal(context, camp)
@@ -1065,7 +1092,9 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
           getPolyPoints();
         },
       ),
-    );
+    ).whenComplete(() {
+      context.pushNamed(AppRouter.map.name);
+    });
   }
 }
 
