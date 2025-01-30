@@ -2,6 +2,7 @@ import 'package:campconnect/models/user.dart';
 import 'package:campconnect/screens/add_screens/add_camp_location_screen.dart';
 import 'package:campconnect/screens/add_screens/add_camp_screen.dart';
 import 'package:campconnect/screens/admin_screens/admin_dashboard_screen.dart';
+import 'package:campconnect/screens/admin_shell_screen.dart';
 import 'package:campconnect/screens/home_screen.dart';
 import 'package:campconnect/screens/onboarding_screens/educator_onboarding_screen.dart';
 import 'package:campconnect/screens/onboarding_screens/login_screen.dart';
@@ -43,9 +44,10 @@ class AppRouter {
   static const profile = (name: 'profile', path: '/profile');
   static const notifications = (name: 'notifications', path: '/notifications');
 
-  // Admin Screen Routes
+  // Admin Routes
+  static const adminShell = (name: 'adminShell', path: '/admin');
   static const adminDashboard =
-      (name: 'adminDashboard', path: '/adminDashboard');
+      (name: 'adminDashboard', path: '/admin/dashboard');
 
   // Viewing Routes
   static const viewSavedCamps =
@@ -127,6 +129,19 @@ class AppRouter {
         path: adminDashboard.path,
         name: adminDashboard.name,
         builder: (context, state) => const AdminDashboardScreen(),
+      ),
+
+      // Admin Screens with ShellRoute
+      ShellRoute(
+        builder: (context, state, child) =>
+            AdminShellScreen(state: state, child: child),
+        routes: [
+          GoRoute(
+            path: adminDashboard.path,
+            name: adminDashboard.name,
+            builder: (context, state) => const AdminDashboardScreen(),
+          ),
+        ],
       ),
 
       // Main Screens with ShellRoute
