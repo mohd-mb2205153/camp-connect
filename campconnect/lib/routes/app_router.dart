@@ -99,7 +99,7 @@ class AppRouter {
   static Future<GoRouter> _initializeRouter() async {
     String initialRoute = await _getInitialRoute();
     return GoRouter(
-      initialLocation: initialRoute,
+      initialLocation: onboarding.path,
       routes: [
         // Onboarding Routes
         GoRoute(
