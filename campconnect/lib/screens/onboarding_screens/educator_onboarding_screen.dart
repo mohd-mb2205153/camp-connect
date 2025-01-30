@@ -161,17 +161,16 @@ class _EducatorOnboardingScreenState
 
       await repo.addTeacher(updatedTeacher);
 
-      ref
-          .read(loggedInUserNotifierProvider.notifier)
-          .setTeacher(updatedTeacher);
-
       showCustomSnackBar(
-          message: "You have registered successfully!",
-          icon: Icons.check_circle,
-          context: context);
+        message:
+            "Your registration is pending verification. We will notify you once your application has been reviewed.",
+        icon: Icons.info,
+        context: context,
+        backgroundColor: AppColors.orange,
+      );
 
-      ref.read(showNavBarNotifierProvider.notifier).setActiveBottomNavBar(0);
-      context.goNamed(AppRouter.home.name);
+      // Redirect to onboarding instead of home
+      context.goNamed(AppRouter.onboarding.name);
     } catch (error) {
       showCustomSnackBar(
           message: "There has been an error with your registration.",

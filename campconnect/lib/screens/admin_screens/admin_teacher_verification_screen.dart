@@ -51,7 +51,7 @@ class _AdminTeacherVerificationScreenState
       ),
       body: Stack(
         children: [
-          buildBackground("bg10"), // Same background as ViewTeachersScreen
+          buildBackground("bg10"),
           Column(
             children: [
               _buildTabBar(),
@@ -83,11 +83,10 @@ class _AdminTeacherVerificationScreenState
               indicatorSize: TabBarIndicatorSize.label,
               controller: _tabController,
               indicator: BoxDecoration(
-                color: Colors.white, // Selected tab background
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(25),
               ),
-              onTap: (index) =>
-                  setState(() {}), // Update the UI when a tab is tapped
+              onTap: (index) => setState(() {}),
               tabs: [
                 _buildTabItem('Pending', 0),
                 _buildTabItem('Rejected', 1),
@@ -211,20 +210,19 @@ class _AdminTeacherVerificationScreenState
 
   Widget _buildTeacherCard(Teacher teacher) {
     return Padding(
-      padding: const EdgeInsets.only(top: 6.0), // Reduce top padding
+      padding: const EdgeInsets.only(top: 6.0),
       child: Card(
         color: AppColors.darkTeal,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(20.0), // Reduce padding inside card
+          padding: const EdgeInsets.all(20.0),
           child: Stack(
             children: [
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // Status Indicator Circle
                   Container(
                     height: 8,
                     width: 8,
@@ -234,17 +232,15 @@ class _AdminTeacherVerificationScreenState
                     ),
                   ),
                   addHorizontalSpace(20),
-
-                  // Teacher Info
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min, // Ensures column shrinks
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Row(
                           children: [
                             Container(
-                              width: 35, // Reduce profile icon size
+                              width: 35,
                               height: 35,
                               decoration: const BoxDecoration(
                                 color: AppColors.lightTeal,
@@ -253,10 +249,10 @@ class _AdminTeacherVerificationScreenState
                               child: const Icon(
                                 Icons.person_2_rounded,
                                 color: Colors.white,
-                                size: 20, // Reduce icon size
+                                size: 20,
                               ),
                             ),
-                            const SizedBox(width: 15), // Reduce spacing
+                            const SizedBox(width: 15),
                             Expanded(
                               child: Text(
                                 '${teacher.firstName} ${teacher.lastName}',
@@ -266,12 +262,12 @@ class _AdminTeacherVerificationScreenState
                             ),
                           ],
                         ),
-                        addVerticalSpace(6), // Reduce spacing
+                        addVerticalSpace(6),
                         Text(
                           'Contact: ${teacher.phoneCode} ${teacher.mobileNumber}',
                           style: getTextStyle('small', color: Colors.white),
                         ),
-                        addVerticalSpace(4), // Reduce spacing
+                        addVerticalSpace(4),
                         Text(
                           'Email: ${teacher.email}',
                           style: getTextStyle('small', color: Colors.white),
@@ -281,8 +277,6 @@ class _AdminTeacherVerificationScreenState
                   ),
                 ],
               ),
-
-              // More Button (Positioned on Top Right)
               Positioned(
                 top: 6,
                 right: 8,
@@ -303,7 +297,6 @@ class _AdminTeacherVerificationScreenState
     );
   }
 
-  /// Action Button with White Icons (Smaller and Tighter)
   Widget _buildActionButton({
     required IconData icon,
     required Color color,
@@ -325,12 +318,11 @@ class _AdminTeacherVerificationScreenState
       context: context,
       builder: (context) {
         return Container(
-          height: 200, // Increased height to accommodate View option
+          height: 200,
           padding: const EdgeInsets.all(16.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // View Details Option
               ListTile(
                 leading: const Icon(Icons.visibility, color: Colors.white),
                 title: Text(
@@ -342,8 +334,6 @@ class _AdminTeacherVerificationScreenState
                   _showTeacherDetailsDialog(context, teacher);
                 },
               ),
-
-              // Change Status Option
               ListTile(
                 leading: const Icon(Icons.edit, color: Colors.white),
                 title: Text(
@@ -351,12 +341,10 @@ class _AdminTeacherVerificationScreenState
                   style: getTextStyle("mediumBold", color: Colors.white),
                 ),
                 onTap: () {
-                  Navigator.pop(context); // Close Bottom Sheet
+                  Navigator.pop(context);
                   _showStatusChangeDialog(context, teacher);
                 },
               ),
-
-              // Delete Teacher Option
               ListTile(
                 leading: const Icon(Icons.delete, color: Colors.white),
                 title: Text(
@@ -364,7 +352,7 @@ class _AdminTeacherVerificationScreenState
                   style: getTextStyle("mediumBold", color: Colors.white),
                 ),
                 onTap: () {
-                  Navigator.pop(context); // Close Bottom Sheet
+                  Navigator.pop(context);
                   _deleteTeacher(teacher);
                 },
               ),
@@ -459,7 +447,6 @@ class _AdminTeacherVerificationScreenState
                     });
                     Navigator.of(context).pop();
 
-                    // Show SnackBar notification
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
@@ -486,13 +473,13 @@ class _AdminTeacherVerificationScreenState
       builder: (BuildContext context) {
         return Dialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12), // Reduced radius
+            borderRadius: BorderRadius.circular(12),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(16.0), // Added padding for spacing
+            padding: const EdgeInsets.all(16.0),
             child: SingleChildScrollView(
               child: Column(
-                mainAxisSize: MainAxisSize.min, // Ensures dialog wraps content
+                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
@@ -508,8 +495,6 @@ class _AdminTeacherVerificationScreenState
                     ],
                   ),
                   addVerticalSpace(10),
-
-                  // Contact Details
                   _buildDetailRow(Icons.email, 'Email', teacher.email),
                   _buildDetailRow(Icons.phone, 'Phone',
                       '${teacher.phoneCode} ${teacher.mobileNumber}'),
@@ -523,28 +508,16 @@ class _AdminTeacherVerificationScreenState
                       teacher.availabilitySchedule),
                   _buildDetailRow(
                       Icons.location_on, 'Travel', teacher.willingnessToTravel),
-
                   addVerticalSpace(16),
-
-                  // Areas of Expertise
                   _buildSectionHeader(Icons.book, 'Areas of Expertise'),
                   buildChips(teacher.areasOfExpertise),
-
                   addVerticalSpace(10),
-
-                  // Certifications
                   _buildSectionHeader(Icons.badge, 'Certifications'),
                   buildChips(teacher.certifications),
-
                   addVerticalSpace(10),
-
-                  // Teaching Camps
                   _buildSectionHeader(Icons.cottage, 'Teaching Camps'),
                   buildChips(teacher.teachingCamps),
-
                   addVerticalSpace(10),
-
-                  // Close Button
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
@@ -606,7 +579,6 @@ class _AdminTeacherVerificationScreenState
     //   teachers.remove(teacher);
     // });
 
-    // Show deletion confirmation
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('${teacher.firstName} has been removed')),
     );
