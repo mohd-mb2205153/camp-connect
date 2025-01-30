@@ -68,7 +68,6 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
     _loadCustomIcons();
     _startLiveLocationUpdates();
     initializeUserDetails();
-    // ref.read(campProviderNotifier.notifier).initializeCamps();
 
     Timer.periodic(const Duration(seconds: 8), (timer) {
       if (mounted) {
@@ -247,12 +246,10 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
         if (!didPop) {
-          //Temporary solution to remove screens from navigation stack
-          if (Platform.isAndroid) {
-            SystemNavigator.pop();
-          } else if (Platform.isIOS) {
-            exit(0);
-          }
+          context.goNamed(AppRouter.home.name);
+          ref
+              .read(showNavBarNotifierProvider.notifier)
+              .setActiveBottomNavBar(0);
         }
         return;
       },
