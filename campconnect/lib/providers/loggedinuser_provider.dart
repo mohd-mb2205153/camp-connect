@@ -1,3 +1,4 @@
+import 'package:campconnect/models/admin.dart';
 import 'package:campconnect/providers/show_nav_bar_provider.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +22,10 @@ class LoggedInUserNotifier extends Notifier<User?> {
     state = teacher;
   }
 
+  void setAdmin(Admin admin) {
+    state = admin;
+  }
+
   void clearUser() {
     state = null;
   }
@@ -29,9 +34,13 @@ class LoggedInUserNotifier extends Notifier<User?> {
 
   bool get isTeacher => state is Teacher;
 
+  bool get isAdmin => state is Admin;
+
   Student? get student => state is Student ? state as Student : null;
 
   Teacher? get teacher => state is Teacher ? state as Teacher : null;
+
+  Admin? get admin => state is Admin ? state as Admin : null;
 
   bool get isLoggedIn => state != null;
 

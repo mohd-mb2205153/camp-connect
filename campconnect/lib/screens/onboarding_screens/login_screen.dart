@@ -1,3 +1,4 @@
+import 'package:campconnect/models/admin.dart';
 import 'package:campconnect/models/student.dart';
 import 'package:campconnect/models/teacher.dart';
 import 'package:campconnect/providers/loggedinuser_provider.dart';
@@ -106,6 +107,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ref.read(loggedInUserNotifierProvider.notifier).setTeacher(teacher);
         ref.read(showNavBarNotifierProvider.notifier).setActiveBottomNavBar(0);
         context.replaceNamed(AppRouter.home.name);
+        return;
+      }
+
+      final adminDoc = await FirebaseFirestore.instance
+          .collection('admin')
+          .where('email', isEqualTo: email)
+          .get();
+
+      debugPrint(adminDoc.docs.first.data().toString());
+
+      if (adminDoc.docs.isNotEmpty) {
+        final admin = Admin.fromJson(adminDoc.docs.first.data());
+        ref.read(loggedInUserNotifierProvider.notifier).setAdmin(admin);
+        ref.read(showNavBarNotifierProvider.notifier).setActiveBottomNavBar(0);
+        context.replaceNamed(AppRouter.adminDashboard.name);
         return;
       }
 

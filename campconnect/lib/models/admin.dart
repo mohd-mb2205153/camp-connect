@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:campconnect/models/user.dart';
 
 class Admin extends User {
@@ -17,7 +18,9 @@ class Admin extends User {
     return {
       'firstName': firstName,
       'lastName': lastName,
-      'dateOfBirth': dateOfBirth.toIso8601String(),
+      'dateOfBirth': dateOfBirth is Timestamp
+          ? (dateOfBirth as Timestamp).toDate().toIso8601String()
+          : dateOfBirth.toIso8601String(),
       'nationality': nationality,
       'primaryLanguages': primaryLanguages,
       'phoneCode': phoneCode,
@@ -31,7 +34,9 @@ class Admin extends User {
     return Admin(
       firstName: json['firstName'],
       lastName: json['lastName'],
-      dateOfBirth: DateTime.parse(json['dateOfBirth']),
+      dateOfBirth: json['dateOfBirth'] is Timestamp
+          ? (json['dateOfBirth'] as Timestamp).toDate()
+          : DateTime.parse(json['dateOfBirth']),
       nationality: json['nationality'],
       primaryLanguages: List<String>.from(json['primaryLanguages']),
       phoneCode: json['phoneCode'],
