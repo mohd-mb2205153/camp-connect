@@ -71,12 +71,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> getJwtToken() async {
-    String? token = await FirebaseAuth.instance.currentUser?.getIdToken(); // Firebase JWT token
+    String? token = await FirebaseAuth.instance.currentUser
+        ?.getIdToken(); // Firebase JWT token
     print("This is the user token: $token");
     if (token != null) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('jwt_token', token); // Store token
-    } 
+    }
   }
 
   void handleLogin(BuildContext context) async {
@@ -85,15 +86,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     if (email.isEmpty || password.isEmpty) {
       showCustomSnackBar(
-          message: "Please fill in all fields",
-          icon: Icons.error,
-          context: context);
+        message: "Please fill in all fields",
+        icon: Icons.error,
+        context: context,
+      );
       return;
     }
 
     try {
       await _authService.signin(email: email, password: password);
 
+      // check if the user is a student
       final studentDoc = await FirebaseFirestore.instance
           .collection('students')
           .where('email', isEqualTo: email)
@@ -103,8 +106,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         final student = Student.fromJson(studentDoc.docs.first.data());
         ref.read(loggedInUserNotifierProvider.notifier).setStudent(student);
         ref.read(showNavBarNotifierProvider.notifier).setActiveBottomNavBar(0);
-
-        // await getJwtToken(); 
         context.replaceNamed(AppRouter.home.name);
         return;
       }
@@ -116,18 +117,43 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
       if (teacherDoc.docs.isNotEmpty) {
         final teacher = Teacher.fromJson(teacherDoc.docs.first.data());
+
+        // handle pending teachers
+        if (teacher.verificationStatus == 'pending') {
+          showCustomSnackBar(
+            message:
+                "Your account is pending verification. Please wait for approval.",
+            icon: Icons.info,
+            backgroundColor: AppColors.orange,
+            context: context,
+          );
+          return;
+        }
+
+        // handle rejected teachers
+        if (teacher.verificationStatus == 'rejected') {
+          showCustomSnackBar(
+            message:
+                "Your registration was rejected. Click 'Report Issue' to dispute.",
+            icon: Icons.warning,
+            backgroundColor: Colors.red,
+            context: context,
+          );
+          return;
+        }
+
+        // only approved teachers to log in
         ref.read(loggedInUserNotifierProvider.notifier).setTeacher(teacher);
         ref.read(showNavBarNotifierProvider.notifier).setActiveBottomNavBar(0);
         context.replaceNamed(AppRouter.home.name);
         return;
       }
 
+      // check if the user is an admin
       final adminDoc = await FirebaseFirestore.instance
           .collection('admin')
           .where('email', isEqualTo: email)
           .get();
-
-      debugPrint(adminDoc.docs.first.data().toString());
 
       if (adminDoc.docs.isNotEmpty) {
         final admin = Admin.fromJson(adminDoc.docs.first.data());
@@ -137,55 +163,57 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         return;
       }
 
-      throw Exception("User not found in students or teachers collections");
+      throw Exception(
+          "User not found in students, teachers, or admin collections.");
     } on FirebaseAuthException catch (e) {
-      // Handle specific Firebase authentication error codes
-      if (e.code == 'user-not-found') {
-        debugPrint("FirebaseAuthException: user-not-found");
-
-        showCustomSnackBar(
-            message: "No account found for this email.",
-            icon: Icons.error,
-            context: context);
-      } else if (e.code == 'wrong-password') {
-        debugPrint("FirebaseAuthException: wrong-password");
-
-        showCustomSnackBar(
-            message: "Incorrect password. Please try again.",
-            icon: Icons.error,
-            context: context);
-      } else if (e.code == 'invalid-email') {
-        debugPrint("FirebaseAuthException: invalid-email");
-
-        showCustomSnackBar(
-            message: "Invalid email address.",
-            icon: Icons.error,
-            context: context);
-      } else {
-        debugPrint("FirebaseAuthException: ${e.code}, message: ${e.message}");
-
-        showCustomSnackBar(
-            message: "Authentication error: ${e.message ?? 'Unknown error.'}",
-            icon: Icons.error,
-            context: context);
-      }
+      handleFirebaseAuthErrors(e, context);
     } on FirebaseException catch (e) {
-      debugPrint("FirebaseException: ${e.message}");
-
       showCustomSnackBar(
-          message: "Database error: ${e.message ?? 'Unknown error occurred'}",
-          icon: Icons.error,
-          context: context);
+        message: "Database error: ${e.message ?? 'Unknown error occurred'}",
+        icon: Icons.error,
+        context: context,
+      );
     } catch (e) {
-      debugPrint("General error: $e");
-
       showCustomSnackBar(
-          message: "Something went wrong. Please try again later.",
-          icon: Icons.error,
-          context: context);
+        message: "Something went wrong. Please try again later.",
+        icon: Icons.error,
+        context: context,
+      );
     }
   }
 
+  void handleFirebaseAuthErrors(FirebaseAuthException e, BuildContext context) {
+    String errorMessage;
+
+    switch (e.code) {
+      case 'user-not-found':
+        errorMessage = "No account found for this email.";
+        break;
+      case 'wrong-password':
+        errorMessage = "Incorrect password. Please try again.";
+        break;
+      case 'invalid-email':
+        errorMessage = "Invalid email address.";
+        break;
+      case 'user-disabled':
+        errorMessage =
+            "This account has been disabled. Please contact support.";
+        break;
+      case 'too-many-requests':
+        errorMessage = "Too many failed attempts. Please try again later.";
+        break;
+      default:
+        errorMessage = "Authentication error: ${e.message ?? 'Unknown error.'}";
+    }
+
+    debugPrint("FirebaseAuthException: ${e.code}, message: ${e.message}");
+
+    showCustomSnackBar(
+      message: errorMessage,
+      icon: Icons.error,
+      context: context,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
