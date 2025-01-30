@@ -42,6 +42,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
   List<String> filteredLanguages = [];
   List<String> filteredSubjects = [];
   List<String> filteredAdditional = [];
+  
   String? selectedFilterType;
   TextEditingController areaRadiusController = TextEditingController();
 
@@ -68,6 +69,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
     _loadCustomIcons();
     _startLiveLocationUpdates();
     initializeUserDetails();
+    ref.read(campProviderNotifier.notifier).initializeCamps();
 
     Timer.periodic(const Duration(seconds: 8), (timer) {
       if (mounted) {
@@ -411,7 +413,46 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
                         color: AppColors.teal,
                         height: 20,
                       ),
-                      _buildFilterRadios(setModalState),
+                      Wrap(
+                        children: [
+                          Row(
+                            children: [
+                              _buildFilterRadio(
+                                  setModalState: setModalState,
+                                  title: 'Educational Level'),
+                              _buildFilterRadio(
+                                  setModalState: setModalState,
+                                  title: 'Languages'),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              _buildFilterRadio(
+                                  setModalState: setModalState,
+                                  title: 'Subjects'),
+                              _buildFilterRadio(
+                                  setModalState: setModalState,
+                                  title: 'Area Radius'),
+                            ],
+                          ),
+                          Expanded(
+                            child: RadioListTile(
+                              title: Text(
+                                'Additional Support',
+                                style: getTextStyle('small',
+                                    color: AppColors.teal),
+                              ),
+                              value: 'Additional Support',
+                              groupValue: selectedFilterType,
+                              onChanged: (value) {
+                                setModalState(() {
+                                  selectedFilterType = value!;
+                                });
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
                       Divider(
                         color: AppColors.teal,
                         height: 20,
@@ -502,15 +543,9 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
                                           radius,
                                         );
 
-                                    markers.clear();
-                                    // Rebuilding the map
-                                    ref.watch(campProviderNotifier).when(
-                                          data: (data) =>
-                                              _buildMapScreen(context, data),
-                                          error: (err, stack) =>
-                                              _buildErrorScreen(err),
-                                          loading: () => _buildLoadingScreen(),
-                                        );
+                                    setState(() {
+                                      markers.clear();
+                                    });
 
                                     // Pan the camera to users location
                                     if (_googleMapController != null) {
@@ -563,93 +598,22 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
     );
   }
 
-  Widget _buildFilterRadios(StateSetter setModalState) {
-    return Wrap(
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: RadioListTile(
-                title: Text(
-                  'Educational Level',
-                  style: getTextStyle('small', color: AppColors.teal),
-                ),
-                value: 'Educational Level',
-                groupValue: selectedFilterType,
-                onChanged: (value) {
-                  setModalState(() {
-                    selectedFilterType = value!;
-                  });
-                },
-              ),
-            ),
-            Expanded(
-              child: RadioListTile(
-                title: Text(
-                  'Languages',
-                  style: getTextStyle('small', color: AppColors.teal),
-                ),
-                value: 'Languages',
-                groupValue: selectedFilterType,
-                onChanged: (value) {
-                  setModalState(() {
-                    selectedFilterType = value!;
-                  });
-                },
-              ),
-            ),
-          ],
+  Widget _buildFilterRadio(
+      {required StateSetter setModalState, required String title}) {
+    return Expanded(
+      child: RadioListTile(
+        title: Text(
+          title,
+          style: getTextStyle('small', color: AppColors.teal),
         ),
-        Row(
-          children: [
-            Expanded(
-              child: RadioListTile(
-                title: Text(
-                  'Subjects',
-                  style: getTextStyle('small', color: AppColors.teal),
-                ),
-                value: 'Subjects',
-                groupValue: selectedFilterType,
-                onChanged: (value) {
-                  setModalState(() {
-                    selectedFilterType = value!;
-                  });
-                },
-              ),
-            ),
-            Expanded(
-              child: RadioListTile(
-                title: Text(
-                  'Area Radius',
-                  style: getTextStyle('small', color: AppColors.teal),
-                ),
-                value: 'Area Radius',
-                groupValue: selectedFilterType,
-                onChanged: (value) {
-                  setModalState(() {
-                    selectedFilterType = value!;
-                  });
-                },
-              ),
-            ),
-          ],
-        ),
-        Expanded(
-          child: RadioListTile(
-            title: Text(
-              'Additional Support',
-              style: getTextStyle('small', color: AppColors.teal),
-            ),
-            value: 'Additional Support',
-            groupValue: selectedFilterType,
-            onChanged: (value) {
-              setModalState(() {
-                selectedFilterType = value!;
-              });
-            },
-          ),
-        ),
-      ],
+        value: title,
+        groupValue: selectedFilterType,
+        onChanged: (value) {
+          setModalState(() {
+            selectedFilterType = value!;
+          });
+        },
+      ),
     );
   }
 
@@ -681,69 +645,55 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
                     color: Colors.grey,
                   ),
                   onPressed: () {
-                    ref.watch(provider).when(
-                          data: (list) {
-                            setState(() {
-                              showModalBottomSheet(
-                                context: context,
-                                shape: const RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.vertical(
-                                    top: Radius.circular(12),
-                                  ),
-                                ),
-                                builder: (_) {
-                                  return ListView.builder(
-                                    itemCount: list.length,
-                                    itemBuilder: (_, index) {
-                                      return ListTile(
-                                        title: Text(
-                                          list[index],
-                                          style: getTextStyle("small"),
-                                        ),
-                                        onTap: () {
-                                          setModalState(() {
-                                            if (!filteredList
-                                                .contains(list[index])) {
-                                              filteredList.add(list[index]);
-                                            }
+                    ref.watch(provider).whenData(
+                      (list) {
+                        setState(() {
+                          showModalBottomSheet(
+                            context: context,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(
+                                top: Radius.circular(12),
+                              ),
+                            ),
+                            builder: (_) {
+                              return ListView.builder(
+                                itemCount: list.length,
+                                itemBuilder: (_, index) {
+                                  return ListTile(
+                                    title: Text(
+                                      list[index],
+                                      style: getTextStyle("small"),
+                                    ),
+                                    onTap: () {
+                                      setModalState(() {
+                                        if (!filteredList
+                                            .contains(list[index])) {
+                                          filteredList.add(list[index]);
+                                        }
 
-                                            if (title ==
-                                                'Filter Educational Level') {
-                                              setModalState(() {
-                                                ref
-                                                    .read(campProviderNotifier
-                                                        .notifier)
-                                                    .filterByEducationLevel(
-                                                        filteredList);
-                                                markers
-                                                    .clear(); // Clear existing markers
-                                                ref
-                                                    .watch(campProviderNotifier)
-                                                    .when(
-                                                      data: (data) =>
-                                                          _buildMapScreen(
-                                                              context, data),
-                                                      error: (err, stack) =>
-                                                          _buildErrorScreen(
-                                                              err),
-                                                      loading: () =>
-                                                          _buildLoadingScreen(),
-                                                    );
-                                              });
-                                            }
+                                        if (title ==
+                                            'Filter Educational Level') {
+                                          ref
+                                              .read(
+                                                  campProviderNotifier.notifier)
+                                              .filterByEducationLevel(
+                                                  filteredList);
+                                          setState(() {
+                                            markers
+                                                .clear(); // Clear existing markers
                                           });
-                                          Navigator.pop(context);
-                                        },
-                                      );
+                                        }
+                                      });
+                                      Navigator.pop(context);
                                     },
                                   );
                                 },
                               );
-                            });
-                          },
-                          loading: () => const CircularProgressIndicator(),
-                          error: (err, stack) => Text('Error: $err'),
-                        );
+                            },
+                          );
+                        });
+                      },
+                    );
                   },
                 ),
               ],
@@ -816,12 +766,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
       filteredLanguages = [];
       filteredSubjects = [];
       areaRadiusController.text = '';
-      markers.clear(); // Clear markers
-      ref.watch(campProviderNotifier).when(
-            data: (data) => _buildMapScreen(context, data),
-            error: (err, stack) => _buildErrorScreen(err),
-            loading: () => _buildLoadingScreen(),
-          );
+      markers.clear();
     });
   }
 
