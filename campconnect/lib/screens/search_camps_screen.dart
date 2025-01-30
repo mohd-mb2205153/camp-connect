@@ -1,7 +1,9 @@
+import 'package:campconnect/providers/show_nav_bar_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:campconnect/theme/constants.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
+import 'package:go_router/go_router.dart';
 
 class SearchCampsScreen extends ConsumerStatefulWidget {
   const SearchCampsScreen({super.key});
@@ -58,6 +60,7 @@ class _SearchCampsScreenState extends ConsumerState<SearchCampsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         scrolledUnderElevation: 0.0,
         backgroundColor: AppColors.darkTeal,
@@ -65,7 +68,10 @@ class _SearchCampsScreenState extends ConsumerState<SearchCampsScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            Navigator.of(context).pop();
+            ref
+                .read(showNavBarNotifierProvider.notifier)
+                .showBottomNavBar(true);
+            context.pop();
           },
         ),
         title: Text(
@@ -73,80 +79,125 @@ class _SearchCampsScreenState extends ConsumerState<SearchCampsScreen> {
           style: getTextStyle("mediumBold", color: Colors.white),
         ),
       ),
-      body: Column(
+      body: Stack(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _searchController,
-              onChanged: _filterCamps,
-              decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.search),
-                hintText: "Search camps...",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                filled: true,
-                fillColor: Colors.white,
-              ),
-            ),
-          ),
-          Expanded(
-            child: _filteredCamps.isEmpty
-                ? const Center(child: Text("No camps found"))
-                : ListView.builder(
-                    itemCount: _filteredCamps.length,
-                    itemBuilder: (context, index) {
-                      final camp = _filteredCamps[index];
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8.0, vertical: 4.0),
-                        child: Card(
-                          color: AppColors.darkTeal,
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  width: 50,
-                                  height: 50,
-                                  decoration: BoxDecoration(
-                                    color: AppColors.lightTeal,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Image.asset(
-                                    'assets/images/tent_icon_white.png',
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        camp.name,
-                                        style: getTextStyle('mediumBold',
-                                            color: Colors.white),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        camp.description,
-                                        style: getTextStyle('small',
-                                            color: Colors.white70),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    },
+          // Background
+          buildBackground(
+              "bg9"), // Assuming you have a method like this in your code
+
+          // Content
+          Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 130, 12, 0),
+                child: TextField(
+                  controller: _searchController,
+                  onChanged: _filterCamps,
+                  style: getTextStyle("small", color: AppColors.teal),
+                  decoration: InputDecoration(
+                    prefixIcon: const Icon(
+                      Icons.search,
+                      color: Colors.grey,
+                    ),
+                    hintText: "Search camps here",
+                    hintStyle: getTextStyle("small", color: Colors.grey),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Colors.grey),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide:
+                          BorderSide(color: AppColors.lightTeal, width: 2),
+                    ),
+                    filled: true,
+                    fillColor: const Color.fromARGB(255, 222, 222, 222),
+                    contentPadding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 16),
+                    suffixIcon: _searchController.text.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear, color: Colors.grey),
+                            onPressed: () {
+                              _searchController.clear();
+                              _filterCamps("");
+                            },
+                          )
+                        : null,
                   ),
+                ),
+              ),
+              Expanded(
+                child: _filteredCamps.isEmpty
+                    ? const Center(child: Text("No camps found"))
+                    : ListView.builder(
+                        itemCount: _filteredCamps.length,
+                        itemBuilder: (context, index) {
+                          final camp = _filteredCamps[index];
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8.0, vertical: 4.0),
+                            child: Card(
+                              color: AppColors.darkTeal,
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      width: 50,
+                                      height: 50,
+                                      decoration: BoxDecoration(
+                                        color: AppColors.lightTeal,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Image.asset(
+                                        'assets/images/tent_icon_white.png',
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            camp.name,
+                                            style: getTextStyle('mediumBold',
+                                                color: Colors.white),
+                                          ),
+                                          const SizedBox(height: 8),
+                                          Text(
+                                            camp.description,
+                                            style: getTextStyle('small',
+                                                color: Colors.white70),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 50,
+                                      child: IconButton(
+                                        icon: const Icon(Icons.remove_red_eye,
+                                            color: Colors.white),
+                                        onPressed: () {
+                                          //add logic to go to maps and pass campId for focusing
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+              ),
+            ],
           ),
         ],
       ),

@@ -317,6 +317,9 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
             children: [
               _buildCircleIconButton(Icons.search, () {
                 context.goNamed(AppRouter.searchCamps.name);
+                ref
+                    .read(showNavBarNotifierProvider.notifier)
+                    .showBottomNavBar(false);
               }),
               const Spacer(),
               _buildFilterButton(context),
@@ -827,7 +830,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
     } else {
       // displayText =
       //     "Last Updated: ${getTimeDifferenceString(lastUpdatedTime!)}";
-      displayText = "Last Updated: 3 hours ago";
+      displayText = "Last Updated: THIS IS A PLACEHOLDER";
     }
 
     return Text(
@@ -1167,11 +1170,17 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
             addVerticalSpace(12),
             _buildStatusOfResources(),
             addVerticalSpace(12),
+            _buildSectionTitle("Offered Educational Levels"),
+            _buildChips(widget.camp.educationLevel, (_) => Icons.school,
+                AppColors.lightTeal),
+            addVerticalSpace(12),
             _buildSectionTitle("Additional Support"),
-            _buildChips(widget.camp.additionalSupport, getIcon),
+            _buildChips(
+                widget.camp.additionalSupport, getIcon, AppColors.lightTeal),
             addVerticalSpace(12),
             _buildSectionTitle("Languages Spoken"),
-            _buildChips(widget.camp.languages, (_) => Icons.language_rounded),
+            _buildChips(widget.camp.languages, (_) => Icons.language_rounded,
+                AppColors.orange),
             addVerticalSpace(12),
           ],
         ),
@@ -1383,8 +1392,8 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
     );
   }
 
-  Widget _buildChips(
-      List<String>? items, IconData Function(String) iconResolver) {
+  Widget _buildChips(List<String>? items,
+      IconData Function(String) iconResolver, Color? color) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: SizedBox(
@@ -1394,7 +1403,7 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8),
               child: Chip(
-                backgroundColor: AppColors.lightTeal,
+                backgroundColor: color ?? AppColors.lightTeal,
                 avatar: Icon(iconResolver(item), color: Colors.white),
                 label: Text(
                   item,
