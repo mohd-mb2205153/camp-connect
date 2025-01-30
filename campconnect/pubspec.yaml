@@ -55,6 +55,7 @@ dependencies:
   location: ^7.0.1
   connectivity_plus: ^6.1.2
   flutter_polyline_points: ^2.1.0
+  shared_preferences: ^2.5.1
 
 dev_dependencies:
   flutter_test:

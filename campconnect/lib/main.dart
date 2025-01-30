@@ -1,6 +1,7 @@
 import 'package:campconnect/routes/app_router.dart';
 import 'package:campconnect/services/firebase_options.dart';
 import 'package:campconnect/theme/app_theme.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await FirebaseAuth.instance.setPersistence(Persistence.LOCAL); // Enable persistent login
   debugPrint("Initializing Firebase...");
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
