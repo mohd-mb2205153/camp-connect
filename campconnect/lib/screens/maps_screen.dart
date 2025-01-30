@@ -242,36 +242,24 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
       );
     }
 
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) async {
-        if (!didPop) {
-          context.goNamed(AppRouter.home.name);
-          ref
-              .read(showNavBarNotifierProvider.notifier)
-              .setActiveBottomNavBar(0);
-        }
-        return;
-      },
-      child: Scaffold(
-        extendBodyBehindAppBar: true,
-        appBar: _buildAppBar(camp: selectedCamp),
-        body: Stack(
-          children: [
-            _buildGoogleMap(),
-            _buildHeader(context),
-            AnimatedOpacity(
-              opacity: polyLineCordinates.isNotEmpty ? 1.0 : 0.0,
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-              child: polyLineCordinates.isNotEmpty
-                  ? Stack(children: [_routeCancelButton(context)])
-                  : const SizedBox.shrink(),
-            ),
-          ],
-        ),
-        floatingActionButton: _buildFloatingActionButtons(context),
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: _buildAppBar(camp: selectedCamp),
+      body: Stack(
+        children: [
+          _buildGoogleMap(),
+          _buildHeader(context),
+          AnimatedOpacity(
+            opacity: polyLineCordinates.isNotEmpty ? 1.0 : 0.0,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            child: polyLineCordinates.isNotEmpty
+                ? Stack(children: [_routeCancelButton(context)])
+                : const SizedBox.shrink(),
+          ),
+        ],
       ),
+      floatingActionButton: _buildFloatingActionButtons(context),
     );
   }
 
@@ -1090,7 +1078,12 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
         },
       ),
     ).whenComplete(() {
-      // context.pushNamed(AppRouter.map.name);
+      setState(() {
+        loggedUser = ref.read(loggedInUserNotifierProvider);
+        savedOrTeachingCamps =
+            isTeacher ? loggedUser.teachingCamps : loggedUser.savedCamps;
+      });
+      markers = {};
     });
   }
 }
