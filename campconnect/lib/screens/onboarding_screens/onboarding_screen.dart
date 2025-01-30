@@ -4,6 +4,7 @@ import 'package:campconnect/utils/helper_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
@@ -13,6 +14,8 @@ class OnboardingScreen extends ConsumerStatefulWidget {
 }
 
 class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
+  final String youtubeVideoUrl = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+
   @override
   void initState() {
     super.initState();
@@ -20,6 +23,19 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       FocusScope.of(context).unfocus();
     });
+  }
+
+  void _openYouTubeVideo() async {
+    final Uri url = Uri.parse(youtubeVideoUrl);
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } else {
+      showCustomSnackBar(
+        message: "Could not open the video.",
+        icon: Icons.error,
+        context: context,
+      );
+    }
   }
 
   @override
@@ -52,6 +68,15 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 ),
               ),
             ),
+            Positioned(
+              top: 52,
+              right: 24,
+              child: IconButton(
+                icon: const Icon(Icons.info_outline, color: Colors.white),
+                onPressed: _openYouTubeVideo,
+                tooltip: "Watch Intro Video",
+              ),
+            ),
             Align(
               alignment: Alignment.bottomCenter,
               child: SizedBox(
@@ -82,8 +107,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                               Expanded(
                                 child: Text(
                                   wrapText(
-                                      "We empower safe spaces for learning, growth, and brighter futures, even in challenging times.",
-                                      37),
+                                    "We empower safe spaces for learning, growth, and brighter futures, even in challenging times.",
+                                    37,
+                                  ),
                                   style: getTextStyle('small',
                                       color: Colors.white),
                                   overflow: TextOverflow.visible,
@@ -106,9 +132,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                           ),
                           addVerticalSpace(20),
                           RegisterButton(
-                              onRegisterPressed: () =>
-                                  context.pushReplacementNamed(
-                                      AppRouter.register.name)),
+                            onRegisterPressed: () => context
+                                .pushReplacementNamed(AppRouter.register.name),
+                          ),
                         ],
                       ),
                     ),
