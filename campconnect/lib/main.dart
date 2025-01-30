@@ -9,7 +9,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await FirebaseAuth.instance.setPersistence(Persistence.LOCAL); // Enable persistent login
   debugPrint("Initializing Firebase...");
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
