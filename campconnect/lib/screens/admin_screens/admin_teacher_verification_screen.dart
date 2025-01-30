@@ -382,32 +382,99 @@ class _AdminTeacherVerificationScreenState
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Change Verification Status"),
-          content: DropdownButton<String>(
-            value: selectedStatus,
-            isExpanded: true,
-            onChanged: (String? newValue) {
-              if (newValue != null) {
-                setState(() {
-                  teacher.verificationStatus = newValue;
-                });
-                Navigator.pop(context);
-              }
-            },
-            items: statuses.map((status) {
-              return DropdownMenuItem<String>(
-                value: status,
-                child: Text(status.toUpperCase()),
-              );
-            }).toList(),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel"),
-            ),
-          ],
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              backgroundColor: const Color.fromARGB(255, 0, 36, 39),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              title: Text(
+                "Change Verification Status",
+                style: getTextStyle("mediumBold", color: Colors.white),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Select a new status:",
+                    style: getTextStyle("small", color: Colors.white70),
+                  ),
+                  addVerticalSpace(10),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.white12,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        dropdownColor: const Color.fromARGB(255, 0, 36, 39),
+                        value: selectedStatus,
+                        isExpanded: true,
+                        style: getTextStyle("small", color: Colors.white),
+                        onChanged: (String? newValue) {
+                          if (newValue != null) {
+                            setState(() {
+                              selectedStatus = newValue;
+                            });
+                          }
+                        },
+                        items: statuses.map((status) {
+                          return DropdownMenuItem<String>(
+                            value: status,
+                            child: Text(
+                              status.toUpperCase(),
+                              style: getTextStyle("smallBold",
+                                  color: AppColors.lightTeal),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  child: Text(
+                    'Cancel',
+                    style:
+                        getTextStyle("smallBold", color: AppColors.lightTeal),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                TextButton(
+                  child: Text(
+                    'Confirm',
+                    style:
+                        getTextStyle("smallBold", color: AppColors.lightTeal),
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      teacher.verificationStatus = selectedStatus;
+                    });
+                    Navigator.of(context).pop();
+
+                    // Show SnackBar notification
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'Status changed to ${selectedStatus.toUpperCase()}',
+                          style: getTextStyle('small', color: AppColors.white),
+                        ),
+                        duration: const Duration(seconds: 3),
+                        backgroundColor: AppColors.teal,
+                      ),
+                    );
+                  },
+                ),
+              ],
+            );
+          },
         );
       },
     );
@@ -525,15 +592,42 @@ class _AdminTeacherVerificationScreenState
     );
   }
 
-  void _deleteTeacher(Teacher teacher) {
-    setState(() {
-      // Assuming you have a list `teachers` storing the teacher data
-      // teachers.removeWhere((t) => t.id == teacher.id);
-    });
+  void _deleteTeacher(Teacher teacher) async {
+    bool confirmed = await _showDeleteConfirmationDialog(context, teacher);
+    if (!confirmed) return;
 
+    // ref
+    //     .read(teacherProviderNotifier.notifier)
+    //     .removeTeachingCampFromTeacher(teacherId: teacher.id!, campId: widget.campId);
+    // await ref.read(campProviderNotifier.notifier).removeCampsClass(
+    //     targetTeacherId: teacher.id!, campId: widget.campId);
+
+    // setState(() {
+    //   teachers.remove(teacher);
+    // });
+
+    // Show deletion confirmation
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('${teacher.firstName} has been deleted')),
+      SnackBar(content: Text('${teacher.firstName} has been removed')),
     );
+  }
+
+  Future<bool> _showDeleteConfirmationDialog(
+      BuildContext context, Teacher teacher) async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return ConfirmationDialog(
+              type: 'Remove',
+              title: 'Remove ${teacher.firstName} ${teacher.lastName}?',
+              content: 'Are you sure you want to remove this teacher?',
+              onConfirm: () {
+                Navigator.pop(context, true);
+              },
+            );
+          },
+        ) ??
+        false;
   }
 
   Widget buildChips(List<String>? items) {
