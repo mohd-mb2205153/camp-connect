@@ -2,6 +2,7 @@ import 'package:campconnect/providers/camp_provider.dart';
 import 'package:campconnect/providers/class_provider.dart';
 import 'package:campconnect/providers/show_nav_bar_provider.dart';
 import 'package:campconnect/providers/loggedinuser_provider.dart';
+import 'package:campconnect/providers/teacher_provider.dart';
 import 'package:campconnect/routes/app_router.dart';
 import 'package:campconnect/services/auth_services.dart';
 import 'package:campconnect/theme/constants.dart';
@@ -98,7 +99,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Hello Admin, ${adminUser?.firstName ?? "Guest"}",
+                          "Hello ${adminUser?.firstName ?? "Guest"}",
                           style: getTextStyle("largeBold", color: Colors.white),
                         ),
                         addVerticalSpace(8),
@@ -157,7 +158,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          height: 120,
+          height: 80,
           margin: const EdgeInsets.symmetric(horizontal: 6),
           decoration: BoxDecoration(
             color: AppColors.orange,
@@ -170,11 +171,11 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
               ),
             ],
           ),
-          child: Column(
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 40, color: Colors.white),
-              addVerticalSpace(8),
+              Icon(icon, size: 20, color: Colors.white),
+              addHorizontalSpace(8),
               Text(
                 title,
                 textAlign: TextAlign.center,
@@ -188,6 +189,11 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
   }
 
   GestureDetector buildLatestNotices() {
+    final teachers = ref.watch(teacherProviderNotifier).value ?? [];
+    int pendingCount = teachers
+        .where((teacher) => teacher.verificationStatus == 'pending')
+        .length;
+
     return GestureDetector(
       onTap: _launchNoticesURL,
       child: Container(
@@ -202,43 +208,55 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
             children: [
               Row(
                 children: [
-                  Icon(Icons.info, color: Colors.white, size: 20),
+                  Icon(Icons.notifications_active,
+                      color: Colors.white, size: 20),
                   const SizedBox(width: 8),
                   Text(
-                    "Latest Notices",
+                    "Admin Notifications",
                     style: getTextStyle("mediumBold", color: Colors.white),
                   ),
                 ],
               ),
               addVerticalSpace(12),
               Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(8, 0, 24, 0),
-                    child: Image.asset(
-                      'assets/images/unicef-logo-white.png',
-                      width: 48,
-                      height: 48,
-                      fit: BoxFit.contain,
-                    ),
+                    padding: const EdgeInsets.fromLTRB(8, 0, 16, 0),
+                    child: Icon(Icons.warning_amber_rounded,
+                        size: 36, color: Colors.white),
                   ),
                   Expanded(
                     child: RichText(
                       text: TextSpan(
                         style: getTextStyle("small", color: Colors.white),
                         children: [
-                          const TextSpan(
-                            text:
-                                "UNICEF is offering relief goods and book donations to educational camps.\n\n",
-                          ),
                           TextSpan(
-                            text: "Click here",
+                            text: "🔧 Scheduled Maintenance:\n",
                             style:
                                 getTextStyle("smallBold", color: Colors.white),
                           ),
                           const TextSpan(
-                            text: " for more information.",
+                            text:
+                                "The platform will undergo maintenance on Sunday from 12:00 AM - 3:00 AM.\n\n",
+                          ),
+                          TextSpan(
+                            text: "📋 Pending Verifications:\n",
+                            style:
+                                getTextStyle("smallBold", color: Colors.white),
+                          ),
+                          TextSpan(
+                            text:
+                                "There are $pendingCount teacher verification requests pending approval.\n\n",
+                          ),
+                          TextSpan(
+                            text: "📊 Platform Analytics:\n",
+                            style:
+                                getTextStyle("smallBold", color: Colors.white),
+                          ),
+                          const TextSpan(
+                            text:
+                                "Active users have increased by 18% this month. Check reports for more details.",
                           ),
                         ],
                       ),
