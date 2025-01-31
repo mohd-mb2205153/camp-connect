@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:io';
-
 import 'package:campconnect/models/camp.dart';
 import 'package:campconnect/models/teacher.dart';
 import 'package:campconnect/models/user.dart';
@@ -14,7 +12,6 @@ import 'package:campconnect/utils/helper_widgets.dart';
 import 'package:campconnect/widgets/edit_screen_fields.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
@@ -39,9 +36,9 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
   DateTime? lastUpdatedTime;
   bool hasWifi = true; // check connectivity if needed
   List<String> filteredEduLevels = [];
-  List<String> filteredLanguages = [];
-  List<String> filteredSubjects = [];
-  List<String> filteredAdditional = [];
+  // List<String> filteredLanguages = [];
+  // List<String> filteredSubjects = [];
+  // List<String> filteredAdditional = [];
 
   String? selectedFilterType;
   TextEditingController areaRadiusController = TextEditingController();
@@ -171,9 +168,6 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
   @override
   Widget build(BuildContext context) {
     ref.watch(loggedInUserNotifierProvider);
-    // final student = ref.watch(studentProviderNotifier);
-    // final teacher = ref.watch(teacherProviderNotifier);
-    // final classSchedule = ref.watch(classProviderNotifier);
 
     return ref.watch(campProviderNotifier).when(
           data: (data) => _buildMapScreen(context, data),
@@ -396,7 +390,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
       ),
       builder: (context) {
         return SizedBox(
-          height: screenHeight(context) * .6,
+          height: screenHeight(context) * .45,
           child: StatefulBuilder(
             builder: (BuildContext context, StateSetter setModalState) {
               return Padding(
@@ -416,6 +410,8 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
                                   color: Colors.teal),
                             ),
                             Spacer(),
+                            _buildApplyFilterButton(setModalState),
+                            Spacer(),
                             _buildClearAllFilters(setModalState),
                           ],
                         ),
@@ -430,39 +426,51 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
                           Row(
                             children: [
                               _buildFilterRadio(
-                                  setModalState: setModalState,
-                                  title: 'Educational Level'),
-                              _buildFilterRadio(
-                                  setModalState: setModalState,
-                                  title: 'Languages'),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              _buildFilterRadio(
-                                  setModalState: setModalState,
-                                  title: 'Subjects'),
-                              _buildFilterRadio(
-                                  setModalState: setModalState,
-                                  title: 'Area Radius'),
-                            ],
-                          ),
-                          Expanded(
-                            child: RadioListTile(
-                              title: Text(
-                                'Additional Support',
-                                style: getTextStyle('small',
-                                    color: AppColors.teal),
+                                title: 'Educational Level',
+                                onChanged: (value) {
+                                  setModalState(() {
+                                    areaRadiusController.text = '';
+                                    selectedFilterType = value!;
+                                  });
+                                },
                               ),
-                              value: 'Additional Support',
-                              groupValue: selectedFilterType,
-                              onChanged: (value) {
-                                setModalState(() {
-                                  selectedFilterType = value!;
-                                });
-                              },
-                            ),
+                              _buildFilterRadio(
+                                title: 'Area Radius',
+                                onChanged: (value) {
+                                  setModalState(() {
+                                    filteredEduLevels = [];
+                                    selectedFilterType = value!;
+                                  });
+                                },
+                              ),
+                            ],
                           ),
+                          // Row(
+                          //   children: [
+                          //     _buildFilterRadio(
+                          //         setModalState: setModalState,
+                          //         title: 'Subjects'),
+                          //     _buildFilterRadio(
+                          //         setModalState: setModalState,
+                          //         title: 'Languages'),
+                          //   ],
+                          // ),
+                          // Expanded(
+                          //   child: RadioListTile(
+                          //     title: Text(
+                          //       'Additional Support',
+                          //       style: getTextStyle('small',
+                          //           color: AppColors.teal),
+                          //     ),
+                          //     value: 'Additional Support',
+                          //     groupValue: selectedFilterType,
+                          //     onChanged: (value) {
+                          //       setModalState(() {
+                          //         selectedFilterType = value!;
+                          //       });
+                          //     },
+                          //   ),
+                          // ),
                         ],
                       ),
                       Divider(
@@ -481,124 +489,46 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
                           icon: Icons.school,
                           provider: studentEducationLevelProvider,
                         ),
-                      if (selectedFilterType == 'Languages')
-                        _buildFilterPicker(
-                            setModalState: setModalState,
-                            title: 'Filter Languages',
-                            icon: Icons.language,
-                            filteredList: filteredLanguages,
-                            provider: languagesProvider),
-                      if (selectedFilterType == 'Subjects')
-                        _buildFilterPicker(
-                            setModalState: setModalState,
-                            title: 'Filter Subjects',
-                            icon: Icons.subject,
-                            filteredList: filteredSubjects,
-                            provider: subjectsProvider),
-                      if (selectedFilterType == 'Additional Support')
-                        _buildFilterPicker(
-                            setModalState: setModalState,
-                            title: 'Additional Support',
-                            icon: Icons.health_and_safety_rounded,
-                            filteredList: filteredAdditional,
-                            provider: additionalSupportProvider),
+                      // if (selectedFilterType == 'Languages')
+                      //   _buildFilterPicker(
+                      //       setModalState: setModalState,
+                      //       title: 'Filter Languages',
+                      //       icon: Icons.language,
+                      //       filteredList: filteredLanguages,
+                      //       provider: languagesProvider),
+                      // if (selectedFilterType == 'Subjects')
+                      //   _buildFilterPicker(
+                      //       setModalState: setModalState,
+                      //       title: 'Filter Subjects',
+                      //       icon: Icons.subject,
+                      //       filteredList: filteredSubjects,
+                      //       provider: subjectsProvider),
+                      // if (selectedFilterType == 'Additional Support')
+                      //   _buildFilterPicker(
+                      //       setModalState: setModalState,
+                      //       title: 'Additional Support',
+                      //       icon: Icons.health_and_safety_rounded,
+                      //       filteredList: filteredAdditional,
+                      //       provider: additionalSupportProvider),
                       if (selectedFilterType == 'Area Radius')
-                        Column(
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'Filter Area Radius (Km):',
-                                  style: getTextStyle('medium',
-                                      color: AppColors.teal),
-                                ),
-                                SizedBox(
-                                  width: 150,
-                                  child: EditScreenTextField(
-                                    label: 'Radius',
-                                    controller: areaRadiusController,
-                                    type: TextInputType.number,
-                                  ),
-                                ),
-                              ],
+                            Text(
+                              'Filter Area Radius (Km):',
+                              style:
+                                  getTextStyle('medium', color: AppColors.teal),
                             ),
-                            addVerticalSpace(12),
-                            ElevatedButton(
-                              onPressed: () async {
-                                if (areaRadiusController.text.isEmpty) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      backgroundColor: Colors.orange,
-                                      content: Text(
-                                          'Please enter a radius value (KM)'),
-                                    ),
-                                  );
-                                  return;
-                                }
-                                try {
-                                  //Get current location
-                                  Position position =
-                                      await Geolocator.getCurrentPosition(
-                                    desiredAccuracy: LocationAccuracy.high,
-                                  );
-
-                                  double radius =
-                                      double.parse(areaRadiusController.text);
-
-                                  setModalState(() {
-                                    ref
-                                        .read(campProviderNotifier.notifier)
-                                        .filterByRange(
-                                          position.latitude,
-                                          position.longitude,
-                                          radius,
-                                        );
-
-                                    setState(() {
-                                      markers.clear();
-                                    });
-
-                                    // Pan the camera to users location
-                                    if (_googleMapController != null) {
-                                      _googleMapController!.animateCamera(
-                                        CameraUpdate.newLatLngZoom(
-                                          LatLng(position.latitude,
-                                              position.longitude),
-                                          12,
-                                        ),
-                                      );
-                                    }
-                                  });
-                                  Navigator.pop(context);
-                                } catch (e) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('Error: ${e.toString()}'),
-                                    ),
-                                  );
-                                  print(e);
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                elevation: 2,
-                                backgroundColor: AppColors.teal,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 2,
-                                  horizontal: 70,
-                                ),
-                              ),
-                              child: Text(
-                                "Apply Filter",
-                                style: getTextStyle("smallBold",
-                                    color: AppColors.white),
+                            SizedBox(
+                              width: 150,
+                              child: EditScreenTextField(
+                                label: 'Radius',
+                                controller: areaRadiusController,
+                                type: TextInputType.number,
                               ),
                             ),
                           ],
-                        )
+                        ),
                     ],
                   ),
                 ),
@@ -607,11 +537,85 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
           ),
         );
       },
+    ).whenComplete(() {
+      setState(
+        () {
+          markers.clear();
+        },
+      );
+      filteredEduLevels = [];
+      areaRadiusController.text = '';
+    });
+  }
+
+  ElevatedButton _buildApplyFilterButton(StateSetter setModalState) {
+    return ElevatedButton(
+      onPressed: () async {
+        if (areaRadiusController.text.isNotEmpty) {
+          ref.read(campProviderNotifier.notifier).initializeCamps();
+          try {
+            //Get current location
+            Position position = await Geolocator.getCurrentPosition(
+              desiredAccuracy: LocationAccuracy.high,
+            );
+
+            double radius = double.parse(areaRadiusController.text);
+
+            setModalState(() {
+              ref.read(campProviderNotifier.notifier).filterByRange(
+                    position.latitude,
+                    position.longitude,
+                    radius,
+                  );
+
+              // Pan the camera to users location
+              if (_googleMapController != null) {
+                _googleMapController!.animateCamera(
+                  CameraUpdate.newLatLngZoom(
+                    LatLng(position.latitude, position.longitude),
+                    12,
+                  ),
+                );
+              }
+            });
+            Navigator.pop(context);
+          } catch (e) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Error: ${e.toString()}'),
+              ),
+            );
+            print(e);
+          }
+        }
+        if (filteredEduLevels.isNotEmpty) {
+          setState(() {
+            ref
+                .read(campProviderNotifier.notifier)
+                .filterByEducationLevel(filteredEduLevels);
+          });
+        }
+      },
+      style: ElevatedButton.styleFrom(
+        elevation: 2,
+        backgroundColor: AppColors.teal,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+        ),
+        padding: const EdgeInsets.symmetric(
+          vertical: 2,
+          horizontal: 10,
+        ),
+      ),
+      child: Text(
+        "Apply",
+        style: getTextStyle("smallBold", color: AppColors.white),
+      ),
     );
   }
 
   Widget _buildFilterRadio(
-      {required StateSetter setModalState, required String title}) {
+      {required String title, required Function(String?)? onChanged}) {
     return Expanded(
       child: RadioListTile(
         title: Text(
@@ -620,11 +624,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
         ),
         value: title,
         groupValue: selectedFilterType,
-        onChanged: (value) {
-          setModalState(() {
-            selectedFilterType = value!;
-          });
-        },
+        onChanged: onChanged,
       ),
     );
   }
@@ -681,19 +681,6 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
                                         if (!filteredList
                                             .contains(list[index])) {
                                           filteredList.add(list[index]);
-                                        }
-
-                                        if (title ==
-                                            'Filter Educational Level') {
-                                          ref
-                                              .read(
-                                                  campProviderNotifier.notifier)
-                                              .filterByEducationLevel(
-                                                  filteredList);
-                                          setState(() {
-                                            markers
-                                                .clear(); // Clear existing markers
-                                          });
                                         }
                                       });
                                       Navigator.pop(context);
@@ -773,12 +760,12 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
   void handleClearFilter() {
     setState(() {
       ref.read(campProviderNotifier.notifier).initializeCamps();
-      filteredAdditional = [];
       filteredEduLevels = [];
-      filteredLanguages = [];
-      filteredSubjects = [];
       areaRadiusController.text = '';
       markers.clear();
+      // filteredAdditional = [];
+      // filteredLanguages = [];
+      // filteredSubjects = [];
     });
   }
 

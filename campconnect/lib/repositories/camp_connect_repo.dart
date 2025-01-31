@@ -89,20 +89,20 @@ class CampConnectRepo {
           .map((doc) => Camp.fromJson(doc.data() as Map<String, dynamic>))
           .toList());
 
-  Stream<List<Camp>> filterCampByAdditionalSupport(List<String> supports) =>
-      campsRef
-          .where("additionalSupport", arrayContainsAny: supports)
-          .snapshots()
-          .map((snapshot) => snapshot.docs
-              .map((doc) => Camp.fromJson(doc.data() as Map<String, dynamic>))
-              .toList());
+  // Stream<List<Camp>> filterCampByAdditionalSupport(List<String> supports) =>
+  //     campsRef
+  //         .where("additionalSupport", arrayContainsAny: supports)
+  //         .snapshots()
+  //         .map((snapshot) => snapshot.docs
+  //             .map((doc) => Camp.fromJson(doc.data() as Map<String, dynamic>))
+  //             .toList());
 
-  Stream<List<Camp>> filterCampByLanguage(List<String> languages) => campsRef
-      .where("languages", arrayContainsAny: languages)
-      .snapshots()
-      .map((snapshot) => snapshot.docs
-          .map((doc) => Camp.fromJson(doc.data() as Map<String, dynamic>))
-          .toList());
+  // Stream<List<Camp>> filterCampByLanguage(List<String> languages) => campsRef
+  //     .where("languages", arrayContainsAny: languages)
+  //     .snapshots()
+  //     .map((snapshot) => snapshot.docs
+  //         .map((doc) => Camp.fromJson(doc.data() as Map<String, dynamic>))
+  //         .toList());
 
   Future<List<Camp>> filterCampByName(String queryName) async {
     final querySnapshot = await campsRef
@@ -188,21 +188,6 @@ class CampConnectRepo {
       return 0;
     }
   }
-
-  // Future<void> addCampToTeacher({
-  //   required String teacherId,
-  //   required String campId,
-  //   required String teachingCamps,
-  // }) async {
-  //   try {
-  //     final teacherRef = teachersRef.doc(teacherId);
-  //     await teacherRef.update({
-  //       teachingCamps: FieldValue.arrayUnion([campId]),
-  //     });
-  //   } catch (e) {
-  //     throw Exception("Failed to update $teachingCamps for teacher: $e");
-  //   }
-  // }
 
   Future<void> addTeacher(Teacher teacher) async {
     final docId = teachersRef.doc().id;
