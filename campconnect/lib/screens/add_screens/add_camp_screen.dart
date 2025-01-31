@@ -30,10 +30,12 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
   final nameController = TextEditingController();
   final descriptionController = TextEditingController();
   final statusOfResourcesController = TextEditingController();
+  final campCapacityController = TextEditingController();
 
   final FocusNode campNameFocus = FocusNode();
   final FocusNode campDescriptionFocus = FocusNode();
   final FocusNode campStatusOfResourcesFocus = FocusNode();
+  final FocusNode campCapacityFocus = FocusNode();
 
   String? locationString;
   List<String>? latlng;
@@ -131,6 +133,7 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
         statusOfResources: statusOfResourcesController.text,
         additionalSupport: selectedAdditionalSupports,
         languages: selectedLanguages,
+        capacity: int.parse(campCapacityController.text),
       );
 
       try {
@@ -288,6 +291,35 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
                 buildAdditionalSupportPicker(),
                 addVerticalSpace(12),
                 buildLanguages(),
+                addVerticalSpace(12),
+                Column(
+                  children: [
+                    Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Camp Capacity",
+                              textAlign: TextAlign.start,
+                              style: getTextStyle("small",
+                                  color: AppColors.lightTeal),
+                            ),
+                          ],
+                        ),
+                        buildTextArea(
+                          controller: campCapacityController,
+                          hintText: "Enter the capacity of the camp",
+                          focusNode: campCapacityFocus,
+                          prefixIcon: Icon(
+                            Icons.water,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
                 addVerticalSpace(16),
                 Padding(
                   padding: const EdgeInsets.only(bottom: 60),
@@ -298,6 +330,17 @@ class _AddCampScreenState extends ConsumerState<AddCampScreen> {
                           if (nameController.text.isNotEmpty &&
                               descriptionController.text.isNotEmpty &&
                               selectedEducationalLevels.isNotEmpty) {
+                            int? capacity =
+                                int.tryParse(campCapacityController.text);
+                            if (capacity == null || capacity <= 0) {
+                              showCustomSnackBar(
+                                message:
+                                    "Please enter a valid camp capacity greater than 0.",
+                                icon: Icons.error,
+                                context: context,
+                              );
+                              return;
+                            }
                             addCamp();
                             ref
                                 .read(showNavBarNotifierProvider.notifier)

@@ -177,6 +177,18 @@ class CampConnectRepo {
     }
   }
 
+  Future<int> getSavedStudentCountForCamp(String campId) async {
+    try {
+      final querySnapshot =
+          await studentsRef.where("savedCamps", arrayContains: campId).get();
+
+      return querySnapshot.size;
+    } catch (e) {
+      print("Error fetching saved students count: $e");
+      return 0;
+    }
+  }
+
   // Future<void> addCampToTeacher({
   //   required String teacherId,
   //   required String campId,

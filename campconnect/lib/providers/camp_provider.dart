@@ -136,6 +136,10 @@ class CampProvider extends AsyncNotifier<List<Camp>> {
     }
   }
 
+  Future<int> getSavedStudentCountForCamp(String campId) async {
+    return await _repo.getSavedStudentCountForCamp(campId);
+  }
+
   Future<List<Camp>> filterByName(String queryName) {
     return _repo.filterCampByName(queryName);
   }
@@ -150,3 +154,10 @@ First index latidude, Second index longitude.
 */
 final selectedCampLocationProvider =
     StateProvider<List<double>?>((ref) => null);
+
+final savedStudentCountProvider =
+    FutureProvider.family<int, String>((ref, campId) async {
+  return await ref
+      .watch(campProviderNotifier.notifier)
+      .getSavedStudentCountForCamp(campId);
+});

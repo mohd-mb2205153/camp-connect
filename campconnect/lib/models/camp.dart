@@ -12,6 +12,7 @@ class Camp {
   List<String>?
       additionalSupport; // Additional support offered (e.g., trauma support, wifi, etc.)
   List<String>? languages;
+  int capacity;
 
   Camp({
     this.id,
@@ -25,6 +26,7 @@ class Camp {
     required this.statusOfResources,
     this.additionalSupport,
     this.languages,
+    this.capacity = 0,
   });
 
   void addClass(String classId) {
@@ -54,6 +56,7 @@ class Camp {
           : [],
       languages:
           json['languages'] != null ? List<String>.from(json['languages']) : [],
+      capacity: json['capacity'] ?? 0,
     );
   }
 
@@ -70,6 +73,7 @@ class Camp {
       "statusOfResources": statusOfResources,
       "additionalSupport": additionalSupport ?? [],
       "languages": languages,
+      "capacity": capacity,
     };
   }
 }

@@ -1063,6 +1063,7 @@ class CampDetailsModal extends ConsumerStatefulWidget {
 
 class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
   Camp? camp;
+  int savedStudentCount = 0;
   late bool isSaved;
   late bool isTeaching;
 
@@ -1070,6 +1071,21 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
   void initState() {
     super.initState();
     initializeStates();
+    fetchSavedStudentCount();
+  }
+
+  void fetchSavedStudentCount() async {
+    if (widget.campId.isNotEmpty) {
+      int count = await ref
+          .read(campProviderNotifier.notifier)
+          .getSavedStudentCountForCamp(widget.campId);
+
+      if (mounted) {
+        setState(() {
+          savedStudentCount = count;
+        });
+      }
+    }
   }
 
   void initializeStates() {
@@ -1166,6 +1182,10 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
             addVerticalSpace(12),
             _buildOptions(context, widget.campId),
             addVerticalSpace(12),
+            _buildSectionTitle("Current Capacity"),
+            addVerticalSpace(12),
+            _buildCapacity(),
+            addVerticalSpace(12),
             _buildStatusOfResources(),
             addVerticalSpace(12),
             _buildSectionTitle("Offered Educational Levels"),
@@ -1180,6 +1200,41 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
                 AppColors.orange),
             addVerticalSpace(12),
           ],
+        ),
+      ),
+    );
+  }
+
+  Padding _buildCapacity() {
+    final savedStudentCount =
+        ref.watch(savedStudentCountProvider(widget.campId));
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+      child: Chip(
+        backgroundColor: AppColors.orange,
+        avatar: Icon(
+          Icons.person,
+          color: Colors.white,
+          size: 16,
+        ),
+        label: savedStudentCount.when(
+          data: (count) => Text(
+            "Enrolled $count/${camp?.capacity ?? 0} Students",
+            style: getTextStyle('small', color: Colors.white),
+          ),
+          loading: () => Text(
+            "Loading...",
+            style: getTextStyle('small', color: Colors.white),
+          ),
+          error: (err, _) => Text(
+            "Error",
+            style: getTextStyle('small', color: Colors.white),
+          ),
+        ),
+        shape: RoundedRectangleBorder(
+          side: const BorderSide(color: Colors.transparent),
+          borderRadius: BorderRadius.circular(20),
         ),
       ),
     );
