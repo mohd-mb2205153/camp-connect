@@ -42,7 +42,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
   List<String> filteredLanguages = [];
   List<String> filteredSubjects = [];
   List<String> filteredAdditional = [];
-  
+
   String? selectedFilterType;
   TextEditingController areaRadiusController = TextEditingController();
 
@@ -63,6 +63,8 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
   List<LatLng> polyLineCordinates = [];
   List<String> savedOrTeachingCamps = [];
 
+  DateTime? _lastWifiConnectionTime;
+
   @override
   void initState() {
     super.initState();
@@ -73,9 +75,13 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
 
     Timer.periodic(const Duration(seconds: 8), (timer) {
       if (mounted) {
-        setState(() {
-          lastUpdatedTime = DateTime.now();
-          checkWifiStatus().then((status) => hasWifi = status);
+        checkWifiStatus().then((status) {
+          if (status) {
+            _lastWifiConnectionTime = DateTime.now();
+          }
+          setState(() {
+            hasWifi = status;
+          });
         });
       } else {
         timer.cancel();
@@ -85,7 +91,34 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
 
   Future<bool> checkWifiStatus() async {
     final connectivityResult = await Connectivity().checkConnectivity();
-    return connectivityResult == ConnectivityResult.wifi;
+    bool wifiConnected = connectivityResult == ConnectivityResult.wifi;
+
+    if (!wifiConnected && _lastWifiConnectionTime == null) {
+      _lastWifiConnectionTime = DateTime.now();
+    }
+
+    return wifiConnected;
+  }
+
+  String getTimeDifferenceString(DateTime timestamp) {
+    final now = DateTime.now();
+    final difference = now.difference(timestamp);
+
+    if (difference.inSeconds < 60) {
+      return "${difference.inSeconds} seconds ago";
+    } else if (difference.inMinutes < 60) {
+      return "${difference.inMinutes} minutes ago";
+    } else if (difference.inHours < 24) {
+      return "${difference.inHours} hours ago";
+    } else if (difference.inDays < 7) {
+      return "${difference.inDays} days ago";
+    } else if (difference.inDays < 30) {
+      return "${(difference.inDays / 7).floor()} weeks ago";
+    } else if (difference.inDays < 365) {
+      return "${(difference.inDays / 30).floor()} months ago";
+    } else {
+      return "${(difference.inDays / 365).floor()} years ago";
+    }
   }
 
   void initializeUserDetails() {
@@ -132,27 +165,6 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
       result.points.forEach((PointLatLng point) =>
           polyLineCordinates.add(LatLng(point.latitude, point.longitude)));
       setState(() {});
-    }
-  }
-
-  String getTimeDifferenceString(DateTime timestamp) {
-    final now = DateTime.now();
-    final difference = now.difference(timestamp);
-
-    if (difference.inSeconds < 60) {
-      return "${difference.inSeconds} seconds ago";
-    } else if (difference.inMinutes < 60) {
-      return "${difference.inMinutes} minutes ago";
-    } else if (difference.inHours < 24) {
-      return "${difference.inHours} hours ago";
-    } else if (difference.inDays < 7) {
-      return "${difference.inDays} days ago";
-    } else if (difference.inDays < 30) {
-      return "${(difference.inDays / 7).floor()} weeks ago";
-    } else if (difference.inDays < 365) {
-      return "${(difference.inDays / 30).floor()} months ago";
-    } else {
-      return "${(difference.inDays / 365).floor()} years ago";
     }
   }
 
@@ -794,14 +806,14 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
 
   Widget _buildLastUpdatedText() {
     String displayText;
-    if (lastUpdatedTime == null) {
-      displayText = "Last Updated: Never";
-    } else if (hasWifi) {
+
+    if (hasWifi) {
       displayText = "Last Updated: Now";
+    } else if (_lastWifiConnectionTime != null) {
+      displayText =
+          "Last Updated: ${getTimeDifferenceString(_lastWifiConnectionTime!)}";
     } else {
-      // displayText =
-      //     "Last Updated: ${getTimeDifferenceString(lastUpdatedTime!)}";
-      displayText = "Last Updated: THIS IS A PLACEHOLDER";
+      displayText = "Last Updated: Unknown";
     }
 
     return Text(
