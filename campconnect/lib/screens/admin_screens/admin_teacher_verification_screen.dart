@@ -18,6 +18,7 @@ class _AdminTeacherVerificationScreenState
     extends ConsumerState<AdminTeacherVerificationScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  List<Teacher> statusList = [];
 
   @override
   void initState() {
@@ -115,13 +116,10 @@ class _AdminTeacherVerificationScreenState
   Widget _buildTeacherList(String status) {
     return Consumer(
       builder: (context, ref, child) {
-        final teachersAsync = ref
-            .watch(teacherProviderNotifier.notifier)
-            .getTeachersByStatus(status)
-            .asStream();
-
-        return StreamBuilder<List<Teacher>>(
-          stream: teachersAsync,
+        return FutureBuilder(
+          future: ref
+              .read(teacherProviderNotifier.notifier)
+              .getTeachersByStatus(status),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -129,13 +127,12 @@ class _AdminTeacherVerificationScreenState
             if (!snapshot.hasData || snapshot.data!.isEmpty) {
               return const EmptyScreen();
             }
-
-            final teachers = snapshot.data!;
+            statusList = List<Teacher>.from(snapshot.data!);
             return ListView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: teachers.length,
+              itemCount: statusList.length,
               itemBuilder: (context, index) {
-                return _buildTeacherCard(teachers[index]);
+                return _buildTeacherCard(statusList[index]);
               },
             );
           },
@@ -257,7 +254,7 @@ class _AdminTeacherVerificationScreenState
       context: context,
       builder: (BuildContext context) {
         return StatefulBuilder(
-          builder: (context, setState) {
+          builder: (context, setModalState) {
             return AlertDialog(
               backgroundColor: const Color.fromARGB(255, 0, 36, 39),
               shape: RoundedRectangleBorder(
@@ -290,7 +287,7 @@ class _AdminTeacherVerificationScreenState
                         style: getTextStyle("small", color: Colors.white),
                         onChanged: (String? newValue) {
                           if (newValue != null) {
-                            setState(() {
+                            setModalState(() {
                               selectedStatus = newValue;
                             });
                           }
@@ -333,6 +330,9 @@ class _AdminTeacherVerificationScreenState
                     ref
                         .read(teacherProviderNotifier.notifier)
                         .updateTeacher(teacher);
+                    setState(() {
+                      statusList.remove(teacher);
+                    });
                     Navigator.of(context).pop();
 
                     ScaffoldMessenger.of(context).showSnackBar(
