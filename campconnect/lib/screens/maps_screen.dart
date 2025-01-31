@@ -1220,7 +1220,7 @@ class _CampDetailsModalState extends ConsumerState<CampDetailsModal> {
         ),
         label: savedStudentCount.when(
           data: (count) => Text(
-            "Enrolled $count/${camp?.capacity ?? 0} Students",
+            "Enrolled $count out of ${camp?.capacity ?? 0} Students",
             style: getTextStyle('small', color: Colors.white),
           ),
           loading: () => Text(
