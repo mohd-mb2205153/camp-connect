@@ -357,6 +357,9 @@ class _AdminTeacherVerificationScreenState
 
   void _deleteTeacher(Teacher teacher) async {
     ref.read(teacherProviderNotifier.notifier).deleteTeacher(teacher);
+    setState(() {
+      statusList.remove(teacher);
+    });
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('${teacher.firstName} has been removed')),
     );

@@ -45,14 +45,14 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
 
   GoogleMapController? _googleMapController;
   static const CameraPosition initialCameraPosition =
-      CameraPosition(target: LatLng(25.3, 51.487), zoom: 10);
+      CameraPosition(target: LatLng(31.525033, 34.442683), zoom: 10);
 
   Set<Marker> markers = {};
   BitmapDescriptor customIcon = BitmapDescriptor.defaultMarker;
   BitmapDescriptor liveLocationIcon = BitmapDescriptor.defaultMarker;
   BitmapDescriptor customIconMarked = BitmapDescriptor.defaultMarker;
 
-  late StreamSubscription<Position> _positionStreamSubscription;
+  // late StreamSubscription<Position> _positionStreamSubscription;
   bool _followUserLocation = true;
 
   late LatLng currentLocation;
@@ -66,7 +66,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
   void initState() {
     super.initState();
     _loadCustomIcons();
-    _startLiveLocationUpdates();
+    // _startLiveLocationUpdates();
     initializeUserDetails();
     ref.read(campProviderNotifier.notifier).initializeCamps();
 
@@ -141,7 +141,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
 
   @override
   void dispose() {
-    _positionStreamSubscription.cancel();
+    // _positionStreamSubscription.cancel();
     _googleMapController?.dispose();
     areaRadiusController.dispose();
     super.dispose();
@@ -151,8 +151,7 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
     PolylinePoints polylinePoints = PolylinePoints();
     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
         request: PolylineRequest(
-            origin: PointLatLng(
-                currentLocation.latitude, currentLocation.longitude),
+            origin: PointLatLng(31.525033, 34.442683),
             destination: PointLatLng(destinationCampLocation.latitude,
                 destinationCampLocation.longitude),
             mode: TravelMode.walking),
@@ -206,14 +205,15 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
     });
   }
 
-  void _startLiveLocationUpdates() {
-    _positionStreamSubscription = Geolocator.getPositionStream(
-      locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
-    ).listen(_updateLiveLocationMarker);
-  }
+  // void _startLiveLocationUpdates() {
+  //   _positionStreamSubscription = Geolocator.getPositionStream(
+  //     locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
+  //   ).listen(_updateLiveLocationMarker);
+  // }
 
   void _updateLiveLocationMarker(Position position) {
-    LatLng userLocation = LatLng(position.latitude, position.longitude);
+    //LatLng userLocation = LatLng(position.latitude, position.longitude);
+    LatLng userLocation = LatLng(31.525033, 34.442683);
 
     if (mounted) {
       setState(() {
@@ -945,8 +945,8 @@ class _MapsScreenState extends ConsumerState<MapsScreen> {
           distanceFilter: 10,
         ),
       );
-
-      LatLng userLocation = LatLng(position.latitude, position.longitude);
+      // LatLng userLocation = LatLng(position.latitude, position.longitude);
+      LatLng userLocation = LatLng(31.525033, 34.442683);
 
       if (_googleMapController != null) {
         _googleMapController!.animateCamera(
