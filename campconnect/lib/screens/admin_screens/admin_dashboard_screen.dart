@@ -1,6 +1,5 @@
 import 'package:campconnect/providers/camp_provider.dart';
 import 'package:campconnect/providers/class_provider.dart';
-import 'package:campconnect/providers/show_nav_bar_provider.dart';
 import 'package:campconnect/providers/loggedinuser_provider.dart';
 import 'package:campconnect/providers/teacher_provider.dart';
 import 'package:campconnect/routes/app_router.dart';
