@@ -164,6 +164,19 @@ class CampConnectRepo {
     }
   }
 
+  Future<List<Teacher>> getTeachersByStatus(String status) async {
+    try {
+      final querySnapshot = await teachersRef
+          .where('verificationStatus', isEqualTo: status)
+          .get();
+      return querySnapshot.docs
+          .map((doc) => Teacher.fromJson(doc.data() as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      throw Exception('Error fetching teachers with status $status: $e');
+    }
+  }
+
   // Future<void> addCampToTeacher({
   //   required String teacherId,
   //   required String campId,

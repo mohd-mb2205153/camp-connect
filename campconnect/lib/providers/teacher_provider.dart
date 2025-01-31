@@ -53,6 +53,15 @@ class TeacherProvider extends AsyncNotifier<List<Teacher>> {
       ..add(teacher));
   }
 
+  Future<List<Teacher>> getTeachersByStatus(String status) async {
+    try {
+      return await _repo.getTeachersByStatus(status);
+    } catch (e) {
+      state = AsyncError(e, StackTrace.current);
+      rethrow;
+    }
+  }
+
   Future<void> addCampToTeacher(
       {required String teacherId, required String campId}) async {
     try {

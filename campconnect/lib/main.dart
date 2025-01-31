@@ -16,7 +16,7 @@ void main() async {
   );
   debugPrint("Firebase initialized. Starting app...");
 
-  GoRouter router = await AppRouter.router; // Wait for the router
+  GoRouter router = await AppRouter.router;
   runApp(ProviderScope(
       child: MyApp(
     router: router,

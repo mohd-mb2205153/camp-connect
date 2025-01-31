@@ -1,11 +1,5 @@
 import 'package:campconnect/models/teacher.dart';
-import 'package:campconnect/theme/constants.dart';
-import 'package:campconnect/utils/helper_widgets.dart';
-import 'package:campconnect/widgets/empty_screen.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import 'package:campconnect/models/teacher.dart';
+import 'package:campconnect/providers/teacher_provider.dart';
 import 'package:campconnect/theme/constants.dart';
 import 'package:campconnect/utils/helper_widgets.dart';
 import 'package:campconnect/widgets/empty_screen.dart';
@@ -118,94 +112,36 @@ class _AdminTeacherVerificationScreenState
     );
   }
 
-  List<Teacher> _generateDummyTeachers(String status) {
-    return [
-      Teacher(
-        id: 'T001',
-        firstName: 'John',
-        lastName: 'Doe',
-        dateOfBirth: DateTime(1990, 7, 20),
-        nationality: 'American',
-        primaryLanguages: ['English'],
-        phoneCode: '+1',
-        mobileNumber: '1234567890',
-        email: 'johndoe@example.com',
-        highestEducationLevel: 'Bachelors',
-        certifications: ['Teaching Certificate'],
-        teachingExperience: 5,
-        areasOfExpertise: ['Mathematics', 'Physics'],
-        willingnessToTravel: 'Within 10 km',
-        availabilitySchedule: 'Mon-Fri 9 AM - 5 PM',
-        preferredCampDuration: 'Short-term',
-        teachingCamps: ['Camp Alpha'],
-        verificationStatus: status,
-      ),
-      Teacher(
-        id: 'T002',
-        firstName: 'Jane',
-        lastName: 'Smith',
-        dateOfBirth: DateTime(1985, 5, 15),
-        nationality: 'British',
-        primaryLanguages: ['English'],
-        phoneCode: '+44',
-        mobileNumber: '9876543210',
-        email: 'janesmith@example.com',
-        highestEducationLevel: 'Masters',
-        certifications: ['TESOL Certification', 'PGCE'],
-        teachingExperience: 8,
-        areasOfExpertise: ['Biology', 'Chemistry'],
-        willingnessToTravel: 'Within 20 km',
-        availabilitySchedule: 'Tue-Thu 10 AM - 3 PM',
-        preferredCampDuration: '1 week',
-        teachingCamps: ['Camp Beta'],
-        verificationStatus: status,
-      ),
-      Teacher(
-        id: 'T003',
-        firstName: 'Alice',
-        lastName: 'Johnson',
-        dateOfBirth: DateTime(1992, 11, 10),
-        nationality: 'Canadian',
-        primaryLanguages: ['English', 'French'],
-        phoneCode: '+1',
-        mobileNumber: '4567890123',
-        email: 'alicejohnson@example.com',
-        highestEducationLevel: 'PhD',
-        certifications: ['Teaching License'],
-        teachingExperience: 10,
-        areasOfExpertise: ['Computer Science', 'Physics'],
-        willingnessToTravel: 'Remote Only',
-        availabilitySchedule: 'Flexible',
-        preferredCampDuration: 'Long-term',
-        teachingCamps: ['Camp Gamma'],
-        verificationStatus: status,
-      ),
-    ];
-  }
-
-  Color _getStatusColor(String status) {
-    switch (status.toLowerCase()) {
-      case 'pending':
-        return AppColors.orange;
-      case 'rejected':
-        return Colors.red;
-      default:
-        return AppColors.lightTeal;
-    }
-  }
-
   Widget _buildTeacherList(String status) {
-    List<Teacher> teachers = _generateDummyTeachers(status);
+    return Consumer(
+      builder: (context, ref, child) {
+        final teachersAsync = ref
+            .watch(teacherProviderNotifier.notifier)
+            .getTeachersByStatus(status)
+            .asStream();
 
-    return teachers.isEmpty
-        ? const EmptyScreen()
-        : ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: teachers.length,
-            itemBuilder: (context, index) {
-              return _buildTeacherCard(teachers[index]);
-            },
-          );
+        return StreamBuilder<List<Teacher>>(
+          stream: teachersAsync,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const EmptyScreen();
+            }
+
+            final teachers = snapshot.data!;
+            return ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: teachers.length,
+              itemBuilder: (context, index) {
+                return _buildTeacherCard(teachers[index]);
+              },
+            );
+          },
+        );
+      },
+    );
   }
 
   Widget _buildTeacherCard(Teacher teacher) {
@@ -221,7 +157,6 @@ class _AdminTeacherVerificationScreenState
           child: Stack(
             children: [
               Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Container(
                     height: 8,
@@ -235,43 +170,19 @@ class _AdminTeacherVerificationScreenState
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Row(
-                          children: [
-                            Container(
-                              width: 35,
-                              height: 35,
-                              decoration: const BoxDecoration(
-                                color: AppColors.lightTeal,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.person_2_rounded,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                            ),
-                            const SizedBox(width: 15),
-                            Expanded(
-                              child: Text(
-                                '${teacher.firstName} ${teacher.lastName}',
-                                style: getTextStyle('mediumBold',
-                                    color: Colors.white),
-                              ),
-                            ),
-                          ],
+                        Text(
+                          '${teacher.firstName} ${teacher.lastName}',
+                          style:
+                              getTextStyle('mediumBold', color: Colors.white),
                         ),
                         addVerticalSpace(6),
                         Text(
-                          'Contact: ${teacher.phoneCode} ${teacher.mobileNumber}',
-                          style: getTextStyle('small', color: Colors.white),
-                        ),
+                            'Contact: ${teacher.phoneCode} ${teacher.mobileNumber}',
+                            style: getTextStyle('small', color: Colors.white)),
                         addVerticalSpace(4),
-                        Text(
-                          'Email: ${teacher.email}',
-                          style: getTextStyle('small', color: Colors.white),
-                        ),
+                        Text('Email: ${teacher.email}',
+                            style: getTextStyle('small', color: Colors.white)),
                       ],
                     ),
                   ),
@@ -284,10 +195,7 @@ class _AdminTeacherVerificationScreenState
                   onTap: () {
                     _showTeacherOptionsBottomSheet(context, teacher);
                   },
-                  child: const Icon(
-                    Icons.more_horiz,
-                    color: Colors.white,
-                  ),
+                  child: const Icon(Icons.more_horiz, color: Colors.white),
                 ),
               ),
             ],
@@ -297,49 +205,29 @@ class _AdminTeacherVerificationScreenState
     );
   }
 
-  Widget _buildActionButton({
-    required IconData icon,
-    required Color color,
-    required String tooltip,
-    required VoidCallback onTap,
-  }) {
-    return IconButton(
-      icon: Icon(icon, color: color, size: 20),
-      tooltip: tooltip,
-      onPressed: onTap,
-      padding: EdgeInsets.zero,
-      constraints: BoxConstraints(),
-    );
-  }
-
   void _showTeacherOptionsBottomSheet(BuildContext context, Teacher teacher) {
     showModalBottomSheet(
       backgroundColor: AppColors.darkTeal,
       context: context,
       builder: (context) {
         return Container(
-          height: 200,
           padding: const EdgeInsets.all(16.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
                 leading: const Icon(Icons.visibility, color: Colors.white),
-                title: Text(
-                  'View Details',
-                  style: getTextStyle("mediumBold", color: Colors.white),
-                ),
+                title: Text('View Details',
+                    style: getTextStyle("mediumBold", color: Colors.white)),
                 onTap: () {
-                  Navigator.pop(context); // Close Bottom Sheet
+                  Navigator.pop(context);
                   _showTeacherDetailsDialog(context, teacher);
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.edit, color: Colors.white),
-                title: Text(
-                  'Change Status',
-                  style: getTextStyle("mediumBold", color: Colors.white),
-                ),
+                title: Text('Change Status',
+                    style: getTextStyle("mediumBold", color: Colors.white)),
                 onTap: () {
                   Navigator.pop(context);
                   _showStatusChangeDialog(context, teacher);
@@ -347,10 +235,8 @@ class _AdminTeacherVerificationScreenState
               ),
               ListTile(
                 leading: const Icon(Icons.delete, color: Colors.white),
-                title: Text(
-                  'Delete Teacher',
-                  style: getTextStyle("mediumBold", color: Colors.white),
-                ),
+                title: Text('Delete Teacher',
+                    style: getTextStyle("mediumBold", color: Colors.white)),
                 onTap: () {
                   Navigator.pop(context);
                   _deleteTeacher(teacher);
@@ -441,10 +327,12 @@ class _AdminTeacherVerificationScreenState
                     style:
                         getTextStyle("smallBold", color: AppColors.lightTeal),
                   ),
-                  onPressed: () {
-                    setState(() {
-                      teacher.verificationStatus = selectedStatus;
-                    });
+                  onPressed: () async {
+                    teacher =
+                        teacher.copyWith(verificationStatus: selectedStatus);
+                    ref
+                        .read(teacherProviderNotifier.notifier)
+                        .updateTeacher(teacher);
                     Navigator.of(context).pop();
 
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -464,6 +352,13 @@ class _AdminTeacherVerificationScreenState
           },
         );
       },
+    );
+  }
+
+  void _deleteTeacher(Teacher teacher) async {
+    ref.read(teacherProviderNotifier.notifier).deleteTeacher(teacher);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('${teacher.firstName} has been removed')),
     );
   }
 
@@ -565,43 +460,6 @@ class _AdminTeacherVerificationScreenState
     );
   }
 
-  void _deleteTeacher(Teacher teacher) async {
-    bool confirmed = await _showDeleteConfirmationDialog(context, teacher);
-    if (!confirmed) return;
-
-    // ref
-    //     .read(teacherProviderNotifier.notifier)
-    //     .removeTeachingCampFromTeacher(teacherId: teacher.id!, campId: widget.campId);
-    // await ref.read(campProviderNotifier.notifier).removeCampsClass(
-    //     targetTeacherId: teacher.id!, campId: widget.campId);
-
-    // setState(() {
-    //   teachers.remove(teacher);
-    // });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('${teacher.firstName} has been removed')),
-    );
-  }
-
-  Future<bool> _showDeleteConfirmationDialog(
-      BuildContext context, Teacher teacher) async {
-    return await showDialog<bool>(
-          context: context,
-          builder: (BuildContext context) {
-            return ConfirmationDialog(
-              type: 'Remove',
-              title: 'Remove ${teacher.firstName} ${teacher.lastName}?',
-              content: 'Are you sure you want to remove this teacher?',
-              onConfirm: () {
-                Navigator.pop(context, true);
-              },
-            );
-          },
-        ) ??
-        false;
-  }
-
   Widget buildChips(List<String>? items) {
     return Wrap(
       children: (items ?? []).map((item) {
@@ -623,5 +481,16 @@ class _AdminTeacherVerificationScreenState
         );
       }).toList(),
     );
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return AppColors.orange;
+      case 'rejected':
+        return Colors.red;
+      default:
+        return AppColors.lightTeal;
+    }
   }
 }
