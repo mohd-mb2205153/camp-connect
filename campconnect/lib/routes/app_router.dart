@@ -1,4 +1,5 @@
 import 'package:campconnect/models/user.dart' as userModel;
+import 'package:campconnect/providers/loggedinuser_provider.dart';
 import 'package:campconnect/screens/add_screens/add_camp_location_screen.dart';
 import 'package:campconnect/screens/add_screens/add_camp_screen.dart';
 import 'package:campconnect/screens/admin_screens/admin_dashboard_screen.dart';
@@ -90,7 +91,7 @@ class AppRouter {
     if (token != null && user != null) {
       return home.path; // User is remembered, go to home
     } else {
-      return login.path; // Otherwise, go to login
+      return onboarding.path; // Otherwise, go to login
     }
   }
 

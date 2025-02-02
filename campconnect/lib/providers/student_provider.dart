@@ -1,7 +1,9 @@
 import 'package:campconnect/models/student.dart';
 import 'package:campconnect/providers/loggedinuser_provider.dart';
 import 'package:campconnect/providers/repo_provider.dart';
+import 'package:campconnect/providers/show_nav_bar_provider.dart';
 import 'package:campconnect/repositories/camp_connect_repo.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class StudentProvider extends AsyncNotifier<List<Student>> {
@@ -49,6 +51,10 @@ class StudentProvider extends AsyncNotifier<List<Student>> {
     Student? student = await _repo.getStudentById(studentId);
     student!.savedCamps.remove(campId);
     updateStudent(student);
+  }
+
+  Future<Student?> getStudentByEmail(String email) async {
+    return await _repo.getStudentByEmail(email);
   }
 }
 
