@@ -126,6 +126,23 @@ class CampConnectRepo {
             (snapshot) =>
                 Student.fromJson(snapshot.data() as Map<String, dynamic>),
           );
+  Future<Student?> getStudentByEmail(String email) async {
+    try {
+      //Isssue is here
+      final querySnapshot =
+          await studentsRef.where('email', isEqualTo: email).limit(1).get();
+      if (querySnapshot.docs.isNotEmpty) {
+        // Convert document to Student object
+        return Student.fromJson(
+            querySnapshot.docs.first.data() as Map<String, dynamic>);
+      }
+      print("No student found");
+      return null;
+    } catch (e) {
+      print("Error fetching student: $e");
+      return null;
+    }
+  }
 
   Future<void> addStudent(Student student) async {
     final docId = studentsRef.doc().id;
