@@ -5,6 +5,7 @@ import 'package:campconnect/utils/helper_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../providers/show_nav_bar_provider.dart';
 import '../../services/auth_services.dart';
@@ -156,6 +157,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               buildMenuItem(Icons.power_settings_new, 'Logout', () async {
                 await AuthService().signout(context: context);
                 ref.read(loggedInUserNotifierProvider.notifier).clearUser();
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                await prefs.remove('jwt_token');
+                await prefs.remove('email');
                 context.go(AppRouter.onboarding.path);
               }),
             ],
