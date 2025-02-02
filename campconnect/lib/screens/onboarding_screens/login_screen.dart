@@ -73,7 +73,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Future<void> getJwtToken() async {
     String? token = await FirebaseAuth.instance.currentUser
         ?.getIdToken(); // Firebase JWT token
-    print("This is the user token: $token");
+    print("This is the user 1st login token: $token");
     if (token != null) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('jwt_token', token); // Store token
@@ -101,11 +101,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           .collection('students')
           .where('email', isEqualTo: email)
           .get();
+      
+      //Saving the email address of the user locally, for future JWT authentication 
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('email', email);
 
       if (studentDoc.docs.isNotEmpty) {
         final student = Student.fromJson(studentDoc.docs.first.data());
         ref.read(loggedInUserNotifierProvider.notifier).setStudent(student);
         ref.read(showNavBarNotifierProvider.notifier).setActiveBottomNavBar(0);
+        await getJwtToken(); //Should be outside the condition
         context.replaceNamed(AppRouter.home.name);
         return;
       }
