@@ -6,7 +6,7 @@ CampConnect is a Flutter-based mobile application designed to bridge the gap bet
 
 Project Video:
 
-[https://youtu.be/NW1u85gMUBk?si=q1L-S18u7zzF3_0v](https://youtu.be/NW1u85gMUBk?si=q1L-S18u7zzF3_0v)
+[![Video Title](https://img.youtube.com/vi/NW1u85gMUBk/0.jpg)](https://www.youtube.com/watch?v=NW1u85gMUBk)
 ---
 
 ## Installation and Setup
