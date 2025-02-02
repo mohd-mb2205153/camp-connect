@@ -4,7 +4,7 @@
 
 CampConnect is a Flutter-based mobile application designed to bridge the gap between displaced students and educational opportunities. The app uses geolocation and real-time data to connect users with nearby educational camps, resources, and mentors, fostering access to structured learning and a supportive community.
 
-Project Video:
+## Project Video:
 
 [![Video Title](https://img.youtube.com/vi/NW1u85gMUBk/0.jpg)](https://www.youtube.com/watch?v=NW1u85gMUBk)
 ---
