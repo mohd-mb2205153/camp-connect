@@ -42,12 +42,12 @@ CampConnect is a Flutter-based mobile application designed to bridge the gap bet
     flutter run
     ```
 - **Sign-in on the App:**
-  - Log in as Student using the given credential:
-    - Username: peter@gmail.com
-    - Password: peter123
-  - Log in as Teacher using the given credential:
+  - Log in as a Student using the given credential:
     - Username: ali@gmail.com
     - Password: ali123
+  - Log in as a Teacher using the given credential:
+    - Username: johnson@gmail.com
+    - Password: johnson123
 
 ## Future Plans
 
@@ -70,4 +70,4 @@ We have exciting plans to enhance the functionality of our app in the future:
 
 ## License
 
-This project is licensed under the GPL License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the GPL License. For details, see the [LICENSE](LICENSE) file.
